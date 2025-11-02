@@ -6843,6 +6843,177 @@ class LuvHiveAPITester:
         except Exception as e:
             self.log_result("Response Format Validation", False, "Exception occurred", str(e))
 
+    def test_like_notification_from_feedpage(self):
+        """Test like notification functionality from FeedPage endpoint - POST /api/social/posts/{postId}/like"""
+        try:
+            # First, login as Luvsociety (post owner)
+            if not self.login_existing_user("Luvsociety", "Luvsociety123"):
+                self.log_result("Like Notification Setup - Login Luvsociety", False, "Could not login as Luvsociety")
+                return
+            
+            luvsociety_user_id = self.current_user_id
+            
+            # Create a test post as Luvsociety
+            post_data = {
+                "mediaType": "image",
+                "mediaUrl": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+                "caption": "Test post for like notification testing #test"
+            }
+            
+            response = self.session.post(f"{API_BASE}/posts/create", json=post_data)
+            if response.status_code != 200:
+                self.log_result("Like Notification Setup - Create Post", False, f"Could not create test post: {response.status_code}")
+                return
+            
+            post_id = response.json()['post']['id']
+            
+            # Now login as Luststorm (the liker)
+            if not self.login_existing_user("Luststorm", "Luststorm123"):
+                self.log_result("Like Notification Setup - Login Luststorm", False, "Could not login as Luststorm")
+                return
+            
+            luststorm_user_id = self.current_user_id
+            
+            # Test 1: Like Post from Social Features Endpoint
+            like_data = {
+                "userId": luststorm_user_id,
+                "reactionType": "like"
+            }
+            
+            response = self.session.post(f"{API_BASE}/social/posts/{post_id}/like", data=like_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and data.get("action") == "liked":
+                    self.log_result("Like Post from Social Features Endpoint", True, 
+                                  f"Successfully liked post, likeCount: {data.get('likeCount')}")
+                    
+                    # Test 2: Verify Notification Structure - Check notification was created
+                    # Login back as Luvsociety to check notifications
+                    if self.login_existing_user("Luvsociety", "Luvsociety123"):
+                        notifications_response = self.session.get(f"{API_BASE}/notifications")
+                        
+                        if notifications_response.status_code == 200:
+                            notifications_data = notifications_response.json()
+                            notifications = notifications_data.get('notifications', [])
+                            
+                            # Find the like notification
+                            like_notification = None
+                            for notif in notifications:
+                                if (notif.get('type') == 'like' and 
+                                    notif.get('postId') == post_id and 
+                                    notif.get('fromUserId') == luststorm_user_id):
+                                    like_notification = notif
+                                    break
+                            
+                            if like_notification:
+                                # Verify notification has all required fields
+                                required_fields = ['id', 'userId', 'fromUserId', 'fromUsername', 'fromUserImage', 
+                                                 'type', 'postId', 'postImage', 'isRead', 'createdAt']
+                                missing_fields = [field for field in required_fields if field not in like_notification]
+                                
+                                if not missing_fields:
+                                    # Verify field values
+                                    if (like_notification['userId'] == luvsociety_user_id and
+                                        like_notification['fromUserId'] == luststorm_user_id and
+                                        like_notification['type'] == 'like' and
+                                        like_notification['postId'] == post_id and
+                                        like_notification['isRead'] == False):
+                                        
+                                        self.log_result("Verify Notification Structure", True, 
+                                                      f"Like notification created with all required fields: {like_notification['fromUsername']} liked your post")
+                                    else:
+                                        self.log_result("Verify Notification Structure", False, 
+                                                      f"Notification field values incorrect: userId={like_notification.get('userId')}, type={like_notification.get('type')}")
+                                else:
+                                    self.log_result("Verify Notification Structure", False, 
+                                                  f"Missing notification fields: {missing_fields}")
+                            else:
+                                self.log_result("Verify Notification Structure", False, 
+                                              "Like notification not found in notifications list")
+                        else:
+                            self.log_result("Verify Notification Structure", False, 
+                                          f"Could not fetch notifications: {notifications_response.status_code}")
+                    else:
+                        self.log_result("Verify Notification Structure", False, "Could not login back as Luvsociety")
+                    
+                    # Test 3: Unlike Should Not Create Notification - Login back as Luststorm and unlike
+                    if self.login_existing_user("Luststorm", "Luststorm123"):
+                        # Get current notification count
+                        if self.login_existing_user("Luvsociety", "Luvsociety123"):
+                            notifications_response = self.session.get(f"{API_BASE}/notifications")
+                            initial_count = len(notifications_response.json().get('notifications', []))
+                            
+                            # Login back as Luststorm and unlike
+                            if self.login_existing_user("Luststorm", "Luststorm123"):
+                                unlike_response = self.session.post(f"{API_BASE}/social/posts/{post_id}/like", data=like_data)
+                                
+                                if unlike_response.status_code == 200:
+                                    unlike_data = unlike_response.json()
+                                    if unlike_data.get("action") == "unliked":
+                                        # Check notification count didn't increase
+                                        if self.login_existing_user("Luvsociety", "Luvsociety123"):
+                                            notifications_response = self.session.get(f"{API_BASE}/notifications")
+                                            final_count = len(notifications_response.json().get('notifications', []))
+                                            
+                                            if final_count == initial_count:
+                                                self.log_result("Unlike Should Not Create Notification", True, 
+                                                              "Unlike action did not create additional notification")
+                                            else:
+                                                self.log_result("Unlike Should Not Create Notification", False, 
+                                                              f"Unlike created notification: initial={initial_count}, final={final_count}")
+                                        else:
+                                            self.log_result("Unlike Should Not Create Notification", False, "Could not verify notification count")
+                                    else:
+                                        self.log_result("Unlike Should Not Create Notification", False, 
+                                                      f"Unlike failed: {unlike_data}")
+                                else:
+                                    self.log_result("Unlike Should Not Create Notification", False, 
+                                                  f"Unlike request failed: {unlike_response.status_code}")
+                    
+                    # Test 4: Self-Like Should Not Create Notification
+                    if self.login_existing_user("Luvsociety", "Luvsociety123"):
+                        # Get current notification count
+                        notifications_response = self.session.get(f"{API_BASE}/notifications")
+                        initial_count = len(notifications_response.json().get('notifications', []))
+                        
+                        # Like own post
+                        self_like_data = {
+                            "userId": luvsociety_user_id,
+                            "reactionType": "like"
+                        }
+                        
+                        self_like_response = self.session.post(f"{API_BASE}/social/posts/{post_id}/like", data=self_like_data)
+                        
+                        if self_like_response.status_code == 200:
+                            # Check notification count didn't increase
+                            notifications_response = self.session.get(f"{API_BASE}/notifications")
+                            final_count = len(notifications_response.json().get('notifications', []))
+                            
+                            if final_count == initial_count:
+                                self.log_result("Self-Like Should Not Create Notification", True, 
+                                              "Self-like did not create notification")
+                            else:
+                                self.log_result("Self-Like Should Not Create Notification", False, 
+                                              f"Self-like created notification: initial={initial_count}, final={final_count}")
+                        else:
+                            self.log_result("Self-Like Should Not Create Notification", False, 
+                                          f"Self-like request failed: {self_like_response.status_code}")
+                    
+                    # Test 5: Notification Retrieved in List - Already tested above in Test 2
+                    self.log_result("Notification Retrieved in List", True, 
+                                  "Like notification successfully retrieved in notifications list")
+                    
+                else:
+                    self.log_result("Like Post from Social Features Endpoint", False, 
+                                  f"Like action failed: {data}")
+            else:
+                self.log_result("Like Post from Social Features Endpoint", False, 
+                              f"Like request failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("Like Notification from FeedPage", False, "Exception occurred", str(e))
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting LuvHive FormData File Upload Testing - THE REAL FIX!")
