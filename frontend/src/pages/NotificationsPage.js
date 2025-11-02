@@ -105,6 +105,30 @@ const NotificationsPage = ({ user, onLogout }) => {
     }
   };
 
+  const handleNotificationClick = (notif) => {
+    // Handle navigation based on notification type
+    switch (notif.type) {
+      case "like":
+      case "comment":
+        // Navigate to the post detail page
+        if (notif.postId) {
+          navigate(`/post/${notif.postId}`);
+        }
+        break;
+      case "follow":
+      case "follow_request":
+      case "follow_request_accepted":
+      case "started_following":
+        // Navigate to the user's profile
+        navigate(`/profile/${notif.fromUserId}`);
+        break;
+      default:
+        // For unknown types, navigate to profile
+        navigate(`/profile/${notif.fromUserId}`);
+        break;
+    }
+  };
+
   const getNotificationIcon = (type) => {
     switch (type) {
       case "like":
