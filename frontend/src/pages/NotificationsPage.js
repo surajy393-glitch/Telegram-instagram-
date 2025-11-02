@@ -186,8 +186,13 @@ const NotificationsPage = ({ user, onLogout }) => {
                   if (["like", "comment"].includes(notif.type) && notif.postId) {
                     navigate(`/post/${notif.postId}`);
                   } else if (notif.type === "story_like") {
-                    // For story likes, navigate to feed where stories are displayed
-                    navigate('/feed');
+                    // For story likes, navigate to feed with story ID to auto-open
+                    navigate('/feed', { 
+                      state: { 
+                        openStoryId: notif.postId, 
+                        fromUserId: notif.fromUserId 
+                      } 
+                    });
                   } else {
                     // For follow/follow_request/follow_request_accepted/started_following
                     navigate(`/profile/${notif.fromUserId}`);
