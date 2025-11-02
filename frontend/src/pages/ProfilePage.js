@@ -351,9 +351,8 @@ const ProfilePage = ({ user, onLogout }) => {
           setUserPosts([]);
         }
       } else if (error.response?.status === 401) {
-        // Handle expired or invalid tokens
-        console.error("401 Unauthorized - logging out");
-        onLogout();
+        // Don't logout - user may not have permission to view these posts
+        console.error("401 Unauthorized - unable to load posts for this profile");
         setUserPosts([]);
       } else {
         setUserPosts([]);
