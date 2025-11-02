@@ -4648,19 +4648,33 @@ async def archive_story(story_id: str, current_user: User = Depends(get_current_
 # Notifications
 @api_router.get("/notifications")
 async def get_notifications(current_user: User = Depends(get_current_user)):
-    notifications = await db.notifications.find({"userId": current_user.id}).sort("createdAt", -1).to_list(100)
+    notifications = await db.notifications.find(
+        {"userId": current_user.id}
+    ).sort("createdAt", -1).to_list(100)
     
     notifications_list = []
     for notif in notifications:
+        created_at = notif.get("createdAt")
+
+        # Normalize createdAt -> string
+        if hasattr(created_at, "isoformat"):
+            created_at_str = created_at.isoformat()
+        else:
+            # already a string or missing; keep or default to now
+            created_at_str = created_at if isinstance(created_at, str) \
+                else datetime.now(timezone.utc).isoformat()
+
         notifications_list.append({
-            "id": notif["id"],
-            "fromUserId": notif["fromUserId"],
-            "fromUsername": notif["fromUsername"],
+            "id": notif.get("id") or str(uuid4()),
+            "fromUserId": notif.get("fromUserId"),
+            "fromUsername": notif.get("fromUsername"),
             "fromUserImage": notif.get("fromUserImage"),
-            "type": notif["type"],
-            "postId": notif.get("postId"),
-            "isRead": notif.get("isRead", False),
-            "createdAt": notif["createdAt"].isoformat()
+            "type": notif.get("type"),
+            # support both post notifications and story notifications:
+            "postId": notif.get("postId") or notif.get("storyId"),
+            # some old docs used "read" instead of "isRead"
+            "isRead": notif.get("isRead", notif.get("read", False)),
+            "createdAt": created_at_str,
         })
     
     return {"notifications": notifications_list}
