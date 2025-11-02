@@ -260,6 +260,11 @@ async def like_post(postId: str, userId: str = Form(...), reactionType: str = Fo
         if not post:
             raise HTTPException(status_code=404, detail="Post not found")
         
+        # Get user who is liking the post
+        user = await db.users.find_one({"id": userId})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
         likes = post.get("likes", [])
         
         if userId in likes:
@@ -270,6 +275,22 @@ async def like_post(postId: str, userId: str = Form(...), reactionType: str = Fo
             # Like
             likes.append(userId)
             action = "liked"
+            
+            # Create notification if liking someone else's post
+            if post.get("userId") != userId:
+                notification = {
+                    "id": str(uuid4()),
+                    "userId": post.get("userId"),  # Post owner receives notification
+                    "fromUserId": userId,
+                    "fromUsername": user.get("username", "Unknown"),
+                    "fromUserImage": user.get("profileImage"),
+                    "type": "like",
+                    "postId": postId,
+                    "postImage": post.get("imageUrl") or post.get("mediaUrl"),  # Include post image for notification preview
+                    "isRead": False,
+                    "createdAt": datetime.now(timezone.utc)
+                }
+                await db.notifications.insert_one(notification)
         
         # Update post
         await db.posts.update_one(
