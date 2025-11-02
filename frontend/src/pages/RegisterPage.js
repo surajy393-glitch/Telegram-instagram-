@@ -421,7 +421,8 @@ const RegisterPage = ({ onLogin }) => {
       // Fetch a complete user profile after registration to avoid missing fields.
       // This prevents issues with missing ID or profileImage immediately after sign-up.
       try {
-        const meRes = await httpClient.get(`${API}/auth/me`);
+        // Use relative path with httpClient to avoid double /api
+        const meRes = await httpClient.get('/auth/me');
         const fullUser = meRes.data.user || meRes.data;
         
         // Normalize the user object to ensure profileImage field exists
