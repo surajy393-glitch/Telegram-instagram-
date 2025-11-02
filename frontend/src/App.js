@@ -19,6 +19,7 @@ import PostDetailPage from "@/pages/PostDetailPage";
 import ChatPage from "@/pages/ChatPage";
 import TelegramAuthHandler from "@/components/TelegramAuthHandler";
 import { Toaster } from "@/components/ui/toaster";
+import { getToken, setToken } from "@/utils/authClient";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
