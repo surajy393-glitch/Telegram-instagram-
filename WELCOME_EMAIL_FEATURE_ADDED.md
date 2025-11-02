@@ -83,7 +83,7 @@ The `send_welcome_email()` function sends a beautiful HTML email with:
 ### ✅ Environment Variables
 ```bash
 # Already configured in /app/backend/.env
-SENDGRID_API_KEY="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"
+SENDGRID_API_KEY="SG.************************************"  # Redacted for security
 EMAIL_MODE="sendgrid"
 ```
 
