@@ -28,6 +28,16 @@ function App() {
 
   useEffect(() => {
     const loadUser = async () => {
+      // Clean up old generic localStorage keys (migration)
+      if (localStorage.getItem("user")) {
+        console.log("🧹 Cleaning up old generic 'user' key");
+        localStorage.removeItem("user");
+      }
+      if (localStorage.getItem("token")) {
+        console.log("🧹 Cleaning up old generic 'token' key");
+        localStorage.removeItem("token");
+      }
+      
       const token = getToken();
       
       console.log("🔍 App.js: Checking authentication...");
