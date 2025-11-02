@@ -116,13 +116,11 @@ const ProfilePage = ({ user, onLogout }) => {
   useEffect(() => {
     if (isViewingSpecificUser) {
       fetchUserProfile(userId);
-      fetchPendingFollowRequests();  // Fetch pending follow requests
       // Don't fetch posts immediately with URL userId - wait for profile to load
       // Then use the actual ID from viewingUser
     } else {
       fetchProfile();
       fetchUsers();
-      fetchPendingFollowRequests();  // Fetch pending follow requests for own profile
     }
   }, [userId]);
 
