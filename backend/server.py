@@ -5590,9 +5590,22 @@ async def calculate_compatibility(
         if not other_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        # Get user data
-        user1_interests = user1_data.get("interests", "").split(", ") if isinstance(user1_data.get("interests"), str) else []
-        user2_interests = other_user.get("interests", "").split(", ") if isinstance(other_user.get("interests"), str) else []
+        # Get user data - handle both array and string formats
+        user1_interests_raw = user1_data.get("interests", [])
+        if isinstance(user1_interests_raw, str):
+            user1_interests = [i.strip() for i in user1_interests_raw.split(",") if i.strip()]
+        elif isinstance(user1_interests_raw, list):
+            user1_interests = [str(i).strip() for i in user1_interests_raw if i]
+        else:
+            user1_interests = []
+        
+        user2_interests_raw = other_user.get("interests", [])
+        if isinstance(user2_interests_raw, str):
+            user2_interests = [i.strip() for i in user2_interests_raw.split(",") if i.strip()]
+        elif isinstance(user2_interests_raw, list):
+            user2_interests = [str(i).strip() for i in user2_interests_raw if i]
+        else:
+            user2_interests = []
         
         user1_personality = user1_data.get("personalityAnswers", {})
         user2_personality = other_user.get("personalityAnswers", {})
