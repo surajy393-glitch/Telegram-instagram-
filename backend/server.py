@@ -3781,7 +3781,7 @@ async def get_posts_feed(current_user: User = Depends(get_current_user)):
         # Skip posts from private accounts unless the viewer is a follower or the owner
         if post_author:
             is_private = post_author.get("isPrivate", False)
-            followers = post_author.get("followers", [])
+            followers = post_author.get("followers") or []  # ensure list, not None
             if (
                 is_private
                 and current_user.id not in followers
