@@ -464,6 +464,41 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   };
 
+  const acceptFollowRequest = async (fromUserId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${API}/users/${fromUserId}/accept-follow-request`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Remove request from state
+      setIncomingRequests((prev) =>
+        prev.filter((req) => req.fromUserId !== fromUserId)
+      );
+    } catch (error) {
+      console.error("Failed to accept request", error);
+      alert("Failed to accept follow request");
+    }
+  };
+
+  const rejectFollowRequest = async (fromUserId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${API}/users/${fromUserId}/reject-follow-request`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIncomingRequests((prev) =>
+        prev.filter((req) => req.fromUserId !== fromUserId)
+      );
+    } catch (error) {
+      console.error("Failed to reject request", error);
+      alert("Failed to reject follow request");
+    }
+  };
+
   const handleFollowToggle = async (targetUserId, isFollowing, hasRequested) => {
     // Prevent multiple simultaneous follow actions on same user
     if (followingInProgress.has(targetUserId)) {
