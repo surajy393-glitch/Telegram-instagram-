@@ -3785,7 +3785,7 @@ async def get_posts_feed(current_user: User = Depends(get_current_user)):
             if (
                 is_private
                 and current_user.id not in followers
-                and post_author.get("id") != current_user.id
+                and post["userId"] != current_user.id  # compare against post userId
             ):
                 continue  # do not add this post to the feed
         
