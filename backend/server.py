@@ -3759,11 +3759,23 @@ async def get_posts_feed(current_user: User = Depends(get_current_user)):
     
     posts_list = []
     for post in posts:
-        # Get post author's current profile picture, verification status, and founder status
+        # Get post author's current profile picture, verification status, founder status, and privacy info
         post_author = await db.users.find_one(
             {"id": post["userId"]}, 
-            {"isVerified": 1, "isFounder": 1, "profileImage": 1}
+            {"isVerified": 1, "isFounder": 1, "profileImage": 1, "isPrivate": 1, "followers": 1}
         )
+        
+        # Skip posts from private accounts unless the viewer is a follower or the owner
+        if post_author:
+            is_private = post_author.get("isPrivate", False)
+            followers = post_author.get("followers", [])
+            if (
+                is_private
+                and current_user.id not in followers
+                and post_author.get("id") != current_user.id
+            ):
+                continue  # do not add this post to the feed
+        
         is_verified = post_author.get("isVerified", False) if post_author else False
         is_founder = post_author.get("isFounder", False) if post_author else False
         current_profile_image = post_author.get("profileImage") if post_author else post.get("userProfileImage")
