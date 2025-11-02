@@ -79,6 +79,7 @@ const ProfilePage = ({ user, onLogout }) => {
   const [followersLoading, setFollowersLoading] = useState(false);
   const [incomingRequests, setIncomingRequests] = useState([]);
   const [hasIncomingRequestFromViewedUser, setHasIncomingRequestFromViewedUser] = useState(false);
+  const [error, setError] = useState(null);
 
   // Check if we're viewing a specific user or discovery page
   const isViewingSpecificUser = !!userId;
