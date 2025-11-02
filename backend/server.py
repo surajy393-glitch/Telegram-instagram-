@@ -1358,7 +1358,8 @@ async def register_enhanced(
             },
             "interests": [],
             "location": "",
-            "lastUsernameChange": None
+            "lastUsernameChange": None,
+            "telegramId": telegramId if telegramId else None
         }
         
         await db.users.insert_one(user_dict)
