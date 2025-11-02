@@ -2230,7 +2230,7 @@ async def get_verification_status(current_user: User = Depends(get_current_user)
     basic_requirements_met = (
         account_age_days >= 45 and
         bool(getattr(current_user, 'emailVerified', False)) and
-        bool(getattr(current_user, 'phoneVerified', False)) and
+        bool(getattr(current_user, 'mobileVerified', False)) and
         getattr(current_user, 'violationsCount', 0) == 0 and
         profile_complete
     )
@@ -2253,7 +2253,7 @@ async def get_verification_status(current_user: User = Depends(get_current_user)
     criteria = {
         # Identity & Security
         "emailVerified": bool(getattr(current_user, 'emailVerified', False)),
-        "phoneVerified": bool(getattr(current_user, 'phoneVerified', False)),
+        "mobileVerified": bool(getattr(current_user, 'mobileVerified', False)),
         
         # Profile Completeness
         "profileComplete": profile_complete,
