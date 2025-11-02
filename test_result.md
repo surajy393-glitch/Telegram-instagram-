@@ -316,6 +316,18 @@ test_plan:
   luvhive_verified_backend_complete: true
   followers_following_backend_complete: true
 
+  - task: "Like Notification from FeedPage - Social Features"
+    implemented: true
+    working: "NA"
+    file: "backend/social_features.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ LIKE NOTIFICATION FIX IMPLEMENTED in social_features.py (lines 256-307). Added notification creation logic to like_post function when user likes a post from FeedPage. Implementation matches server.py pattern: 1) Fetches user who is liking to get username and profile image, 2) Creates notification only when liking (not unliking) and only if post owner is different from liker, 3) Notification includes: userId (post owner), fromUserId (liker), fromUsername, fromUserImage, type='like', postId, postImage (for preview), isRead=false, createdAt timestamp, 4) Inserts notification into notifications collection. This fix ensures like notifications are sent from both FeedPage (social_features.py) and HomePage (server.py) endpoints. Backend restarted successfully."
+
 agent_communication:
   - agent: "main"
     message: "BACKEND IMPLEMENTATION COMPLETE for 3-dot menu feature. Implemented: 1) Added mutedUsers field to User model and all registration flows, 2) Created mute/unmute endpoints (POST /api/users/{userId}/mute and /api/users/{userId}/unmute) - silent hiding of posts without notifying the muted user, 3) Verified block/unblock endpoints exist and functional, 4) Enhanced report post endpoint to use JSON with detailed report data including all requested categories, 5) Updated feed filtering to exclude both muted and blocked users from feed, 6) Updated explore filtering to exclude both muted and blocked users. Ready for backend testing with deep_testing_backend_v2."
