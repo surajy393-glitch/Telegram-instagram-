@@ -108,6 +108,7 @@ const NotificationsPage = ({ user, onLogout }) => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case "like":
+      case "story_like":
         return <Heart className="w-10 h-10 text-red-500 fill-red-500" />;
       case "comment":
         return <MessageCircle className="w-10 h-10 text-blue-500" />;
@@ -125,6 +126,8 @@ const NotificationsPage = ({ user, onLogout }) => {
     switch (notif.type) {
       case "like":
         return "liked your post";
+      case "story_like":
+        return "liked your story";
       case "comment":
         return "commented on your post";
       case "follow":
