@@ -380,7 +380,7 @@ const SocialSettingsPage = ({ user, onLogout }) => {
 
       {/* Premium Dialog */}
       <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-center text-xl font-bold">👑 Premium Membership</DialogTitle>
             <DialogDescription className="text-center">
