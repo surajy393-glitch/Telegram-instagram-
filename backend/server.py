@@ -3559,12 +3559,25 @@ async def get_stories_feed(current_user: User = Depends(get_current_user)):
     stories_by_user = {}
     for story in stories:
         user_id = story["userId"]
+        
+        # Get user's current profile picture, verification, founder status, and privacy info
+        story_author = await db.users.find_one(
+            {"id": user_id}, 
+            {"isVerified": 1, "isFounder": 1, "profileImage": 1, "isPrivate": 1, "followers": 1}
+        )
+        
+        # Skip private stories unless the viewer is a follower or the owner
+        if story_author:
+            is_private = story_author.get("isPrivate", False)
+            followers = story_author.get("followers", [])
+            if (
+                is_private
+                and current_user.id not in followers
+                and user_id != current_user.id
+            ):
+                continue  # do not show this story
+        
         if user_id not in stories_by_user:
-            # Get user's current profile picture, verification, and founder status
-            story_author = await db.users.find_one(
-                {"id": user_id}, 
-                {"isVerified": 1, "isFounder": 1, "profileImage": 1}
-            )
             is_verified = story_author.get("isVerified", False) if story_author else False
             is_founder = story_author.get("isFounder", False) if story_author else False
             current_profile_image = story_author.get("profileImage") if story_author else story.get("userProfileImage")
