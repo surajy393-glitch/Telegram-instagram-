@@ -179,7 +179,6 @@ const NotificationsPage = ({ user, onLogout }) => {
                   !notif.isRead ? "bg-pink-50/50" : ""
                 }`}
                 data-testid={`notification-${notif.id}`}
-                onClick={() => handleNotificationClick(notif)}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0">
