@@ -451,7 +451,7 @@ const VerificationStatusPage = ({ user }) => {
                 </h4>
                 <div className="space-y-3">
                   {group.criteria.map((criterion) => {
-                    const isVerifiable = (criterion.key === 'emailVerified' || criterion.key === 'phoneVerified') && !criterion.met;
+                    const isVerifiable = (criterion.key === 'emailVerified' || criterion.key === 'mobileVerified') && !criterion.met;
                     
                     return (
                       <div 
