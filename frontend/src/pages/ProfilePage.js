@@ -637,42 +637,6 @@ const ProfilePage = ({ user, onLogout }) => {
         </header>
 
         <div className="container mx-auto px-4 py-8 max-w-2xl">
-          {/* Follow Request Banner - Show if viewing user has sent a request to logged-in user */}
-          {isViewingSpecificUser && pendingFollowRequests.some(req => req.id === userId) && (
-            <div className="glass-effect rounded-2xl p-4 mb-6 border-2 border-pink-200 bg-gradient-to-r from-pink-50 to-rose-50 shadow-lg animate-fadeIn">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={viewingUser?.profileImage || "https://via.placeholder.com/40"}
-                    alt={viewingUser?.username}
-                    className="w-10 h-10 rounded-full object-cover border-2 border-pink-300"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-800">
-                      <span className="text-pink-600">@{viewingUser?.username}</span> wants to follow you
-                    </p>
-                    <p className="text-xs text-gray-500">Approve or delete this follow request</p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => handleAcceptFollowRequest(userId)}
-                    className="bg-pink-500 hover:bg-pink-600 text-white text-sm py-2 px-4 rounded-lg shadow-md transition-all"
-                  >
-                    Confirm
-                  </Button>
-                  <Button
-                    onClick={() => handleRejectFollowRequest(userId)}
-                    variant="outline"
-                    className="border-pink-300 text-pink-600 hover:bg-pink-50 text-sm py-2 px-4 rounded-lg shadow-md transition-all"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* User Profile Card */}
           <div className="glass-effect rounded-3xl p-8 mb-8 shadow-xl animate-fadeIn">
             <div className="text-center">
