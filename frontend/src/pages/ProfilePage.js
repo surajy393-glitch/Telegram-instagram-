@@ -274,10 +274,12 @@ const ProfilePage = ({ user, onLogout }) => {
       setViewingUser(response.data);
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      // Log out if the token is invalid or expired
+      // Don't logout - just show error message
       if (error.response?.status === 401) {
-        console.error("401 Unauthorized - logging out");
-        onLogout();
+        console.error("401 Unauthorized - unable to load profile");
+        setError("Unable to load this profile. It may be private or restricted.");
+      } else {
+        setError("Failed to load profile. Please try again.");
       }
     } finally {
       setLoading(false);
