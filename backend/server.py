@@ -3862,6 +3862,13 @@ async def like_post(post_id: str, current_user: User = Depends(get_current_user)
     
     if current_user.id in likes:
         likes.remove(current_user.id)
+        # Delete like notification when unliking
+        await db.notifications.delete_many({
+            "userId": post["userId"],
+            "fromUserId": current_user.id,
+            "type": "like",
+            "postId": post_id
+        })
     else:
         likes.append(current_user.id)
         
