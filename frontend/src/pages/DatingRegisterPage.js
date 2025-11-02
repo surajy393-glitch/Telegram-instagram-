@@ -573,6 +573,9 @@ const DatingRegisterPage = ({ onLogin }) => {
       });
 
       const token = response.data.access_token;
+      // Store the token using centralized utility
+      setToken(token);
+      
       let fullUser;
       try {
         // Attempt to fetch the complete user record using the new token.
