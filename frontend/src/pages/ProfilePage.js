@@ -273,6 +273,7 @@ const ProfilePage = ({ user, onLogout }) => {
       }
       console.log("Profile fetched successfully:", response.data.username);
       setViewingUser(response.data);
+      setError(null); // Clear any previous errors
     } catch (error) {
       console.error('Error fetching user profile:', error);
       // Don't logout - just show error message
