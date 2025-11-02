@@ -501,6 +501,10 @@ const ProfilePage = ({ user, onLogout }) => {
       setIncomingRequests((prev) =>
         prev.filter((req) => req.fromUserId !== fromUserId)
       );
+      // Hide banner if accepting from viewed user's profile
+      if (fromUserId === viewingUser?.id) {
+        setHasIncomingRequestFromViewedUser(false);
+      }
     } catch (error) {
       console.error("Failed to accept request", error);
       alert("Failed to accept follow request");
@@ -518,6 +522,10 @@ const ProfilePage = ({ user, onLogout }) => {
       setIncomingRequests((prev) =>
         prev.filter((req) => req.fromUserId !== fromUserId)
       );
+      // Hide banner if rejecting from viewed user's profile
+      if (fromUserId === viewingUser?.id) {
+        setHasIncomingRequestFromViewedUser(false);
+      }
     } catch (error) {
       console.error("Failed to reject request", error);
       alert("Failed to reject follow request");
