@@ -767,6 +767,32 @@ const ProfilePage = ({ user, onLogout }) => {
             </div>
           )}
 
+          {/* Banner when the viewed user has requested to follow you */}
+          {!isViewingOwnProfile && hasIncomingRequestFromViewedUser && (
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-2xl animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-gray-800">
+                  @{viewingUser?.username} wants to follow you
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => acceptFollowRequest(viewingUser.id)}
+                    className="bg-pink-500 hover:bg-pink-600 text-white text-sm px-4 rounded-lg"
+                  >
+                    Confirm
+                  </Button>
+                  <Button
+                    onClick={() => rejectFollowRequest(viewingUser.id)}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 text-sm px-4 rounded-lg"
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* User Profile Card */}
           <div className="glass-effect rounded-3xl p-8 mb-8 shadow-xl animate-fadeIn">
             <div className="text-center">
