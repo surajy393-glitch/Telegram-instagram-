@@ -27,8 +27,8 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is authenticated - synchronously load from localStorage
-    const token = localStorage.getItem("token");
+    // Check if user is authenticated - use centralized token getter
+    const token = getToken();
     const userDataString = localStorage.getItem("user");
     
     console.log("🔍 App.js: Checking authentication...");
@@ -44,7 +44,7 @@ function App() {
         setUser(userData);
       } catch (error) {
         console.error("❌ Failed to parse user data:", error);
-        localStorage.removeItem("token");
+        setToken(null); // Clear token using centralized utility
         localStorage.removeItem("user");
       }
     }
@@ -53,7 +53,7 @@ function App() {
 
   const handleLogin = (token, userData) => {
     console.log("🔐 handleLogin called with user:", userData);
-    localStorage.setItem("token", token);
+    setToken(token); // Use centralized token setter
     localStorage.setItem("user", JSON.stringify(userData));
     setIsAuthenticated(true);
     setUser(userData);
@@ -61,7 +61,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    setToken(null); // Clear token using centralized utility
     localStorage.removeItem("user");
     setIsAuthenticated(false);
     setUser(null);
