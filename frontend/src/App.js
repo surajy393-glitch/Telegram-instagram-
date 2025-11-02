@@ -78,11 +78,10 @@ function App() {
     loadUser();
   }, []);
 
-
   const handleLogin = (token, userData) => {
     console.log("🔐 handleLogin called with user:", userData);
     setToken(token); // Use centralized token setter
-    localStorage.setItem("user", JSON.stringify(userData));
+    setUserStorage(userData); // Store in Telegram-scoped storage
     setIsAuthenticated(true);
     setUser(userData);
     console.log("✅ User state updated, profileImage:", userData?.profileImage);
@@ -90,7 +89,7 @@ function App() {
 
   const handleLogout = () => {
     setToken(null); // Clear token using centralized utility
-    localStorage.removeItem("user");
+    setUserStorage(null); // Clear Telegram-scoped user storage
     setIsAuthenticated(false);
     setUser(null);
   };
