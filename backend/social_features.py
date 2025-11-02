@@ -271,6 +271,13 @@ async def like_post(postId: str, userId: str = Form(...), reactionType: str = Fo
             # Unlike
             likes.remove(userId)
             action = "unliked"
+            # Delete like notification when unliking
+            await db.notifications.delete_many({
+                "userId": post.get("userId"),
+                "fromUserId": userId,
+                "type": "like",
+                "postId": postId
+            })
         else:
             # Like
             likes.append(userId)
