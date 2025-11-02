@@ -3530,6 +3530,7 @@ async def like_story(story_id: str, current_user: User = Depends(get_current_use
             type="story_like",
             # reuse postId for downstream routing; include the story id here
             postId=str(story_id),
+            postImage=story.get("mediaUrl")  # Include story image for notification preview
         )
         await db.notifications.insert_one(notification.dict())
     
