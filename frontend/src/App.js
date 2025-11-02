@@ -27,29 +27,68 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is authenticated - use centralized token getter
-    const token = getToken();
-    const userDataString = localStorage.getItem("user");
-    
-    console.log("🔍 App.js: Checking authentication...");
-    console.log("   Token present:", !!token);
-    console.log("   User data present:", !!userDataString);
-    
-    if (token && userDataString) {
-      try {
-        const userData = JSON.parse(userDataString);
-        console.log("✅ User loaded from localStorage:", userData.username);
-        console.log("   Profile Image:", userData.profileImage);
-        setIsAuthenticated(true);
-        setUser(userData);
-      } catch (error) {
-        console.error("❌ Failed to parse user data:", error);
-        setToken(null); // Clear token using centralized utility
-        localStorage.removeItem("user");
+    const loadUser = async () => {
+      const token = getToken();
+      
+      console.log("🔍 App.js: Checking authentication...");
+      console.log("   Token present:", !!token);
+      
+      if (!token) {
+        // No token, check localStorage as fallback
+        const userDataString = localStorage.getItem("user");
+        if (userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            console.log("📱 User loaded from localStorage (no token):", userData.username);
+            setUser(userData);
+          } catch (error) {
+            console.error("❌ Failed to parse localStorage user data:", error);
+            localStorage.removeItem("user");
+          }
+        }
+        setLoading(false);
+        return;
       }
-    }
-    setLoading(false);
+      
+      try {
+        // Fetch fresh user data from API
+        console.log("🔄 Fetching fresh user data from API...");
+        const response = await httpClient.get('/auth/me');
+        const freshUser = response.data;
+        
+        console.log("✅ Fresh user data received:", freshUser.username);
+        console.log("   Premium status:", freshUser.isPremium);
+        console.log("   Profile Image:", freshUser.profileImage);
+        
+        // Update both state and localStorage with fresh data
+        setIsAuthenticated(true);
+        setUser(freshUser);
+        localStorage.setItem("user", JSON.stringify(freshUser));
+      } catch (error) {
+        console.error("❌ Failed to fetch fresh user data:", error);
+        
+        // Fallback to localStorage if API fails
+        const userDataString = localStorage.getItem("user");
+        if (userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            console.log("📱 Fallback to localStorage after API error:", userData.username);
+            setIsAuthenticated(true);
+            setUser(userData);
+          } catch (parseError) {
+            console.error("❌ Failed to parse localStorage fallback:", parseError);
+            setToken(null);
+            localStorage.removeItem("user");
+          }
+        }
+      }
+      
+      setLoading(false);
+    };
+    
+    loadUser();
   }, []);
+
 
   const handleLogin = (token, userData) => {
     console.log("🔐 handleLogin called with user:", userData);
