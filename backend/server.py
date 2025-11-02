@@ -293,6 +293,7 @@ class Notification(BaseModel):
     fromUserImage: Optional[str] = None
     type: str  # "like", "comment", "follow"
     postId: Optional[str] = None  # For like/comment notifications
+    postImage: Optional[str] = None  # Post thumbnail/image for preview
     isRead: bool = False
     createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
