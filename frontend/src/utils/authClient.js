@@ -20,14 +20,11 @@ function getTelegramUserId() {
 }
 
 // Read the persisted JWT and remove extraneous quotes.
-// Also checks Telegram-scoped storage (tg_<id>_token).
+// Only checks Telegram-scoped storage (tg_<id>_token) for strict session isolation.
 export function getToken() {
   const telegramUserId = getTelegramUserId();
   const telegramKey = `tg_${telegramUserId}_token`;
   let stored = localStorage.getItem(telegramKey);
-  if (!stored) {
-    stored = localStorage.getItem('token');
-  }
   if (!stored) return null;
   return stored.replace(/^"+|"+$/g, '');
 }
