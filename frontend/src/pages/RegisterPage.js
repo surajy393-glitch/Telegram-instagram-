@@ -366,7 +366,7 @@ const RegisterPage = ({ onLogin }) => {
 
     try {
       // First register the user with enhanced endpoint
-      const response = await axios.post(`${API}/auth/register-enhanced`, {
+      const response = await httpClient.post(`${API}/auth/register-enhanced`, {
         fullName: formData.fullName,
         username: formData.username,
         email: formData.email,
@@ -393,6 +393,9 @@ const RegisterPage = ({ onLogin }) => {
 
       // Check if auto-login is enabled (mobile-only registration)
       if (response.data.auto_login && response.data.access_token) {
+        // Store the token so future API calls include the Authorization header
+        setToken(response.data.access_token);
+        
         // Auto-login the user
         onLogin(response.data.access_token, response.data.user);
         
@@ -408,13 +411,13 @@ const RegisterPage = ({ onLogin }) => {
       }
 
       const token = response.data.access_token;
+      // Store the token so future API calls include the Authorization header
+      setToken(token);
       
       // Fetch a complete user profile after registration to avoid missing fields.
       // This prevents issues with missing ID or profileImage immediately after sign-up.
       try {
-        const meRes = await axios.get(`${API}/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const meRes = await httpClient.get(`${API}/auth/me`);
         const fullUser = meRes.data.user || meRes.data;
         
         // Normalize the user object to ensure profileImage field exists
