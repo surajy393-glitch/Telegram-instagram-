@@ -166,11 +166,11 @@ const VerificationStatusPage = ({ user }) => {
       progress: verificationData?.currentValues?.emailVerified ? 'Verified' : 'Not verified'
     },
     {
-      key: 'phoneVerified',
+      key: 'mobileVerified',
       label: 'Phone Verified',
       requirement: 'Verify your phone number',
-      met: verificationData?.criteria?.phoneVerified || false,
-      progress: verificationData?.currentValues?.phoneVerified ? 'Verified' : 'Not verified'
+      met: verificationData?.criteria?.mobileVerified || false,
+      progress: verificationData?.currentValues?.mobileVerified ? 'Verified' : 'Not verified'
     }
   ];
 
