@@ -695,6 +695,45 @@ const ProfilePage = ({ user, onLogout }) => {
         </header>
 
         <div className="container mx-auto px-4 py-8 max-w-2xl">
+          {/* Incoming follow requests banner */}
+          {isViewingOwnProfile && incomingRequests.length > 0 && (
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-2xl animate-fadeIn">
+              {incomingRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="flex items-center justify-between py-2 px-1 border-b last:border-b-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={req.fromUserImage || "https://via.placeholder.com/40"}
+                      alt={req.fromUsername}
+                      className="w-10 h-10 rounded-full object-cover border-2 border-pink-200"
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-gray-800">@{req.fromUsername}</span>
+                      <span className="text-sm text-gray-600">wants to follow you</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => acceptFollowRequest(req.fromUserId)}
+                      className="bg-pink-500 hover:bg-pink-600 text-white text-sm px-4 rounded-lg"
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      onClick={() => rejectFollowRequest(req.fromUserId)}
+                      variant="outline"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-100 text-sm px-4 rounded-lg"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* User Profile Card */}
           <div className="glass-effect rounded-3xl p-8 mb-8 shadow-xl animate-fadeIn">
             <div className="text-center">
