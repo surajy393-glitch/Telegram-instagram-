@@ -1236,7 +1236,7 @@ async def register_enhanced(
         if len(clean_username) < 3:
             raise HTTPException(status_code=400, detail="Username must be at least 3 characters")
         
-        if not user_data.password or len(user_data.password) < 6:
+        if not password or len(password) < 6:
             raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
         
         # Email is required only if no mobile number provided
