@@ -125,7 +125,7 @@ class User(BaseModel):
     verificationPathway: Optional[str] = None  # How user got verified (High Engagement, Moderate, etc.)
     isFounder: bool = False  # Official LuvHive/Founder account
     emailVerified: bool = False  # Email verification status
-    phoneVerified: bool = False  # Phone verification status
+    mobileVerified: bool = False  # Phone verification status
     
     # Privacy Controls
     publicProfile: bool = True
