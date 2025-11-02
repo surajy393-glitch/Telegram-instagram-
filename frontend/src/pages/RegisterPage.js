@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { httpClient, setToken } from "@/utils/authClient";
 import {
   Dialog,
   DialogContent,
