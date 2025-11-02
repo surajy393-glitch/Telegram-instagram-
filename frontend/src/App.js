@@ -34,17 +34,11 @@ function App() {
       console.log("   Token present:", !!token);
       
       if (!token) {
-        // No token, check localStorage as fallback
-        const userDataString = localStorage.getItem("user");
-        if (userDataString) {
-          try {
-            const userData = JSON.parse(userDataString);
-            console.log("📱 User loaded from localStorage (no token):", userData.username);
-            setUser(userData);
-          } catch (error) {
-            console.error("❌ Failed to parse localStorage user data:", error);
-            localStorage.removeItem("user");
-          }
+        // No token, check Telegram-scoped storage as fallback
+        const userData = getUser();
+        if (userData) {
+          console.log("📱 User loaded from Telegram-scoped storage (no token):", userData.username);
+          setUser(userData);
         }
         setLoading(false);
         return;
@@ -60,26 +54,21 @@ function App() {
         console.log("   Premium status:", freshUser.isPremium);
         console.log("   Profile Image:", freshUser.profileImage);
         
-        // Update both state and localStorage with fresh data
+        // Update both state and Telegram-scoped storage with fresh data
         setIsAuthenticated(true);
         setUser(freshUser);
-        localStorage.setItem("user", JSON.stringify(freshUser));
+        setUserStorage(freshUser); // Store in Telegram-scoped storage
       } catch (error) {
         console.error("❌ Failed to fetch fresh user data:", error);
         
-        // Fallback to localStorage if API fails
-        const userDataString = localStorage.getItem("user");
-        if (userDataString) {
-          try {
-            const userData = JSON.parse(userDataString);
-            console.log("📱 Fallback to localStorage after API error:", userData.username);
-            setIsAuthenticated(true);
-            setUser(userData);
-          } catch (parseError) {
-            console.error("❌ Failed to parse localStorage fallback:", parseError);
-            setToken(null);
-            localStorage.removeItem("user");
-          }
+        // Fallback to Telegram-scoped storage if API fails
+        const userData = getUser();
+        if (userData) {
+          console.log("📱 Fallback to Telegram-scoped storage after API error:", userData.username);
+          setIsAuthenticated(true);
+          setUser(userData);
+        } else {
+          setToken(null);
         }
       }
       
