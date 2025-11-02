@@ -185,6 +185,9 @@ const NotificationsPage = ({ user, onLogout }) => {
                   // Navigate based on notification type
                   if (["like", "comment"].includes(notif.type) && notif.postId) {
                     navigate(`/post/${notif.postId}`);
+                  } else if (notif.type === "story_like") {
+                    // For story likes, navigate to feed where stories are displayed
+                    navigate('/feed');
                   } else {
                     // For follow/follow_request/follow_request_accepted/started_following
                     navigate(`/profile/${notif.fromUserId}`);
