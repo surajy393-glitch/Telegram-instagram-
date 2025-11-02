@@ -3549,6 +3549,14 @@ async def unlike_story(story_id: str, current_user: User = Depends(get_current_u
         {"$pull": {"likes": current_user.id}}
     )
     
+    # Delete story like notification when unliking
+    await db.notifications.delete_many({
+        "userId": story["userId"],
+        "fromUserId": current_user.id,
+        "type": "story_like",
+        "postId": story_id
+    })
+    
     return {"message": "Story unliked successfully"}
 
 @api_router.get("/stories/feed")
