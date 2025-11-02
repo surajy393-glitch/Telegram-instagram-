@@ -42,6 +42,32 @@ export function setToken(token) {
   }
 }
 
+// Read user data from Telegram-scoped storage
+// Only checks Telegram-scoped storage for strict session isolation.
+export function getUser() {
+  const telegramUserId = getTelegramUserId();
+  const key = `tg_${telegramUserId}_user`;
+  const stored = localStorage.getItem(key);
+  if (!stored) return null;
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    return null;
+  }
+}
+
+// Store user data in Telegram-scoped storage for strict session isolation.
+// If userData is null, clears the Telegram-scoped storage.
+export function setUser(userData) {
+  const telegramUserId = getTelegramUserId();
+  const key = `tg_${telegramUserId}_user`;
+  if (userData) {
+    localStorage.setItem(key, JSON.stringify(userData));
+  } else {
+    localStorage.removeItem(key);
+  }
+}
+
 // Create an axios instance that automatically adds Authorization header.
 // Handles 401 responses globally by removing invalid tokens and redirecting to login.
 export function createHttpClient(
