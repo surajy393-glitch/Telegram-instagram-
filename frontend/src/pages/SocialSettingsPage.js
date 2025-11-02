@@ -122,8 +122,8 @@ const SocialSettingsPage = ({ user, onLogout }) => {
       return;
     }
 
-    // Build proper Telegram Stars invoice URL: https://t.me/$/invoice/<slug>
-    const invoiceUrl = `https://t.me/$/invoice/${invoiceSlug}`;
+    // Build proper Telegram Stars invoice URL: https://t.me/$<slug>
+    const invoiceUrl = `https://t.me/$${invoiceSlug}`;
     console.log("Constructed Invoice URL:", invoiceUrl);
 
     // If inside Telegram and we have a valid invoice URL
