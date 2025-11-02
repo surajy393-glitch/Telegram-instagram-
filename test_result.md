@@ -295,26 +295,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "LuvHive Verified - isVerified field in User model"
-    - "Admin Manual Verification Endpoint"
-    - "Verification Status Endpoint"
-    - "Include isVerified in Feed and Story Endpoints"
-    - "Followers/Following List Endpoints"
-    - "VerifiedBadge Component"
-    - "Display Verified Badge on MyProfilePage"
-    - "Display Verified Badge on ProfilePage"
-    - "Display Verified Badge on Posts in FeedPage"
-    - "Display Verified Badge on Stories in FeedPage"
-    - "Verification Status Page"
-    - "Add LuvHive Verified Button to Settings"
+    - "Like Notification from FeedPage - Social Features"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  backend_testing_needed: false
-  frontend_testing_needed: true
+  backend_testing_needed: true
+  frontend_testing_needed: false
   three_dot_menu_backend_complete: true
   luvhive_verified_backend_complete: true
   followers_following_backend_complete: true
+  like_notification_fix_date: "2025-01-31"
 
   - task: "Like Notification from FeedPage - Social Features"
     implemented: true
