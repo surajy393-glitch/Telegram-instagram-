@@ -7024,15 +7024,19 @@ class LuvHiveAPITester:
         # Try to login with existing user first
         if not self.login_existing_user("Luvsociety", "Luvsociety123"):
             if not self.register_test_user():
-            print("❌ Cannot proceed without authenticated user")
-            return
+                print("❌ Cannot proceed without authenticated user")
+                return
+        
+        print("\n🎯 PRIORITY TEST: Like Notification from FeedPage - Social Features")
+        print("=" * 70)
+        self.test_like_notification_from_feedpage()
         
         if not self.register_second_user():
             print("❌ Cannot proceed without second test user")
             return
         
-        # ========== NEW FORMDATA FILE UPLOAD TESTS (CRITICAL) ==========
-        print("🔥 CRITICAL: Testing NEW FormData File Upload Flow - THE ROOT CAUSE FIX!")
+        # ========== OTHER BACKEND TESTS ==========
+        print("\n🧪 RUNNING OTHER BACKEND TESTS")
         print("-" * 80)
         self.test_new_post_endpoint_with_file()
         self.test_new_story_endpoint_with_file()
