@@ -212,6 +212,19 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   };
 
+  const fetchPendingFollowRequests = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API}/users/follow-requests/pending`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPendingFollowRequests(response.data.requests || []);
+    } catch (error) {
+      console.error("Error fetching pending follow requests:", error);
+      setPendingFollowRequests([]);
+    }
+  };
+
   const fetchUserProfile = async (targetUserId) => {
     try {
       const token = localStorage.getItem('token');
