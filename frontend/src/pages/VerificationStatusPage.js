@@ -284,7 +284,7 @@ const VerificationStatusPage = ({ user }) => {
     
     const basicMissing = [];
     if (!verificationData?.criteria?.emailVerified) basicMissing.push('Verify your email');
-    if (!verificationData?.criteria?.phoneVerified) basicMissing.push('Verify your phone');
+    if (!verificationData?.criteria?.mobileVerified) basicMissing.push('Verify your phone');
     if (!verificationData?.criteria?.profileComplete) basicMissing.push('Complete your profile');
     if (!verificationData?.criteria?.accountAge) {
       const daysLeft = 45 - (verificationData?.currentValues?.accountAgeDays || 0);
