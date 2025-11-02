@@ -3569,7 +3569,7 @@ async def get_stories_feed(current_user: User = Depends(get_current_user)):
         # Skip private stories unless the viewer is a follower or the owner
         if story_author:
             is_private = story_author.get("isPrivate", False)
-            followers = story_author.get("followers", [])
+            followers = story_author.get("followers") or []  # ensure list, not None
             if (
                 is_private
                 and current_user.id not in followers
