@@ -1286,7 +1286,7 @@ async def register_enhanced(
                     )
         
         # Hash password
-        hashed_password = get_password_hash(user_data.password)
+        hashed_password = get_password_hash(password)
         
         # Create complete user
         user_dict = {
@@ -1295,9 +1295,9 @@ async def register_enhanced(
             "username": clean_username,
             "email": clean_email or None,
             "mobileNumber": clean_mobile,
-            "age": user_data.age,
-            "gender": user_data.gender,
-            "country": user_data.country.strip(),
+            "age": age,
+            "gender": gender,
+            "country": country.strip(),
             "password_hash": hashed_password,
             "bio": clean_bio,
             "profileImage": clean_profile_image,
