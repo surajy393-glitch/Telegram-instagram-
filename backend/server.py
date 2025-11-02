@@ -2571,7 +2571,7 @@ async def verify_phone_code(
             # Update user phone and set as verified
             await db.users.update_one(
                 {"id": current_user.id},
-                {"$set": {"mobile": phone_number, "phoneVerified": True}}
+                {"$set": {"mobile": phone_number, "mobileVerified": True}}
             )
             
             # Delete used verification record
