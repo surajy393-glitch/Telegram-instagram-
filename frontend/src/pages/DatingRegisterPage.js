@@ -561,6 +561,17 @@ const DatingRegisterPage = ({ onLogin }) => {
       formDataToSend.append("mobileVerified", mobileVerified);
       formDataToSend.append("personalityAnswers", JSON.stringify(formData.personalityAnswers));
       
+      // Capture Telegram user ID if in Telegram WebApp
+      try {
+        const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+        if (telegramUserId) {
+          formDataToSend.append("telegramId", telegramUserId.toString());
+          console.log("📱 Telegram user ID captured for registration:", telegramUserId);
+        }
+      } catch (e) {
+        console.log("Not in Telegram WebApp context or failed to capture ID:", e);
+      }
+      
       // Add profile photo if uploaded
       if (formData.profilePhoto) {
         formDataToSend.append("profilePhoto", formData.profilePhoto);
