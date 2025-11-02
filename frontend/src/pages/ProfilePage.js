@@ -180,6 +180,30 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   }, [isViewingOwnProfile]);
 
+  useEffect(() => {
+    // Only check when a different user's profile is being viewed
+    const checkIncomingRequestFromViewedUser = async () => {
+      if (!viewingUser || viewingUser.id === user?.id) {
+        setHasIncomingRequestFromViewedUser(false);
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        const resp = await axios.get(`${API}/notifications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const hasReq = (resp.data.notifications || []).some(
+          (n) => n.type === "follow_request" && n.fromUserId === viewingUser.id
+        );
+        setHasIncomingRequestFromViewedUser(hasReq);
+      } catch (err) {
+        console.error("Error checking incoming request", err);
+      }
+    };
+
+    checkIncomingRequestFromViewedUser();
+  }, [viewingUser?.id, user?.id]);
+
   const fetchAccountInfo = async (userId) => {
     console.log("=== fetchAccountInfo CALLED with ID:", userId);
     
