@@ -179,7 +179,13 @@ const LoginPage = ({ onLogin }) => {
         otp: otp.trim()
       });
       
-      onLogin(response.data.access_token, response.data.user);
+      const token = response.data.access_token;
+      const user = response.data.user;
+      
+      // Store token using centralized utility
+      setToken(token);
+      
+      onLogin(token, user);
       toast({
         title: "Success!",
         description: "Successfully logged in via Telegram!",
