@@ -4698,6 +4698,7 @@ async def get_notifications(current_user: User = Depends(get_current_user)):
             "type": notif.get("type"),
             # support both post notifications and story notifications:
             "postId": notif.get("postId") or notif.get("storyId"),
+            "postImage": notif.get("postImage"),  # Include post image for notification preview
             # some old docs used "read" instead of "isRead"
             "isRead": notif.get("isRead", notif.get("read", False)),
             "createdAt": created_at_str,
