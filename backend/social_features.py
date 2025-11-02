@@ -535,11 +535,23 @@ async def get_stories(userId: str, skip: int = 0, limit: int = 50):
         # Format stories
         formatted_stories = []
         for story in stories:
-            # Get story author's current profile picture, verification, and founder status
+            # Get story author's current profile picture, verification, founder status, and privacy info
             story_author = await db.users.find_one(
                 {"id": story.get("userId")}, 
-                {"isVerified": 1, "isFounder": 1, "profileImage": 1}
+                {"isVerified": 1, "isFounder": 1, "profileImage": 1, "isPrivate": 1, "followers": 1}
             )
+            
+            # Skip private stories unless the viewer is a follower or the owner
+            if story_author:
+                is_private = story_author.get("isPrivate", False)
+                followers = story_author.get("followers") or []  # ensure list, not None
+                if (
+                    is_private
+                    and userId not in followers
+                    and story.get("userId") != userId  # viewer is not the owner
+                ):
+                    continue  # do not show this story
+            
             is_verified = story_author.get("isVerified", False) if story_author else False
             is_founder = story_author.get("isFounder", False) if story_author else False
             current_profile_image = story_author.get("profileImage") if story_author else story.get("userAvatar")
