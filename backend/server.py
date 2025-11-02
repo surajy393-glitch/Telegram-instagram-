@@ -1218,7 +1218,8 @@ async def register_enhanced(
     bio: Optional[str] = Form(None),
     emailVerified: bool = Form(False),
     mobileVerified: bool = Form(False),
-    personalityAnswers: Optional[str] = Form(None)
+    personalityAnswers: Optional[str] = Form(None),
+    telegramId: Optional[str] = Form(None)
 ):
     """
     Enhanced registration with mobile number support and file upload
