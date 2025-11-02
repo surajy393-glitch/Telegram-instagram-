@@ -48,6 +48,7 @@ const RegisterPage = ({ onLogin }) => {
     mobileNumber: "",
     age: "",
     gender: "",
+    country: "",
     password: "",
     bio: "",
     profileImage: ""
