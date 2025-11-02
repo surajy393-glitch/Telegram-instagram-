@@ -731,6 +731,13 @@ const ProfilePage = ({ user, onLogout }) => {
         </header>
 
         <div className="container mx-auto px-4 py-8 max-w-2xl">
+          {/* Error Banner */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+              <p>{error}</p>
+            </div>
+          )}
+          
           {/* Incoming follow requests banner */}
           {isViewingOwnProfile && incomingRequests.length > 0 && (
             <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-2xl animate-fadeIn">
