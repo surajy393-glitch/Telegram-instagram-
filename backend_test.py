@@ -7016,15 +7016,14 @@ class LuvHiveAPITester:
 
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting LuvHive FormData File Upload Testing - THE REAL FIX!")
+        print("🚀 Starting LuvHive Backend API Tests - Like Notification Testing")
         print("=" * 80)
         print(f"📡 Testing against: {API_BASE}")
-        print("Bot token: 8494034049:AAFnfoQO2mzJE-AEdI79l5s-i8ygnAf6Hzo")
-        print("Channel: -1003138482795")
-        print()
+        print("=" * 80)
         
-        # Setup phase
-        if not self.register_test_user():
+        # Try to login with existing user first
+        if not self.login_existing_user("Luvsociety", "Luvsociety123"):
+            if not self.register_test_user():
             print("❌ Cannot proceed without authenticated user")
             return
         
