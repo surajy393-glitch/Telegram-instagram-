@@ -1194,18 +1194,41 @@ async def register(user_data: UserRegister):
     }
 
 @api_router.post("/auth/register-enhanced")
-async def register_enhanced(user_data: EnhancedUserRegister):
+async def register_enhanced(
+    fullName: str = Form(...),
+    username: str = Form(...),
+    age: int = Form(...),
+    gender: str = Form(...),
+    country: str = Form(...),
+    password: str = Form(...),
+    email: Optional[str] = Form(None),
+    mobileNumber: Optional[str] = Form(None),
+    city: Optional[str] = Form(None),
+    interests: Optional[str] = Form(None),
+    profilePhoto: Optional[UploadFile] = File(None),
+    profileImage: Optional[str] = Form(None),
+    bio: Optional[str] = Form(None),
+    emailVerified: bool = Form(False),
+    mobileVerified: bool = Form(False),
+    personalityAnswers: Optional[str] = Form(None)
+):
     """
-    Enhanced registration with mobile number support
+    Enhanced registration with mobile number support and file upload
+    Accepts multipart/form-data for file uploads
     """
     try:
         # Validate and clean input
-        clean_username = user_data.username.strip()
-        clean_fullname = user_data.fullName.strip()
-        clean_email = user_data.email.strip().lower() if user_data.email else None
-        clean_mobile = user_data.mobileNumber.strip() if user_data.mobileNumber else None
-        clean_bio = user_data.bio.strip() if user_data.bio else ""
-        clean_profile_image = user_data.profileImage if user_data.profileImage else None
+        clean_username = username.strip()
+        clean_fullname = fullName.strip()
+        clean_email = email.strip().lower() if email else None
+        clean_mobile = mobileNumber.strip() if mobileNumber else None
+        clean_bio = bio.strip() if bio else ""
+        clean_profile_image = profileImage if profileImage else None
+        
+        # Handle file upload if provided
+        if profilePhoto:
+            contents = await profilePhoto.read()
+            clean_profile_image = f"data:image/jpeg;base64,{base64.b64encode(contents).decode()}"
         
         if not clean_username:
             raise HTTPException(status_code=400, detail="Username cannot be empty")
