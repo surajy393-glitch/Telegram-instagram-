@@ -1177,6 +1177,13 @@ async def register(user_data: UserRegister):
     
     access_token = create_access_token(data={"sub": user.id})
     
+    # Send welcome email if email provided
+    if clean_email:
+        try:
+            await send_welcome_email(clean_email, clean_fullname, clean_username)
+        except Exception as e:
+            logger.error(f"Failed to send welcome email: {e}")
+    
     return {
         "message": "Registration successful",
         "access_token": access_token,
