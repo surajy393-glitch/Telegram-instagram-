@@ -65,9 +65,8 @@ const MyProfilePage = ({ user, onLogout }) => {
         // if the backend returns a null/empty profileImage (e.g. right after registration).
         let mergedProfile = { ...profileRes.data };
         try {
-          const localUserString = localStorage.getItem("user");
-          if (localUserString) {
-            const localUser = JSON.parse(localUserString);
+          const localUser = getUser();
+          if (localUser) {
             // Always prefer a base64 image stored locally (from registration)
             // over a null or missing server image.
             if (localUser.profileImage && localUser.profileImage.startsWith('data:')) {
@@ -82,17 +81,16 @@ const MyProfilePage = ({ user, onLogout }) => {
           console.error("❌ Failed to merge local profile image:", mergeErr);
         }
         
-        // Persist merged profile in localStorage so other components see the image
+        // Persist merged profile in Telegram-scoped storage so other components see the image
         try {
-          const localUserString2 = localStorage.getItem("user");
-          if (localUserString2) {
-            const localUser2 = JSON.parse(localUserString2);
+          const localUser2 = getUser();
+          if (localUser2) {
             const updatedUser = { ...localUser2, ...mergedProfile };
-            localStorage.setItem("user", JSON.stringify(updatedUser));
-            console.log("✅ Updated localStorage with merged profile");
+            setUserStorage(updatedUser);
+            console.log("✅ Updated Telegram-scoped storage with merged profile");
           }
         } catch (updateErr) {
-          console.error("❌ Failed to update localStorage with merged profile:", updateErr);
+          console.error("❌ Failed to update Telegram-scoped storage with merged profile:", updateErr);
         }
         
         setProfile(mergedProfile);
