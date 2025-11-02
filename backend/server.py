@@ -1364,8 +1364,12 @@ async def register_enhanced(
         # Generate access token
         access_token = create_access_token(data={"sub": user_dict["id"]})
         
-        # Generate access token for successful registration
-        access_token = create_access_token(data={"sub": user_dict["id"]})
+        # Send welcome email if email provided
+        if clean_email:
+            try:
+                await send_welcome_email(clean_email, clean_fullname, clean_username)
+            except Exception as e:
+                logger.error(f"Failed to send welcome email: {e}")
         
         # ALL successful registrations should auto-login immediately
         # Email verification is optional and can be done later for additional security
