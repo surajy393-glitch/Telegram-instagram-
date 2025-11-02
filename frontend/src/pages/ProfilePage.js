@@ -77,6 +77,7 @@ const ProfilePage = ({ user, onLogout }) => {
   const [followersDialogType, setFollowersDialogType] = useState(null); // 'followers' or 'following'
   const [followersList, setFollowersList] = useState([]);
   const [followersLoading, setFollowersLoading] = useState(false);
+  const [pendingFollowRequests, setPendingFollowRequests] = useState([]);  // New state for pending follow requests
 
   // Check if we're viewing a specific user or discovery page
   const isViewingSpecificUser = !!userId;
