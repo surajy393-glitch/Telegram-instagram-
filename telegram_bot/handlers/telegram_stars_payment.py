@@ -196,7 +196,7 @@ async def successful_payment_callback(update: Update, context: ContextTypes.DEFA
             from motor.motor_asyncio import AsyncIOMotorClient
             mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
             client = AsyncIOMotorClient(mongo_url)
-            db = client.luvhive
+            db = client.luvhive_database
             
             # Update by telegramId
             result = await db.users.update_one(
