@@ -43,9 +43,9 @@ const TelegramAuthHandler = ({ onAuthSuccess }) => {
         if (response.data.success) {
           console.log('✅ Telegram authentication successful');
           
-          // Store token
-          localStorage.setItem('token', response.data.access_token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          // Store token and user in Telegram-scoped storage
+          setToken(response.data.access_token);
+          setUserStorage(response.data.user);
           
           // Call success callback
           if (onAuthSuccess) {
