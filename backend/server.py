@@ -5644,7 +5644,33 @@ async def get_notifications(
             "userId": current_user["id"]
         }).sort("createdAt", -1).skip(skip).limit(limit).to_list(length=limit)
         
-        return {"notifications": notifications}
+        # Normalize each notification
+        notifications_list = []
+        for notif in notifications:
+            created_at = notif.get("createdAt")
+
+            # Normalize createdAt -> string
+            if hasattr(created_at, "isoformat"):
+                created_at_str = created_at.isoformat()
+            else:
+                # already a string or missing; keep or default to now
+                created_at_str = created_at if isinstance(created_at, str) \
+                    else datetime.now(timezone.utc).isoformat()
+
+            notifications_list.append({
+                "id": notif.get("id") or str(uuid4()),
+                "fromUserId": notif.get("fromUserId"),
+                "fromUsername": notif.get("fromUsername"),
+                "fromUserImage": notif.get("fromUserImage"),
+                "type": notif.get("type"),
+                # support both post notifications and story notifications:
+                "postId": notif.get("postId") or notif.get("storyId"),
+                # some old docs used "read" instead of "isRead"
+                "isRead": notif.get("isRead", notif.get("read", False)),
+                "createdAt": created_at_str,
+            })
+        
+        return {"notifications": notifications_list}
     except Exception as e:
         logger.error(f"Error fetching notifications: {e}")
         raise HTTPException(status_code=500, detail=str(e))
