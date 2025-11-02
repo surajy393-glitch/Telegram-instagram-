@@ -257,8 +257,15 @@ const NotificationsPage = ({ user, onLogout }) => {
                   </div>
                   {notif.postId && (
                     <div className="w-12 h-12 flex-shrink-0">
-                      {/* Placeholder for post thumbnail */}
-                      <div className="w-full h-full bg-gray-200 rounded-lg"></div>
+                      {/* Post thumbnail */}
+                      <img 
+                        src={notif.postImage || "https://via.placeholder.com/48?text=Post"} 
+                        alt="Post preview"
+                        className="w-full h-full object-cover rounded-lg"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/48?text=Post";
+                        }}
+                      />
                     </div>
                   )}
                 </div>
