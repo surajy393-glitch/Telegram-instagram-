@@ -29,18 +29,15 @@ export function getToken() {
   return stored.replace(/^"+|"+$/g, '');
 }
 
-// Store token in both regular and Telegram-scoped locations.
-// If token is null, clears both locations.
+// Store token only in Telegram-scoped location for strict session isolation.
+// If token is null, clears the Telegram-scoped location.
 export function setToken(token) {
+  const telegramUserId = getTelegramUserId();
+  const telegramKey = `tg_${telegramUserId}_token`;
+  
   if (token) {
-    localStorage.setItem('token', token);
-    const telegramUserId = getTelegramUserId();
-    const telegramKey = `tg_${telegramUserId}_token`;
     localStorage.setItem(telegramKey, token);
   } else {
-    localStorage.removeItem('token');
-    const telegramUserId = getTelegramUserId();
-    const telegramKey = `tg_${telegramUserId}_token`;
     localStorage.removeItem(telegramKey);
   }
 }
