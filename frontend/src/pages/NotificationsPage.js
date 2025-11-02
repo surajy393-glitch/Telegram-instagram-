@@ -178,6 +178,15 @@ const NotificationsPage = ({ user, onLogout }) => {
                 className={`glass-effect p-4 hover:bg-pink-50 transition-colors cursor-pointer ${
                   !notif.isRead ? "bg-pink-50/50" : ""
                 }`}
+                onClick={() => {
+                  // Navigate based on notification type
+                  if (["like", "comment"].includes(notif.type) && notif.postId) {
+                    navigate(`/post/${notif.postId}`);
+                  } else {
+                    // For follow/follow_request/follow_request_accepted/started_following
+                    navigate(`/profile/${notif.fromUserId}`);
+                  }
+                }}
                 data-testid={`notification-${notif.id}`}
               >
                 <div className="flex items-center gap-3">
