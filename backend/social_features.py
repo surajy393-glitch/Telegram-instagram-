@@ -580,6 +580,10 @@ async def get_stories(userId: str, skip: int = 0, limit: int = 50):
             # Check if user viewed
             user_viewed = userId in story.get("views", [])
             
+            # Check if user liked
+            likes = story.get("likes", [])
+            user_liked = userId in likes
+            
             formatted_stories.append({
                 "id": story["id"],
                 "userId": story.get("userId"),
@@ -590,9 +594,12 @@ async def get_stories(userId: str, skip: int = 0, limit: int = 50):
                 "content": story.get("content"),
                 "storyType": story.get("storyType"),
                 "imageUrl": story.get("imageUrl"),
+                "mediaUrl": story.get("mediaUrl"),  # Add mediaUrl for consistency with backend
                 "isAnonymous": story.get("isAnonymous", False),
                 "views": len(story.get("views", [])),
                 "userViewed": user_viewed,
+                "likes": len(likes),  # Return like count
+                "userLiked": user_liked,  # Return if current user liked this story
                 "createdAt": story["createdAt"].isoformat(),
                 "expiresAt": story["expiresAt"].isoformat(),
                 "timeAgo": get_time_ago(story["createdAt"])
