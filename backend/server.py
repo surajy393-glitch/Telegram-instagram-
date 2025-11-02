@@ -3934,7 +3934,8 @@ async def add_comment_to_post(post_id: str, text: str = Form(...), parentComment
             fromUsername=current_user.username,
             fromUserImage=current_user.profileImage,
             type="comment",
-            postId=post_id
+            postId=post_id,
+            postImage=post.get("mediaUrl")  # Include post image for notification preview
         )
         await db.notifications.insert_one(notification.dict())
     
