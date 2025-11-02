@@ -70,8 +70,6 @@ export function createHttpClient(
         const telegramUserId = getTelegramUserId();
         const telegramKey = `tg_${telegramUserId}_token`;
         const telegramUserKey = `tg_${telegramUserId}_user`;
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
         localStorage.removeItem(telegramKey);
         localStorage.removeItem(telegramUserKey);
         if (typeof window !== 'undefined') {
