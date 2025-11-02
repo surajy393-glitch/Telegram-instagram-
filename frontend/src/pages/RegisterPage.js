@@ -367,13 +367,16 @@ const RegisterPage = ({ onLogin }) => {
 
     try {
       // First register the user with enhanced endpoint
-      const response = await httpClient.post(`${API}/auth/register-enhanced`, {
+      // Use plain axios here (not httpClient) to avoid double /api in URL
+      // Since this is pre-authentication, no token is needed yet
+      const response = await axios.post(`${API}/auth/register-enhanced`, {
         fullName: formData.fullName,
         username: formData.username,
         email: formData.email,
         mobileNumber: formData.mobileNumber || null,
         age: parseInt(formData.age),
         gender: formData.gender,
+        country: formData.country || "India",
         password: formData.password,
         profileImage: formData.profileImage || null,
         bio: formData.bio || ""
