@@ -3521,18 +3521,16 @@ async def like_story(story_id: str, current_user: User = Depends(get_current_use
     
     # Send notification to story owner if it's not their own story
     if story["userId"] != current_user.id:
-        notification = {
-            "id": str(uuid4()),
-            "userId": story["userId"],  # Story owner receives notification
-            "fromUserId": current_user.id,
-            "fromUsername": current_user.username,
-            "type": "story_like",
-            "message": f"{current_user.username} liked your story",
-            "storyId": story_id,
-            "read": False,
-            "createdAt": datetime.now(timezone.utc).isoformat()
-        }
-        await db.notifications.insert_one(notification)
+        notification = Notification(
+            userId=story["userId"],
+            fromUserId=current_user.id,
+            fromUsername=current_user.username,
+            fromUserImage=current_user.profileImage,
+            type="story_like",
+            # reuse postId for downstream routing; include the story id here
+            postId=str(story_id),
+        )
+        await db.notifications.insert_one(notification.dict())
     
     return {"message": "Story liked successfully"}
 
