@@ -157,6 +157,28 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   }, [viewingUser, userPosts.length]);
 
+  useEffect(() => {
+    // Only fetch follow-request notifications when viewing your own profile
+    const fetchIncomingRequests = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const resp = await axios.get(`${API}/notifications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const requests = (resp.data.notifications || []).filter(
+          (n) => n.type === "follow_request"
+        );
+        setIncomingRequests(requests);
+      } catch (err) {
+        console.error("Error fetching follow requests", err);
+      }
+    };
+
+    if (isViewingOwnProfile) {
+      fetchIncomingRequests();
+    }
+  }, [isViewingOwnProfile]);
+
   const fetchAccountInfo = async (userId) => {
     console.log("=== fetchAccountInfo CALLED with ID:", userId);
     
