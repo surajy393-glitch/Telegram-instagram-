@@ -8,6 +8,7 @@ const API = "/api";
 
 const FeedPage = ({ user, onLogout }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -37,6 +38,47 @@ const FeedPage = ({ user, onLogout }) => {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [seenPostIds, setSeenPostIds] = useState(new Set());
+
+  // Handle story auto-open from notifications
+  useEffect(() => {
+    if (location.state?.openStoryId && (myStories || otherStories.length > 0)) {
+      const storyId = location.state.openStoryId;
+      let foundStoryGroup = null;
+      let storyIndex = 0;
+      
+      // Check my stories first
+      if (myStories?.stories) {
+        const index = myStories.stories.findIndex(story => story.id === storyId);
+        if (index !== -1) {
+          foundStoryGroup = myStories;
+          storyIndex = index;
+        }
+      }
+      
+      // Check other users' stories if not found in my stories
+      if (!foundStoryGroup) {
+        for (const storyGroup of otherStories) {
+          const index = storyGroup.stories.findIndex(story => story.id === storyId);
+          if (index !== -1) {
+            foundStoryGroup = storyGroup;
+            storyIndex = index;
+            break;
+          }
+        }
+      }
+      
+      // Open story viewer if found
+      if (foundStoryGroup) {
+        setViewingStories(foundStoryGroup);
+        setCurrentStoryIndex(storyIndex);
+        setShowStoryViewer(true);
+        
+        // Clear navigation state to prevent re-opening
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state, myStories, otherStories]);
+
 
   useEffect(() => {
     if (user) {
