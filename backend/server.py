@@ -3872,7 +3872,8 @@ async def like_post(post_id: str, current_user: User = Depends(get_current_user)
                 fromUsername=current_user.username,
                 fromUserImage=current_user.profileImage,
                 type="like",
-                postId=post_id
+                postId=post_id,
+                postImage=post.get("mediaUrl")  # Include post image for notification preview
             )
             await db.notifications.insert_one(notification.dict())
     
