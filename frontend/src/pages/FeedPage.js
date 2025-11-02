@@ -99,6 +99,15 @@ const FeedPage = ({ user, onLogout }) => {
       
       const stories = response.data.stories || [];
       
+      // Initialize storyLikes state from backend data
+      const likesState = {};
+      stories.forEach(story => {
+        if (story.userLiked) {
+          likesState[story.id] = true;
+        }
+      });
+      setStoryLikes(likesState);
+      
       // Group stories by user
       const storyGroups = {};
       stories.forEach(story => {
@@ -123,7 +132,7 @@ const FeedPage = ({ user, onLogout }) => {
       setMyStories(myStory);
       setOtherStories(otherUserStories);
       
-      console.log('✅ Fetched stories:', { myStory, otherCount: otherUserStories.length });
+      console.log('✅ Fetched stories:', { myStory, otherCount: otherUserStories.length, likesInitialized: Object.keys(likesState).length });
     } catch (error) {
       console.error("Error fetching stories:", error);
     }
