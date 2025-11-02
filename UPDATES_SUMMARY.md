@@ -61,7 +61,7 @@ All sensitive keys are stored in `/app/backend/.env` (not in git):
 ✅ Authentication flow complete
 
 ## Preview URL
-https://f5d6edf0-1653-498c-a1a4-1e10d3a5529b.preview.emergentagent.com
+https://luvhive-bugfix.preview.emergentagent.com
 
 ## Notes
 - All API keys are stored securely in .env files

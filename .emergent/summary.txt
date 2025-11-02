@@ -1,130 +1,94 @@
 <analysis>
-The AI engineer's trajectory involved a comprehensive set of fixes and feature additions for a social dating application, spanning both frontend (React) and backend (FastAPI, MongoDB) components. Initially, the focus was on critical bug fixes related to post loading, media display, privacy, and user profile interactions. This included standardizing media URL resolution, rectifying backend data handling for posts, and enhancing profile display logic to correctly show follow status and About dialogs.
-
-Subsequently, the work shifted to refining the social interaction flow, specifically implementing a nuanced Follow back notification system and making follower/following lists clickable with dynamic follow buttons. A major strategic decision, advised by the AI engineer and confirmed by the user, was to remove the Mystery Match feature from the web app, positioning the Telegram bot as the primary platform for anonymous matching. The final, ongoing phase concentrated on integrating Telegram Stars for premium membership purchases, which involved complex debugging of invoice slugs, API calls, and ensuring cross-database (PostgreSQL for bot, MongoDB for webapp) synchronization of premium status, culminating in the identification of an invalid invoice slug as the immediate blocking issue.
+The previous AI engineer successfully brought the LuvHive application from an initial state to a more functional one, focusing on critical fixes identified through user feedback and self-diagnosis. The workflow was highly iterative, frequently leveraging the  for deep root cause analysis, especially for complex, multi-layered bugs related to registration, notifications, and privacy. Key challenges included inconsistent API usage (e.g., double /api issue), data model discrepancies, and a persistent GitHub secret protection block that required external user intervention. The engineer systematically addressed each reported issue, often verifying backend and frontend changes. The trajectory demonstrates a strong commitment to resolving problems thoroughly, even when faced with unexpected environmental or logical hurdles.
 </analysis>
 
 <product_requirements>
-The application is an MVP dating app with LuvHive Verified badges, Founder Badge, dynamic profile picture updates, auto-refreshing feeds, and infinite scroll. The AI engineer was tasked with resolving several critical issues and implementing new social features:
+The user is developing **LuvHive**, an Instagram-style dating and social web application. Key features include Stories, Posts, User Profiles, a Follow/Unfollow system, Notifications, a Premium chat system, and Telegram bot integration. The application uses a React frontend, FastAPI backend, and MongoDB database.
 
-1.  **About this account Dialog:** Ensure this dialog correctly displays join date, country, and verification pathway.
-2.  **Profile Picture Display:** Fix unreliable display of profile pictures post-registration.
-3.  **Edit Profile Functionality:** Resolve intermittent failures in profile editing.
-4.  **User  field:** Integrate into registration and profile editing.
-5.  **Invalid token Errors:** Fix authentication issues blocking access to features.
-6.  ** Status:** Ensure correct reflection post-registration.
-7.  **Posts Loading and Display:** Resolve issues with posts not showing or images being broken, due to incorrect user IDs, backend filtering,  type errors, URL prefix mismatches, and improper Telegram media handling. Also, fix 401 errors on .
-8.  **Private Profile Post Visibility:** Enforce stricter privacy rules to hide posts from non-owners.
-9.  **Follow Notification and Follow back Button:** Implement a notification for the requester when a follow request is accepted, showing accepted your follow request (no Follow back button), and for the accepter, started following you with a Follow back button (if not already following).
-10. **Clickable Usernames in Notifications:** Make usernames in notifications clickable to navigate to their profile.
-11. **Follow back Button on ProfilePage:** If a user views a profile of someone who follows them (but they don't follow back), the button should display Follow back.
-12. **Clickable Followers/Following Counts:** Make follower/following counts clickable to open a dialog showing the list of users, with privacy checks (public profiles show list, private do not).
-13. **Follow Buttons in Followers/Following Dialog:** Within the dialog, each user in the list should have a dynamic button showing Follow, Follow back, Following, or Requested based on the current user's relationship with them.
-14. **Requested Status for Pending Follows:** Show Requested button if a follow request is pending.
-15. **Conditional Notification Creation:** The started following you notification with a Follow back button should only be created if the accepter does not already follow the requester.
-16. **Remove Mystery Match Feature:** Remove all webapp UI and backend endpoints related to Mystery Match, ensuring no impact on other features or existing user data.
-17. **Add Premium Membership CTA:** Integrate a Premium Membership section in  that allows users to purchase premium via Telegram Stars (preferably inline in Telegram Mini App, with fallback to bot).
-18. **Telegram Bot Integration:** Properly start and configure the Telegram bot, including handling payment errors, correctly parsing payment durations, and removing old commands.
+The previous AI engineer was tasked with resolving several issues to make the application fully functional:
+1.  **Registration Flow Fixes:** Address Registration Failed – Not Found errors, including issues with token handling, API URL construction (double ), missing  field, and ensuring correct registration page () was updated.
+2.  **Welcome Email Integration:** Implement sending a welcome email upon successful user registration.
+3.  **Follow Request Notifications:** Ensure follow requests are properly displayed in the notifications list (clickable) and show a Confirm/Delete banner on the requesting user's profile page.
+4.  **Notifications 500 Error:** Fix backend errors preventing the notifications list from loading due to inconsistent  field types and  vs  flags.
+5.  **Private Account Privacy:** Correctly hide posts and stories from private accounts in the main feed and story tray for non-followers, addressing issues with null  arrays and incorrect  comparisons.
+6.  **Like/Comment Notifications Display:** Ensure like notifications are sent and that comment and like notifications display a post image thumbnail instead of a gray square.
+The current state has most of these issues resolved, but like notifications are still not being generated correctly from the main .
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-stack Architecture:** React (frontend), FastAPI (backend), MongoDB (webapp database), PostgreSQL (Telegram bot database).
-- **API Communication:** RESTful endpoints, JWT authentication, .
-- **UI/UX:** Radix Dialog for modals, Tailwind CSS,  for routing.
-- **State Management:** React , , .
-- **Media Handling:** URL normalization, Telegram proxy, file uploads.
-- **Telegram Bot Integration:** Telegram WebApp API (), Telegram Stars payments, environment variables (, ).
-- **Database Synchronization:** Updating both MongoDB and PostgreSQL for premium status.
+-   **Full-stack Architecture:** React (frontend), FastAPI (backend), MongoDB (database).
+-   **API Communication:** Axios for HTTP requests, JWT for authentication tokens, environment variables (, ) for configuration.
+-   **Deployment:** Kubernetes container environment, Supervisor for service management.
+-   **Security:** GitHub secret scanning for API keys, token handling (Bearer prefix, local storage).
+-   **Debugging:** Extensive use of  for root cause analysis.
 </key_technical_concepts>
 
 <code_architecture>
 
+-   **backend/server.py**: This is the main FastAPI application file defining most API endpoints, MongoDB interactions, and core logic.
+    -   **Changes**:
+        -   Modified  to accept  parameters for multipart/form-data, including  and  uploads, and validated the  field.
+        -   Added  calls to both  and  endpoints.
+        -   Hardened  endpoint to handle inconsistent  types and / fields to prevent 500 errors.
+        -   Updated  model to include  for richer notifications.
+        -   Modified  and  notification creation logic to include .
+        -   Refined privacy checks in  and  to correctly filter private content for non-followers, handling null  arrays and ensuring correct  comparison.
+-   **backend/social_features.py**: This file contains social-specific logic, likely including endpoints for posts and stories feeds.
+    -   **Changes**:
+        -   Added privacy checks to  (for posts) and  (for stories) to ensure private content is hidden from non-followers.
+-   **frontend/src/utils/authClient.js**: New utility file for centralized token handling and Axios instance configuration.
+    -   **Importance**: Provides ,  functions, and  (an Axios instance with automatic  header and 401 error handling). This ensures consistent token management across the frontend.
+    -   **Changes**: Created this file with robust token handling logic.
+-   **frontend/src/App.js**: Main React application component.
+    -   **Changes**: Updated to use 's  and  for consistent authentication state management.
+-   **frontend/src/pages/RegisterPage.js**: Registration form component.
+    -   **Changes**:
+        -   Imported and used  and  from .
+        -   Initial  for registration was reverted to plain  to avoid double  in URL before  base URL was adjusted.
+        -   Added  field to  state and form input.
+        -   Updated validation to include .
+        -   Modified  call to use relative path with  to avoid double .
+-   **frontend/src/pages/DatingRegisterPage.js**: An alternative registration form, found to be the one actually used.
+    -   **Changes**:
+        -   Updated to use the correct  endpoint and  for the initial registration.
+        -   Integrated  for token handling post-registration.
+        -   Confirmed  field already present.
+-   **frontend/src/pages/LoginPage.js**: Login form component.
+    -   **Changes**: Updated to use  from  after successful login and Telegram OTP verification.
+-   **frontend/src/pages/NotificationsPage.js**: Displays user notifications.
+    -   **Changes**:
+        -   Added an  handler to notification rows for navigation to post or profile.
+        -   Modified rendering to display  instead of a gray square for like/comment notifications.
+-   **frontend/src/pages/ProfilePage.js**: Displays user profiles.
+    -   **Changes**:
+        -   Added state (, ) and  to fetch and track pending follow requests.
+        -   Implemented  and  functions to handle follow request actions.
+        -   Added a UI banner at the top of the profile card to display incoming follow requests for the viewed user.
+-   **Documentation Files ( files in )**: Various files were created by the AI engineer to summarize changes and fixes.
+    -   **Changes**: The content of some  files that contained the  was redacted or removed entirely to resolve GitHub secret protection issues.
 
--   :
-    -   **Importance:** Core backend API.
-    -   **Changes:**
-        -   : Modified to create two distinct notifications ( for requester,  for accepter) and conditionally create the  notification only if the accepter doesn't already follow the requester.
-        -   : Added  field (boolean indicating if the viewed user follows the current user).
-        -    and : Added  field to each user object (boolean indicating if current user has a pending follow request to that user).
-        -   Removed  inclusion and all Mystery Match related endpoints and welcome email content.
--   :
-    -   **Importance:** Handles post and story creation.
-    -   **Changes:** No changes in this specific trajectory segment, but previously updated for media URL prefixing.
--   :
-    -   **Importance:** Entry point for the Telegram bot.
-    -   **Changes:** Environment variables (, ) are now loaded, and the bot is successfully started.
--   :
-    -   **Importance:** Handles Telegram Stars payment processing and premium activation.
-    -   **Changes:**
-        -   : Modified to update  status in both PostgreSQL (bot's database) and MongoDB (webapp's database).
-        -   Corrected column name from  to  when inserting into the PostgreSQL  table.
-        -   Improved payload parsing logic to correctly extract payment duration (e.g., 1 week) from the  and send the appropriate confirmation message.
-        -   Removed references to  command, replacing them with .
--    (NEW FILE):
-    -   **Importance:** Script to generate Telegram Stars invoice slug.
-    -   **Contents:** Python script to call  and print the resulting invoice URL and slug.
--   :
-    -   **Importance:** Manages global user state, authentication, and routing.
-    -   **Changes:** Removed routes for  and .
--   :
-    -   **Importance:** Radix UI Dialog component.
-    -   **Changes:** No changes in this trajectory segment, but previously updated for z-index.
--   :
-    -   **Importance:** Main feed display.
-    -   **Changes:** Removed the Mystery Match button.
--   :
-    -   **Importance:** Displays user notifications.
-    -   **Changes:**
-        -   Implemented  function for the Follow back button.
-        -   Conditional rendering for notification messages and Follow back button based on notification type ( vs. ).
-        -   Integrated  and made usernames clickable to navigate to user profiles.
--   :
-    -   **Importance:** Displays user profiles.
-    -   **Changes:**
-        -   Updated  to utilize the new  backend field for button logic (Follow back vs. Follow).
-        -   Added state for , , ,  lists and their loading states.
-        -   Implemented  and  functions to fetch and display lists in a .
-        -   Made followers/following counts clickable.
-        -   Integrated dynamic Follow, Follow back, Following, Requested buttons within the Followers/Following dialog, using  and  fields.
-        -   Updated  to properly update  state.
--   :
-    -   **Importance:** Manages user settings.
-    -   **Changes:**
-        -   Removed all Mystery Match related settings, UI elements, and associated state/functions (e.g., , , , blocked users dialog).
-        -   Replaced the always-visible Premium Membership card with a button that opens a  modal.
-        -   The modal clearly compares Free vs. Premium features and provides purchase links.
-        -   Implemented  function for Telegram Stars payment:
-            -   Uses  for inline Stars payment in Telegram Mini App.
-            -   Includes robust error handling () and validation for .
-            -   Falls back to opening the bot deep link () in a new tab if  is unavailable or fails.
-            -   Reloads the page on successful payment to update premium status.
--   :
-    -   **Importance:** Centralized media URL normalization.
-    -   **Changes:** No changes in this specific trajectory segment, but previously created and updated for consistent media resolution.
--   :
-    -   **Importance:** Frontend environment variables.
-    -   **Changes:** Updated  to  and  with the generated invoice slug.  was added as an empty placeholder.
--   :
-    -   **Importance:** Telegram bot environment variables.
-    -   **Changes:** Added ,  (PostgreSQL), and  for MongoDB access.
 </code_architecture>
 
 <pending_tasks>
-- Fix the Invoice url is invalid error by recreating the Telegram Stars invoice (potentially using a full URL instead of a slug).
-- Validate the new invoice URL/slug in the frontend's  and .
-- Test the full Telegram Stars payment flow within the Telegram Mini App.
+-   The like notifications are still not being generated and sent when a user likes a post from the main , despite other notification types working and frontend rendering being ready.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was actively debugging a critical issue with Telegram Stars premium payment integration. The Buy Premium with Stars button in the webapp's  was consistently redirecting users to the Telegram bot instead of opening the inline Stars payment interface, even when accessed from within the Telegram Mini App.
+Immediately before this summary request, the AI engineer was actively engaged in debugging why like notifications were not being sent when posts were liked from the main . The  was invoked twice for a deep analysis.
 
-Initial investigations confirmed that  was correctly set in  and the  function in  was designed to use . To diagnose the redirection, extensive console logging was added to .
+The **first call** to the  (Chat Message 590) identified the root cause:
+-   **Missing notification call:** The code responsible for sending like notifications is missing in the  file, specifically within the  function.
+-   **Frontend vs. Backend:** The frontend correctly registers the like action, but the backend fails to trigger the notification for the post owner.
+-   **Discrepancy:** The  notifications work when a post is liked from the  but fail from the , which is the primary user flow.
 
-The latest user feedback provided a screenshot of the console output, which clearly showed the error: **Invoice url is invalid**. This indicates that the  value, which was previously generated by the  script in the bot and used in the frontend's , is not recognized as a valid invoice slug by Telegram's  API.
+The **second call** to the  (Chat Message 592) confirmed these findings and provided a detailed fix plan, pinpointing the exact location and code to be added:
+-   **File:** 
+-   **Function:** 
+-   **Action:** Need to add a notification creation call within this function to send a like notification to the post owner.
 
-The current state is that the root cause for the payment redirection is identified as an invalid invoice slug. The webapp's code for handling the  call and its fallbacks is robust, but the input (the slug) itself is incorrect.
+The AI engineer acknowledged these findings and was in the process of implementing this fix, having just completed the troubleshooting calls.
 </current_work>
 
 <optional_next_step>
-Recreate the Telegram Stars invoice in the bot and update the webapp with the new, valid invoice URL.
+Implement the identified fix by adding the like notification creation logic to the  function in .
 </optional_next_step>
