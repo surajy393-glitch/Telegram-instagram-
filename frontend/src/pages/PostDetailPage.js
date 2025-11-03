@@ -259,8 +259,9 @@ const PostDetailPage = ({ user }) => {
       return;
     }
 
-    try {      await axios.post(
-        `posts/${postId}/report`,
+    try {
+      await httpClient.post(
+        `/posts/${postId}/report`,
         { reason: reportReason }
       );
 
