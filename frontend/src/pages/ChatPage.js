@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send, Crown } from "lucide-react";
-import axios from "axios";
+import { httpClient } from "@/utils/authClient";
 import {
   Dialog,
   DialogContent,
