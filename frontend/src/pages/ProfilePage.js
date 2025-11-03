@@ -442,14 +442,11 @@ const ProfilePage = ({ user, onLogout }) => {
     setFollowersLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
       const endpoint = type === 'followers' 
-        ? `${API}/users/${viewingUser?.id}/followers` 
-        : `${API}/users/${viewingUser?.id}/following`;
+        ? `/users/${viewingUser?.id}/followers` 
+        : `/users/${viewingUser?.id}/following`;
       
-      const response = await axios.get(endpoint, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(endpoint);
 
       // Backend returns {followers: [...]} or {following: [...]}
       const listData = type === 'followers' ? response.data.followers : response.data.following;
