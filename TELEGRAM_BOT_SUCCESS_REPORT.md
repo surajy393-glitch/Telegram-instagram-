@@ -57,7 +57,7 @@ Your Telegram bot (@Loveekisssbot) is now **FULLY OPERATIONAL** and integrated w
 ## 🎯 **How to Use (For Users)**
 
 ### **Step 1: Access Web App**
-- Go to: https://auth-fix-60.preview.emergentagent.com/login
+- Go to: https://telegram-connect-5.preview.emergentagent.com/login
 - Click "Continue with Telegram"
 
 ### **Step 2: Authenticate with Bot**
