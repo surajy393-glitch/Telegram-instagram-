@@ -174,8 +174,9 @@ const PostDetailPage = ({ user }) => {
     const reason = window.prompt("Why are you reporting this comment?");
     if (!reason) return;
 
-    try {      await axios.post(
-        `posts/${postId}/comment/${commentId}/report`,
+    try {
+      await httpClient.post(
+        `/posts/${postId}/comment/${commentId}/report`,
         { reason }
       );
 
