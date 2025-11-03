@@ -1,94 +1,88 @@
 <analysis>
-The previous AI engineer successfully brought the LuvHive application from an initial state to a more functional one, focusing on critical fixes identified through user feedback and self-diagnosis. The workflow was highly iterative, frequently leveraging the  for deep root cause analysis, especially for complex, multi-layered bugs related to registration, notifications, and privacy. Key challenges included inconsistent API usage (e.g., double /api issue), data model discrepancies, and a persistent GitHub secret protection block that required external user intervention. The engineer systematically addressed each reported issue, often verifying backend and frontend changes. The trajectory demonstrates a strong commitment to resolving problems thoroughly, even when faced with unexpected environmental or logical hurdles.
+The previous AI engineer successfully stabilized and expanded the LuvHive application, transitioning from initial setup to addressing complex, multi-faceted bugs. The trajectory showcases an iterative problem-solving approach, heavily relying on the  for deep root cause analysis, especially for issues spanning frontend-backend interactions, data persistence, and environment configurations. Key challenges included fixing notification logic, handling complex state management for user sessions across multiple Telegram accounts, resolving payment integration errors with Telegram Stars, and rectifying data inconsistencies in profile verification and compatibility calculations. The engineer meticulously applied fixes, often verifying changes through restarts and re-testing, demonstrating a systematic workflow to ensure functionality and robustness. The ongoing task focuses on comprehensive bug fixing for the ProfilePage.
 </analysis>
 
 <product_requirements>
-The user is developing **LuvHive**, an Instagram-style dating and social web application. Key features include Stories, Posts, User Profiles, a Follow/Unfollow system, Notifications, a Premium chat system, and Telegram bot integration. The application uses a React frontend, FastAPI backend, and MongoDB database.
+The user is developing **LuvHive**, an Instagram-style dating and social web application featuring Stories, Posts, User Profiles, Follow/Unfollow, Notifications, Premium chat, and Telegram bot integration. The application uses a React frontend, FastAPI backend, and MongoDB.
 
-The previous AI engineer was tasked with resolving several issues to make the application fully functional:
-1.  **Registration Flow Fixes:** Address Registration Failed – Not Found errors, including issues with token handling, API URL construction (double ), missing  field, and ensuring correct registration page () was updated.
-2.  **Welcome Email Integration:** Implement sending a welcome email upon successful user registration.
-3.  **Follow Request Notifications:** Ensure follow requests are properly displayed in the notifications list (clickable) and show a Confirm/Delete banner on the requesting user's profile page.
-4.  **Notifications 500 Error:** Fix backend errors preventing the notifications list from loading due to inconsistent  field types and  vs  flags.
-5.  **Private Account Privacy:** Correctly hide posts and stories from private accounts in the main feed and story tray for non-followers, addressing issues with null  arrays and incorrect  comparisons.
-6.  **Like/Comment Notifications Display:** Ensure like notifications are sent and that comment and like notifications display a post image thumbnail instead of a gray square.
-The current state has most of these issues resolved, but like notifications are still not being generated correctly from the main .
+The previous AI engineer was tasked with resolving critical bugs and adding features:
+1.  **Notification System Enhancements**: Ensure like notifications are correctly generated for posts (from FeedPage) and stories, display appropriate images, and that notifications are removed upon unliking.
+2.  **Registration & Profile Verification**: Fix issues with  field, welcome email, and ensure  and  statuses are accurately stored and displayed. The  status and crown icon should display correctly on user profiles.
+3.  **Telegram Bot Integration & Premium Payments**: Integrate and start the Telegram bot, fix UI freezing on the Premium page, and resolve WebAppInvoiceUrlInvalid errors and URL format issues for Telegram Stars payments.
+4.  **Session Management & Multi-Account Support**: Address problems where multiple Telegram accounts on the same device would show the same webapp profile, leading to session contamination and incorrect user data display. The current requirement is for each Telegram account to manage its own isolated webapp session.
+5.  **Vibe Check Functionality**: Fix the Vibe Check feature which was showing 0% due to missing user data and incorrect backend calculation logic.
+6.  **Profile Page Robustness**: Address auto-logout issues and undefined state errors () when viewing other user profiles. Ensure posts, following data, and Vibe Check functionality are reliable on profile pages.
+
+Most of these issues have been addressed. The current primary focus is on resolving multiple authentication and display issues on the .
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Architecture:** React (frontend), FastAPI (backend), MongoDB (database).
--   **API Communication:** Axios for HTTP requests, JWT for authentication tokens, environment variables (, ) for configuration.
--   **Deployment:** Kubernetes container environment, Supervisor for service management.
--   **Security:** GitHub secret scanning for API keys, token handling (Bearer prefix, local storage).
--   **Debugging:** Extensive use of  for root cause analysis.
+-   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database).
+-   **API Communication**: Axios, JWT for authentication, environment variables for URLs.
+-   **Deployment**: Kubernetes, Supervisor for process management.
+-   **Authentication**: Telegram-scoped  for session isolation.
+-   **Debugging**: Extensive use of  for root cause analysis.
+-   **Email Service**: SendGrid for welcome emails and OTP (SendGrid API key issues encountered).
+-   **Telegram Integration**: Telegram bot API, Telegram Web Apps, Telegram Stars for payments.
 </key_technical_concepts>
 
 <code_architecture>
 
--   **backend/server.py**: This is the main FastAPI application file defining most API endpoints, MongoDB interactions, and core logic.
-    -   **Changes**:
-        -   Modified  to accept  parameters for multipart/form-data, including  and  uploads, and validated the  field.
-        -   Added  calls to both  and  endpoints.
-        -   Hardened  endpoint to handle inconsistent  types and / fields to prevent 500 errors.
-        -   Updated  model to include  for richer notifications.
-        -   Modified  and  notification creation logic to include .
-        -   Refined privacy checks in  and  to correctly filter private content for non-followers, handling null  arrays and ensuring correct  comparison.
--   **backend/social_features.py**: This file contains social-specific logic, likely including endpoints for posts and stories feeds.
-    -   **Changes**:
-        -   Added privacy checks to  (for posts) and  (for stories) to ensure private content is hidden from non-followers.
--   **frontend/src/utils/authClient.js**: New utility file for centralized token handling and Axios instance configuration.
-    -   **Importance**: Provides ,  functions, and  (an Axios instance with automatic  header and 401 error handling). This ensures consistent token management across the frontend.
-    -   **Changes**: Created this file with robust token handling logic.
--   **frontend/src/App.js**: Main React application component.
-    -   **Changes**: Updated to use 's  and  for consistent authentication state management.
--   **frontend/src/pages/RegisterPage.js**: Registration form component.
-    -   **Changes**:
-        -   Imported and used  and  from .
-        -   Initial  for registration was reverted to plain  to avoid double  in URL before  base URL was adjusted.
-        -   Added  field to  state and form input.
-        -   Updated validation to include .
-        -   Modified  call to use relative path with  to avoid double .
--   **frontend/src/pages/DatingRegisterPage.js**: An alternative registration form, found to be the one actually used.
-    -   **Changes**:
-        -   Updated to use the correct  endpoint and  for the initial registration.
-        -   Integrated  for token handling post-registration.
-        -   Confirmed  field already present.
--   **frontend/src/pages/LoginPage.js**: Login form component.
-    -   **Changes**: Updated to use  from  after successful login and Telegram OTP verification.
--   **frontend/src/pages/NotificationsPage.js**: Displays user notifications.
-    -   **Changes**:
-        -   Added an  handler to notification rows for navigation to post or profile.
-        -   Modified rendering to display  instead of a gray square for like/comment notifications.
--   **frontend/src/pages/ProfilePage.js**: Displays user profiles.
-    -   **Changes**:
-        -   Added state (, ) and  to fetch and track pending follow requests.
-        -   Implemented  and  functions to handle follow request actions.
-        -   Added a UI banner at the top of the profile card to display incoming follow requests for the viewed user.
--   **Documentation Files ( files in )**: Various files were created by the AI engineer to summarize changes and fixes.
-    -   **Changes**: The content of some  files that contained the  was redacted or removed entirely to resolve GitHub secret protection issues.
 
+-   **backend/server.py**: Main FastAPI application.
+    -   **Changes**: Handled  uploads,  validation, . Hardened  for  and . Modified  (initially) and  to create notifications including  / . Added  to  endpoint response. Updated user creation to save /. Fixed Vibe Check logic for interests/personality.
+-   **backend/social_features.py**: Social features.
+    -   **Changes**: Added notification creation to  function. Ensured privacy checks for posts/stories. Added  field to story responses.
+-   **frontend/src/utils/authClient.js**: Centralized token/user handling.
+    -   **Changes**: Implemented / to use Telegram-scoped storage () instead of generic . Added / for Telegram-scoped user data.
+-   **frontend/src/App.js**: Main React component.
+    -   **Changes**: Updated to use 's Telegram-scoped /. Added auto-cleanup for old generic  keys. Changed user data loading to API-first for premium status.
+-   **frontend/src/pages/DatingRegisterPage.js**: Registration form.
+    -   **Changes**: Integrated  and added  field. Added  capture during registration.
+-   **frontend/src/pages/NotificationsPage.js**: Displays notifications.
+    -   **Changes**: Added handlers for  notification type (icon, text, navigation). Updated  for  to navigate to  (to auto-open story).
+-   **frontend/src/pages/ProfilePage.js**: Displays user profiles.
+    -   **Changes**: Added state for . Removed auto-logout on 401 errors. Added missing  state. Fixed to use  for profile fetching.
+-   **frontend/src/pages/MyProfilePage.js**: Displays the logged-in user's profile.
+    -   **Changes**: Updated to use 's Telegram-scoped /.
+-   **frontend/src/pages/SocialSettingsPage.js**: Settings, including Premium.
+    -   **Changes**: Fixed UI freezing issue with  on dialog content. Corrected Telegram Stars invoice URL format.
+-   **frontend/src/pages/FeedPage.js**: Main feed.
+    -   **Changes**: Added  and  to detect navigation state and auto-open stories.
+-   **frontend/src/pages/VerificationStatusPage.js**: Displays verification status.
+    -   **Changes**: Fixed field name inconsistencies ( to ).
+-   **frontend/src/components/TelegramAuthHandler.js**: Handles Telegram authentication.
+    -   **Changes**: Updated to use 's /.
+-   **frontend/.env**: Environment variables for frontend.
+    -   **Changes**: Updated  to include  suffix. Updated with new  values.
+-   **backend/.env**: Environment variables for backend.
+    -   **Changes**: Updated .
+-   **telegram_bot/start_bot.sh**: Script to start the Telegram bot.
+    -   **Changes**: Updated  environment variable.
+-   **telegram_bot/handlers/telegram_stars_payment.py**: Handles Telegram Stars payment callbacks.
+    -   **Changes**: Corrected MongoDB database name for user updates.
 </code_architecture>
 
 <pending_tasks>
--   The like notifications are still not being generated and sent when a user likes a post from the main , despite other notification types working and frontend rendering being ready.
+-   **Homepage Post Visibility**: The user's own old posts are not appearing on the main homepage feed. This was identified as intended behavior (user posts only on their profile) but user confirmation on desired behavior is pending.
+-   **Email OTP Sending**: The SendGrid API key is likely expired or invalid, causing email OTPs to fail during registration. This requires a new API key from the user.
+-   **ProfilePage Comprehensive Fixes**: The last user feedback indicated that posts are not showing, clicking 'following' does nothing, and vibe check is not working on the ProfilePage. The AI engineer was starting to fix these high-priority issues.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was actively engaged in debugging why like notifications were not being sent when posts were liked from the main . The  was invoked twice for a deep analysis.
+Immediately before this summary request, the AI engineer was addressing a critical set of issues on the . The user provided a video demonstrating that:
+1.  Posts were not visible.
+2.  Clicking the following count did not work.
+3.  The Vibe Check feature was not functioning.
 
-The **first call** to the  (Chat Message 590) identified the root cause:
--   **Missing notification call:** The code responsible for sending like notifications is missing in the  file, specifically within the  function.
--   **Frontend vs. Backend:** The frontend correctly registers the like action, but the backend fails to trigger the notification for the post owner.
--   **Discrepancy:** The  notifications work when a post is liked from the  but fail from the , which is the primary user flow.
+The  was called thrice (Chat Message 710, 712, 714) for deep analysis.
+-   **First call (Chat Message 710)**: Identified multiple potential root causes, including issues with , , , and general API authentication on the .
+-   **Second call (Chat Message 712)**: Confirmed that a significant portion of the  functionality (e.g., , , ) was potentially bypassing the authentication system, leading to 401 errors.
+-   **Third call (Chat Message 714)**: Provided a diagnostic summary explicitly stating that the ProfilePage's ,  list, and  were failing due to authentication bypass.
 
-The **second call** to the  (Chat Message 592) confirmed these findings and provided a detailed fix plan, pinpointing the exact location and code to be added:
--   **File:** 
--   **Function:** 
--   **Action:** Need to add a notification creation call within this function to send a like notification to the post owner.
-
-The AI engineer acknowledged these findings and was in the process of implementing this fix, having just completed the troubleshooting calls.
+The AI engineer acknowledged these findings and was in the process of implementing fixes, prioritizing HIGH PRIORITY ones as identified by the . This indicates the current work is focused on re-integrating authentication properly for ProfilePage's data fetching functions.
 </current_work>
 
 <optional_next_step>
-Implement the identified fix by adding the like notification creation logic to the  function in .
+Address the high-priority ProfilePage issues identified by the , specifically re-integrating authentication for ,  list, and .
 </optional_next_step>

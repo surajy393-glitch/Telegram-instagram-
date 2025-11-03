@@ -61,7 +61,7 @@ I'm your LuvHive bot. I can help you:
 • 🎮 Access exclusive features
 
 Use /auth to link your account or visit our web app:
-https://luvhive-bugfix.preview.emergentagent.com
+https://auth-fix-60.preview.emergentagent.com
 
 Need help? Use /help
         """
@@ -85,7 +85,7 @@ Need help? Use /help
 4. Your account will be linked!
 
 **Need more help?**
-Visit: https://luvhive-bugfix.preview.emergentagent.com
+Visit: https://auth-fix-60.preview.emergentagent.com
         """
         
         await update.message.reply_text(help_text)
@@ -100,7 +100,7 @@ Visit: https://luvhive-bugfix.preview.emergentagent.com
         if existing_user:
             await update.message.reply_text(
                 f"✅ You're already registered as {existing_user.get('username', 'User')}!\n\n"
-                f"Visit your profile: https://luvhive-bugfix.preview.emergentagent.com"
+                f"Visit your profile: https://auth-fix-60.preview.emergentagent.com"
             )
             return
         
@@ -116,7 +116,7 @@ Visit: https://luvhive-bugfix.preview.emergentagent.com
         
         auth_token = jwt.encode(auth_payload, JWT_SECRET, algorithm="HS256")
         
-        auth_url = f"https://luvhive-bugfix.preview.emergentagent.com/auth/telegram?token={auth_token}"
+        auth_url = f"https://auth-fix-60.preview.emergentagent.com/auth/telegram?token={auth_token}"
         
         auth_text = f"""
 🔐 **Telegram Authentication**
@@ -149,11 +149,11 @@ After clicking:
         if existing_user:
             response = f"Hi {existing_user.get('fullName', user.first_name)}! 👋\n\n"
             response += "I received your message. Visit the LuvHive web app to chat with other users!\n\n"
-            response += "🌐 https://luvhive-bugfix.preview.emergentagent.com"
+            response += "🌐 https://auth-fix-60.preview.emergentagent.com"
         else:
             response = "👋 Hi! You're not registered yet.\n\n"
             response += "Use /auth to link your Telegram account with LuvHive!\n\n"
-            response += "Or visit: https://luvhive-bugfix.preview.emergentagent.com"
+            response += "Or visit: https://auth-fix-60.preview.emergentagent.com"
         
         await update.message.reply_text(response)
     
@@ -161,7 +161,7 @@ After clicking:
         """Start the bot"""
         logger.info("🚀 Starting LuvHive Telegram Bot...")
         logger.info(f"🤖 Bot username: @Loveekisssbot")
-        logger.info(f"🌐 Web app: https://luvhive-bugfix.preview.emergentagent.com")
+        logger.info(f"🌐 Web app: https://auth-fix-60.preview.emergentagent.com")
         
         await self.application.run_polling(drop_pending_updates=True)
 
