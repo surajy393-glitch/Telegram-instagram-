@@ -114,10 +114,7 @@ const MyProfilePage = ({ user, onLogout }) => {
     setLoadingFollowers(true);
     
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/users/${profile.id}/followers`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/users/${profile.id}/followers`);
       setFollowersList(response.data.followers || []);
     } catch (error) {
       console.error("Error fetching followers:", error);
