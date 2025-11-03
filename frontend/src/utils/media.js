@@ -20,6 +20,10 @@ export function getMediaSrc(url) {
   
   // Prepend backend URL if provided (e.g. production domain)
   if (BACKEND_URL) {
+    // If BACKEND_URL already ends with /api and path starts with /api, remove duplicate
+    if (BACKEND_URL.endsWith('/api') && path.startsWith('/api/')) {
+      path = path.substring(4); // Remove the first /api
+    }
     return `${BACKEND_URL}${path}`;
   }
   return path;
