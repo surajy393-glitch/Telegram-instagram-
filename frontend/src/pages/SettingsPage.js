@@ -70,8 +70,8 @@ const SettingsPage = ({ user, onLogout }) => {
   };
 
   const handleDownloadData = async () => {
-    try {      const response = await axios.get(`auth/download-data`, {
-        headers: { Authorization: `Bearer ${token}` },
+    try {
+      const response = await httpClient.get(`/auth/download-data`, {
         responseType: 'blob'
       });
       
