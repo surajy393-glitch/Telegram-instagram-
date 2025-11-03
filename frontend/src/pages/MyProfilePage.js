@@ -5,8 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Grid, Bookmark, Crown, Settings, Shield } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
-import axios from "axios";
-import { getUser, setUser as setUserStorage } from "../utils/authClient";
+import { httpClient, getUser, setUser as setUserStorage } from "../utils/authClient";
 
 // Use a fallback so API calls don't break when the env var is missing
 const API = "/api";
