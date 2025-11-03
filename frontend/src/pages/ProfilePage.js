@@ -461,12 +461,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const acceptFollowRequest = async (fromUserId) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${API}/users/${fromUserId}/accept-follow-request`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await httpClient.post(`/users/${fromUserId}/accept-follow-request`, {});
       // Remove request from state
       setIncomingRequests((prev) =>
         prev.filter((req) => req.fromUserId !== fromUserId)
