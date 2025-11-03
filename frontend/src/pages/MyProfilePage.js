@@ -130,11 +130,8 @@ const MyProfilePage = ({ user, onLogout }) => {
     setShowFollowingDialog(true);
     setLoadingFollowing(true);
     
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/users/${profile.id}/following`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try:
+      const response = await httpClient.get(`/users/${profile.id}/following`);
       setFollowingList(response.data.following || []);
     } catch (error) {
       console.error("Error fetching following:", error);
