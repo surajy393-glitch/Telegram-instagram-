@@ -164,10 +164,7 @@ const ProfilePage = ({ user, onLogout }) => {
     // Only fetch follow-request notifications when viewing your own profile
     const fetchIncomingRequests = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const resp = await axios.get(`${API}/notifications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resp = await httpClient.get(`/notifications`);
         const requests = (resp.data.notifications || []).filter(
           (n) => n.type === "follow_request"
         );
