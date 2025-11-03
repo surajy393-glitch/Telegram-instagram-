@@ -124,10 +124,7 @@ const HomePage = ({ user, onLogout }) => {
 
   const fetchNotificationCount = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/notifications/unread-count`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/notifications/unread-count`);
       setNotificationCount(response.data.count);
     } catch (error) {
       console.error("Error fetching notification count:", error);
