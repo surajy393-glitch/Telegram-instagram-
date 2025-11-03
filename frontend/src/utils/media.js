@@ -12,10 +12,6 @@ export function getMediaSrc(url) {
   }
   
   let path = url;
-  // Add /api prefix if missing and the path references the uploads directory
-  if (path.startsWith('/uploads/')) {
-    path = `/api${path}`;
-  }
   
   // Ensure path starts with a single slash
   if (!path.startsWith('/')) {
