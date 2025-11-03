@@ -499,7 +499,7 @@ const ProfilePage = ({ user, onLogout }) => {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       if (!token) {
         console.error("No authentication token found");
         return;
@@ -525,9 +525,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
       console.log(`Action: ${endpoint} for user ${targetUserId}`);
       
-      const response = await axios.post(`${API}/users/${targetUserId}/${endpoint}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.post(`/users/${targetUserId}/${endpoint}`, {});
       
       console.log("Follow action response:", response.data);
       
