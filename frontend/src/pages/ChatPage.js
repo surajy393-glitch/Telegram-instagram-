@@ -71,12 +71,10 @@ const ChatPage = ({ user }) => {
     if (!newMessage.trim()) return;
 
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/chat/send`, 
+      await httpClient.post(`/chat/send`, 
         `receiverId=${userId}&message=${encodeURIComponent(newMessage)}`,
         {
           headers: { 
-            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }
