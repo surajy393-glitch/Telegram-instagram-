@@ -954,7 +954,11 @@ const ProfilePage = ({ user, onLogout }) => {
                   }
                   const isVideo = (post.mediaType || post.postType) === "video";
                   return (
-                    <div key={post.id} className="aspect-square rounded-lg overflow-hidden">
+                    <Link 
+                      key={post.id} 
+                      to={`/post/${post.id}`}
+                      className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity block"
+                    >
                       {isVideo ? (
                         <video
                           src={mediaUrl}
@@ -973,7 +977,7 @@ const ProfilePage = ({ user, onLogout }) => {
                           }}
                         />
                       )}
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
