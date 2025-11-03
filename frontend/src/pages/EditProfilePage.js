@@ -162,7 +162,8 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
       localStorage.setItem("user", JSON.stringify(updatedUser));
       
       // Update app state by calling onLogin with existing token and updated user
-      if (onLogin) {        onLogin(currentToken, updatedUser);
+      if (onLogin) {
+        onLogin(getToken(), updatedUser);
       }
 
       alert("Profile updated successfully!");
