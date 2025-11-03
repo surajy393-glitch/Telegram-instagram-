@@ -365,10 +365,7 @@ const ProfilePage = ({ user, onLogout }) => {
     if (!viewingUser) return;
     
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${viewingUser.id}/block`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`/users/${viewingUser.id}/block`, {});
       alert(`${viewingUser.username} has been blocked`);
     } catch (error) {
       console.error("Error blocking user:", error);
