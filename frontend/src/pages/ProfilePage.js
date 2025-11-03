@@ -900,9 +900,8 @@ const ProfilePage = ({ user, onLogout }) => {
           {/* User Posts Grid */}
           {(
             // If the viewed account is private and it's not your own profile,
-            // hide the posts entirely. Followers should not see content of
-            // private accounts.
-            viewingUser?.isPrivate && !isViewingOwnProfile
+            // hide the posts entirely unless you're following them.
+            viewingUser?.isPrivate && !viewingUser?.isFollowing && !isViewingOwnProfile
           ) ? (
             <div className="glass-effect rounded-3xl overflow-hidden shadow-xl">
               <div className="bg-gradient-to-br from-gray-100 to-gray-200 p-16 text-center">
