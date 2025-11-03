@@ -53,10 +53,7 @@ const NotificationsPage = ({ user, onLogout }) => {
 
   const handleAcceptFollowRequest = async (fromUserId) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${fromUserId}/accept-follow-request`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`/users/${fromUserId}/accept-follow-request`, {});
       
       // Remove notification from list
       setNotifications(prev => prev.filter(n => !(n.type === 'follow_request' && n.fromUserId === fromUserId)));
