@@ -4229,6 +4229,14 @@ async def follow_user(userId: str, current_user: User = Depends(get_current_user
         )
         await db.notifications.insert_one(notification.dict())
         
+        # Delete any "follow" or "started_following" notifications from the user we just followed
+        # This removes the notification prompting us to follow them back
+        await db.notifications.delete_many({
+            "userId": current_user.id,
+            "fromUserId": userId,
+            "type": {"$in": ["started_following", "follow"]}
+        })
+        
         return {"message": "User followed successfully", "requested": False}
 
 @api_router.post("/users/{userId}/unfollow")
