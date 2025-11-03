@@ -39,16 +39,11 @@ const NotificationsPage = ({ user, onLogout }) => {
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/notifications`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/notifications`);
       setNotifications(response.data.notifications || []);
       
       // Mark all as read
-      await axios.post(`${API}/notifications/read-all`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`/notifications/read-all`, {});
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
