@@ -54,13 +54,11 @@ const CommentModal = ({ post, user, isOpen, onClose, onCommentAdded }) => {
 
   const handleLikeComment = async (commentId) => {
     try {
-      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('userId', user.id);
       
-      await axios.post(`${API}/social/comments/${commentId}/like`, formData, {
+      await httpClient.post(`/social/comments/${commentId}/like`, formData, {
         headers: { 
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
