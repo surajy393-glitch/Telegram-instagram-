@@ -261,16 +261,14 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const fetchUserProfile = async (targetUserId) => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
       let response;
       try {
-        // Attempt the detailed UUID-only endpoint
-        response = await axios.get(`${API}/users/${targetUserId}/profile`, { headers });
+        // Attempt the detailed UUID-only endpoint using httpClient (has auth interceptor)
+        response = await httpClient.get(`/users/${targetUserId}/profile`);
       } catch (err) {
         // Fallback to the generic endpoint that accepts usernames as well
         console.log("Profile endpoint failed, trying fallback with username:", targetUserId);
-        response = await axios.get(`${API}/users/${targetUserId}`, { headers });
+        response = await httpClient.get(`/users/${targetUserId}`);
       }
       console.log("Profile fetched successfully:", response.data.username);
       setViewingUser(response.data);
