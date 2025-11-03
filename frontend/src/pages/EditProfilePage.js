@@ -151,9 +151,8 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
         formDataToSend.append("profileImage", formData.profileImage);
       }
 
-      const response = await axios.put(`auth/profile`, formDataToSend, {
+      const response = await httpClient.put(`/auth/profile`, formDataToSend, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
         }
       });
