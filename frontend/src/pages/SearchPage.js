@@ -17,7 +17,7 @@ import {
   X,
   Send
 } from "lucide-react";
-import axios from "axios";
+import { httpClient, getToken } from "@/utils/authClient";
 import {
   Tabs,
   TabsContent,
@@ -28,7 +28,6 @@ import HashtagText from "@/components/HashtagText";
 import SearchSkeleton from "@/components/LoadingSkeleton";
 import { searchCache, trendingCache } from "@/utils/cache";
 
-const API = "/api";
 
 const SearchPage = ({ user, onLogout }) => {
   const location = useLocation();
@@ -77,13 +76,9 @@ const SearchPage = ({ user, onLogout }) => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      console.log('Fetching trending content with token:', token ? 'present' : 'missing');
+    try {      console.log('Fetching trending content with token:', token ? 'present' : 'missing');
       
-      const response = await axios.get(`${API}/search/trending`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/search/trending`);
       
       console.log('Trending response:', response.data);
       
@@ -99,13 +94,9 @@ const SearchPage = ({ user, onLogout }) => {
   }, []);
 
   const fetchExplorePosts = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("token");
-      console.log('🔍 Fetching explore posts');
+    try {      console.log('🔍 Fetching explore posts');
       
-      const response = await axios.get(`${API}/search/explore`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/search/explore`);
       
       console.log('✅ Explore posts response:', response.data);
       setExplorePosts(response.data.posts || []);
@@ -131,10 +122,8 @@ const SearchPage = ({ user, onLogout }) => {
     setLoading(true);
     setShowSuggestions(false);
 
-    try {
-      const token = localStorage.getItem("token");
-      
-      if (!token) {
+    try {      
+      if (!getToken()) {
         console.error('❌ No token found in localStorage');
         alert('Please log in again to search');
         return;
@@ -142,11 +131,11 @@ const SearchPage = ({ user, onLogout }) => {
       
       console.log('🔍 Searching:', { query, type, hasToken: !!token });
       
-      const response = await axios.post(`${API}/search`, {
+      const response = await axios.post(`search`, {
         query: query.trim(),
         type: type === "all" ? "all" : type
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${getToken()}` }
       });
       
       console.log('✅ Search API Response:', response.data);
@@ -161,7 +150,7 @@ const SearchPage = ({ user, onLogout }) => {
     } catch (error) {
       console.error("❌ Error searching:", error);
       console.error("❌ Error response:", error.response?.data);
-      console.error("❌ Token present:", !!localStorage.getItem("token"));
+      console.error("❌ Token present:", !!getToken());
       alert(`Search failed: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
@@ -175,11 +164,7 @@ const SearchPage = ({ user, onLogout }) => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/search/suggestions?q=${encodeURIComponent(query)}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`/search/suggestions?q=${encodeURIComponent(query)}`);
       setSuggestions(response.data.suggestions);
     } catch (error) {
       console.error("Error fetching suggestions:", error);
@@ -221,9 +206,7 @@ const SearchPage = ({ user, onLogout }) => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
+    try {      if (!getToken()) {
         console.error("No authentication token found");
         alert("Please log in to follow users");
         return;
@@ -268,11 +251,9 @@ const SearchPage = ({ user, onLogout }) => {
 
       // Make API call in background
       const endpoint = isFollowing ? "unfollow" : "follow";
-      console.log(`Making API call to: ${API}/users/${targetUserId}/${endpoint}`);
+      console.log(`Making API call to: users/${targetUserId}/${endpoint}`);
       
-      const response = await axios.post(`${API}/users/${targetUserId}/${endpoint}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.post(`/users/${targetUserId}/${endpoint}`, {});
       
       console.log("Follow action successful:", response.data);
       
