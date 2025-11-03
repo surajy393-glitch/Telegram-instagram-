@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Crown, MoreVertical, Shield, AlertCircle, EyeOff, Link2, Share2, Zap, Lock, Info } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import axios from "axios";
+import { getToken, httpClient } from "@/utils/authClient";
 import { getPostMediaUrl as normalizePostMediaUrl } from "@/utils/media";
 import {
   Dialog,
