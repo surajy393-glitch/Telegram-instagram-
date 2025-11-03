@@ -990,6 +990,9 @@ const ProfilePage = ({ user, onLogout }) => {
               <DialogTitle className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-500">
                 Vibe Check
               </DialogTitle>
+              <DialogDescription className="text-center text-gray-600">
+                Check your compatibility with this user
+              </DialogDescription>
             </DialogHeader>
             <div className="text-center py-4">
               {vibeScore !== null ? (
