@@ -989,7 +989,8 @@ const ProfilePage = ({ user, onLogout }) => {
               <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">No Posts Yet</h3>
               <p className="text-gray-600 text-center">This user hasn't posted anything yet</p>
             </div>
-          )}
+          );
+          })()}
         </div>
 
         {/* Vibe Check Dialog */}
