@@ -43,18 +43,16 @@ const MyProfilePage = ({ user, onLogout }) => {
 
   const fetchProfileData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      console.log("🔑 Fetching profile data with token:", token ? "Present" : "Missing");
-      const headers = { Authorization: `Bearer ${token}` };
+      console.log("🔑 Fetching profile data with httpClient");
 
       const [profileRes, postsRes, savedRes, archivedRes] = await Promise.all([
-        axios.get(`${API}/auth/me`, { headers }).catch((err) => {
+        httpClient.get(`/auth/me`).catch((err) => {
           console.error("❌ /auth/me failed:", err.response?.status, err.message);
           return { data: user };
         }),
-        axios.get(`${API}/profile/posts`, { headers }).catch(() => ({ data: { posts: [] } })),
-        axios.get(`${API}/profile/saved`, { headers }).catch(() => ({ data: { posts: [] } })),
-        axios.get(`${API}/profile/archived`, { headers }).catch(() => ({ data: { archived: [] } }))
+        httpClient.get(`/profile/posts`).catch(() => ({ data: { posts: [] } })),
+        httpClient.get(`/profile/saved`).catch(() => ({ data: { posts: [] } })),
+        httpClient.get(`/profile/archived`).catch(() => ({ data: { archived: [] } }))
       ]);
 
       if (profileRes.data) {
