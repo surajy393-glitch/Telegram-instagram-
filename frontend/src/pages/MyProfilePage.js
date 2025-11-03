@@ -130,7 +130,7 @@ const MyProfilePage = ({ user, onLogout }) => {
     setShowFollowingDialog(true);
     setLoadingFollowing(true);
     
-    try:
+    try {
       const response = await httpClient.get(`/users/${profile.id}/following`);
       setFollowingList(response.data.following || []);
     } catch (error) {
