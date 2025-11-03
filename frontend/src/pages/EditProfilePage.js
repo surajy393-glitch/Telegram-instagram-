@@ -41,18 +41,10 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
   }, [user]);
 
   const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("❌ No token found, redirecting to login");
-        navigate("/login");
-        return;
-      }
+    try {      // Token check removed - httpClient handles auth
       
       console.log("📝 EditProfile: Fetching profile with token...");
-      const response = await axios.get(`${API}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`auth/me`);
       
       console.log("✅ EditProfile: Profile data received");
       console.log("   Full Name:", response.data.fullName);
@@ -116,11 +108,7 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
   };
 
   const checkUsernameChange = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/auth/can-change-username`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`auth/can-change-username`);
       setCanChangeUsername(response.data.canChange);
       setDaysRemaining(response.data.daysRemaining);
     } catch (error) {
@@ -153,9 +141,7 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      const token = localStorage.getItem("token");
-      const formDataToSend = new FormData();
+    try {      const formDataToSend = new FormData();
       
       formDataToSend.append("fullName", formData.fullName);
       formDataToSend.append("username", formData.username);
@@ -165,7 +151,7 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
         formDataToSend.append("profileImage", formData.profileImage);
       }
 
-      const response = await axios.put(`${API}/auth/profile`, formDataToSend, {
+      const response = await axios.put(`auth/profile`, formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
@@ -177,9 +163,7 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
       localStorage.setItem("user", JSON.stringify(updatedUser));
       
       // Update app state by calling onLogin with existing token and updated user
-      if (onLogin) {
-        const currentToken = localStorage.getItem("token");
-        onLogin(currentToken, updatedUser);
+      if (onLogin) {        onLogin(currentToken, updatedUser);
       }
 
       alert("Profile updated successfully!");
