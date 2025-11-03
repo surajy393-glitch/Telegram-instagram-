@@ -348,12 +348,9 @@ const ProfilePage = ({ user, onLogout }) => {
     
     setShowVibeCompatibility(true);
     try {
-      const token = localStorage.getItem("token");
       console.log(`Fetching vibe compatibility for user: ${viewingUser.id}`);
       
-      const response = await axios.get(`${API}/auth/calculate-compatibility/${viewingUser.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/auth/calculate-compatibility/${viewingUser.id}`);
       
       console.log("Vibe compatibility response:", response.data);
       setVibeScore(response.data);
