@@ -80,10 +80,7 @@ const NotificationsPage = ({ user, onLogout }) => {
 
   const handleFollowBack = async (fromUserId) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${fromUserId}/follow`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`/users/${fromUserId}/follow`, {});
       
       // Remove notification from list after following back
       setNotifications(prev => prev.filter(n => !(n.type === 'started_following' && n.fromUserId === fromUserId)));
