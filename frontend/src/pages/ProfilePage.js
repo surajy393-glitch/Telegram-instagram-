@@ -275,12 +275,9 @@ const ProfilePage = ({ user, onLogout }) => {
   const fetchUserPosts = async (accountId, username) => {
     setPostsLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-      
       // 1. Try to load posts via the normal endpoint (now accepts UUID or username)
       console.log("Fetching posts with accountId:", accountId, "username:", username);
-      let response = await axios.get(`${API}/users/${accountId}/posts`, { headers });
+      let response = await httpClient.get(`/users/${accountId}/posts`);
       console.log("Posts API response:", response.data);
       
       let postsData = Array.isArray(response.data.posts)
@@ -292,7 +289,7 @@ const ProfilePage = ({ user, onLogout }) => {
       // 2. If no posts returned but postsCount shows > 0, try using the username slug
       if (postsData.length === 0 && viewingUser?.postsCount > 0 && username) {
         console.log("No posts with UUID, trying username fallback:", username);
-        const fallback = await axios.get(`${API}/users/${username}/posts`, { headers });
+        const fallback = await httpClient.get(`/users/${username}/posts`);
         console.log("Fallback response:", fallback.data);
         postsData = Array.isArray(fallback.data.posts)
           ? fallback.data.posts
@@ -304,7 +301,7 @@ const ProfilePage = ({ user, onLogout }) => {
       // 3. If still empty and we expect posts, load the feed and filter by this user
       if (postsData.length === 0 && viewingUser?.postsCount > 0) {
         console.warn("User posts endpoint returned nothing; falling back to feed");
-        const feedResp = await axios.get(`${API}/posts/feed`, { headers });
+        const feedResp = await httpClient.get(`/posts/feed`);
         const feedPosts = Array.isArray(feedResp.data.posts) ? feedResp.data.posts : [];
         postsData = feedPosts.filter(
           (p) => p.userId === accountId || p.username === username
@@ -323,9 +320,7 @@ const ProfilePage = ({ user, onLogout }) => {
       if (error.response?.status === 500 || error.response?.status === 404) {
         console.warn("Primary endpoints failed, attempting feed fallback");
         try {
-          const token = localStorage.getItem('token');
-          const headers = { Authorization: `Bearer ${token}` };
-          const feedResp = await axios.get(`${API}/posts/feed`, { headers });
+          const feedResp = await httpClient.get(`/posts/feed`);
           const feedPosts = Array.isArray(feedResp.data.posts) ? feedResp.data.posts : [];
           const filteredPosts = feedPosts.filter(
             (p) => p.userId === accountId || p.username === username
