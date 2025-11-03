@@ -226,10 +226,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/auth/me`);
       setProfile(response.data);
     } catch (error) {
       console.error("Error fetching profile:", error);
