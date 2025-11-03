@@ -898,11 +898,21 @@ const ProfilePage = ({ user, onLogout }) => {
           </div>
 
           {/* User Posts Grid */}
-          {(
-            // If the viewed account is private and it's not your own profile,
-            // hide the posts entirely unless you're following them.
-            viewingUser?.isPrivate && !viewingUser?.isFollowing && !isViewingOwnProfile
-          ) ? (
+          {(() => {
+            // Debug logging
+            console.log("🔍 Privacy Check Debug:", {
+              isPrivate: viewingUser?.isPrivate,
+              isFollowing: viewingUser?.isFollowing,
+              isViewingOwnProfile: isViewingOwnProfile,
+              userId: viewingUser?.id,
+              currentUserId: user?.id,
+              shouldShowPrivateMessage: viewingUser?.isPrivate && !viewingUser?.isFollowing && !isViewingOwnProfile,
+              postsLoading: postsLoading,
+              userPostsLength: userPosts?.length,
+              viewingUserData: viewingUser
+            });
+            
+            return (viewingUser?.isPrivate && !viewingUser?.isFollowing && !isViewingOwnProfile) ? (
             <div className="glass-effect rounded-3xl overflow-hidden shadow-xl">
               <div className="bg-gradient-to-br from-gray-100 to-gray-200 p-16 text-center">
                 <div className="bg-white rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center shadow-lg">
