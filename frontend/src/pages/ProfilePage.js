@@ -158,7 +158,7 @@ const ProfilePage = ({ user, onLogout }) => {
         fetchUserPosts(accountId, viewingUser.username);
       }
     }
-  }, [viewingUser, userPosts.length]);
+  }, [viewingUser?.id, viewingUser?.isFollowing, viewingUser?.isPrivate, viewingUser?.postsCount, user?.id]);
 
   useEffect(() => {
     // Only fetch follow-request notifications when viewing your own profile
