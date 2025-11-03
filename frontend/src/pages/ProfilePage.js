@@ -204,13 +204,10 @@ const ProfilePage = ({ user, onLogout }) => {
     console.log("=== fetchAccountInfo CALLED with ID:", userId);
     
     try {
-      const token = localStorage.getItem("token");
-      const url = `${API}/users/${userId}/account-info`;
+      const url = `/users/${userId}/account-info`;
       console.log("Fetching from URL:", url);
       
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(url);
       
       console.log("✅ Account info received:", response.data);
       setAccountInfo(response.data);
