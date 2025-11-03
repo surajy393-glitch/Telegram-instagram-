@@ -381,10 +381,7 @@ const ProfilePage = ({ user, onLogout }) => {
   const handleHideStory = async () => {
     if (!viewingUser) return;
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${viewingUser.id}/hide-story`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`/users/${viewingUser.id}/hide-story`, {});
       alert("You will no longer see stories from this user");
     } catch (error) {
       console.error("Error hiding story:", error);
