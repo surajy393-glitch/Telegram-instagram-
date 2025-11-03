@@ -8,9 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import axios from "axios";
+import { httpClient } from "@/utils/authClient";
 
-const API = "/api";
 
 const SettingsPage = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -24,11 +23,7 @@ const SettingsPage = ({ user, onLogout }) => {
   }, []);
 
   const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`/auth/me`);
       setProfile(response.data);
       
       // Load all settings from profile
@@ -59,14 +54,10 @@ const SettingsPage = ({ user, onLogout }) => {
     if (updating[settingKey]) return;
     
     setUpdating(prev => ({ ...prev, [settingKey]: true }));
-    try {
-      const token = localStorage.getItem("token");
-      const newValue = !settings[settingKey];
+    try {      const newValue = !settings[settingKey];
       
-      await axios.put(`${API}/auth/settings`, {
+      await httpClient.put(`/auth/settings`, {
         [settingKey]: newValue
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       setSettings(prev => ({ ...prev, [settingKey]: newValue }));
@@ -79,9 +70,7 @@ const SettingsPage = ({ user, onLogout }) => {
   };
 
   const handleDownloadData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/auth/download-data`, {
+    try {      const response = await axios.get(`auth/download-data`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });

@@ -8,9 +8,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import axios from 'axios';
+import { httpClient } from "@/utils/authClient";
 
-const API = "/api";
 
 const SocialSettingsPage = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -43,11 +42,7 @@ const SocialSettingsPage = ({ user, onLogout }) => {
   }, []);
 
   const fetchUserSettings = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`/auth/me`);
       
       // Map backend settings to frontend state
       setSettings({
@@ -72,9 +67,7 @@ const SocialSettingsPage = ({ user, onLogout }) => {
     // Optimistically update UI
     setSettings({ ...settings, [key]: newValue });
     
-    try {
-      const token = localStorage.getItem('token');
-      
+    try {      
       // Map frontend setting key to backend setting key
       const settingMap = {
         privateProfile: 'isPrivate',
@@ -89,10 +82,7 @@ const SocialSettingsPage = ({ user, onLogout }) => {
       const backendKey = settingMap[key];
       
       // Save to backend
-      await axios.put(`${API}/auth/settings`, 
-        { [backendKey]: newValue },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await httpClient.put(`/auth/settings`, { [backendKey]: newValue });
       
       console.log(`Setting ${key} updated to ${newValue}`);
     } catch (error) {

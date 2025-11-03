@@ -3,9 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, CheckCircle2, XCircle, Shield, Info, HelpCircle } from "lucide-react";
-import axios from "axios";
+import { httpClient } from "@/utils/authClient";
 
-const API = "/api";
 
 const VerificationStatusPage = ({ user }) => {
   const navigate = useNavigate();
@@ -28,11 +27,7 @@ const VerificationStatusPage = ({ user }) => {
   }, []);
 
   const fetchVerificationStatus = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/verification/status`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`/verification/status`);
       setVerificationData(response.data);
     } catch (error) {
       console.error("Error fetching verification status:", error);
@@ -86,22 +81,14 @@ const VerificationStatusPage = ({ user }) => {
   const sendVerificationCode = async () => {
     setVerifying(true);
     setMessage('');
-    try {
-      const token = localStorage.getItem("token");
-      
+    try {      
       if (verificationType === 'email') {
-        const response = await axios.post(`${API}/auth/send-email-verification`, 
-          { email },
-          { headers: { Authorization: `Bearer ${token}` }}
-        );
+        const response = await httpClient.post(`/auth/send-email-verification`, { email });
         // For email, show debug code since we're not sending real emails yet
         setMessage(`Code sent! For testing: ${response.data.debug_code}`);
         setMessageType('success');
       } else {
-        await axios.post(`${API}/auth/send-phone-verification`, 
-          { phone: phoneNumber },
-          { headers: { Authorization: `Bearer ${token}` }}
-        );
+        await httpClient.post(`/auth/send-phone-verification`, { phone: phoneNumber });
         setMessage('Verification code sent to your phone via SMS!');
         setMessageType('success');
       }
@@ -117,20 +104,12 @@ const VerificationStatusPage = ({ user }) => {
   const verifyCode = async () => {
     setVerifying(true);
     setMessage('');
-    try {
-      const token = localStorage.getItem("token");
-      
+    try {      
       if (verificationType === 'email') {
-        await axios.post(`${API}/auth/verify-email-code`, 
-          { code: otpCode },
-          { headers: { Authorization: `Bearer ${token}` }}
-        );
+        await httpClient.post(`/auth/verify-email-code`, { code: otpCode });
         setMessage('Email verified successfully!');
       } else {
-        await axios.post(`${API}/auth/verify-phone-code`, 
-          { code: otpCode },
-          { headers: { Authorization: `Bearer ${token}` }}
-        );
+        await httpClient.post(`/auth/verify-phone-code`, { code: otpCode });
         setMessage('Phone verified successfully!');
       }
       setMessageType('success');
