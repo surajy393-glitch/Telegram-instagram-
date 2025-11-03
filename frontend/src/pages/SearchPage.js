@@ -129,13 +129,11 @@ const SearchPage = ({ user, onLogout }) => {
         return;
       }
       
-      console.log('🔍 Searching:', { query, type, hasToken: !!token });
+      console.log('🔍 Searching:', { query, type, hasToken: !!getToken() });
       
-      const response = await axios.post(`search`, {
+      const response = await httpClient.post(`/search`, {
         query: query.trim(),
         type: type === "all" ? "all" : type
-      }, {
-        headers: { Authorization: `Bearer ${getToken()}` }
       });
       
       console.log('✅ Search API Response:', response.data);
