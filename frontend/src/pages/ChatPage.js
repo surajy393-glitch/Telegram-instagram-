@@ -41,10 +41,7 @@ const ChatPage = ({ user }) => {
 
   const fetchChatUser = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/users/list`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/users/list`);
       const foundUser = response.data.users.find(u => u.id === userId);
       setChatUser(foundUser);
     } catch (error) {
