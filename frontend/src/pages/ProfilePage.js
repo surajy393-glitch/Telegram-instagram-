@@ -187,10 +187,7 @@ const ProfilePage = ({ user, onLogout }) => {
         return;
       }
       try {
-        const token = localStorage.getItem("token");
-        const resp = await axios.get(`${API}/notifications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resp = await httpClient.get(`/notifications`);
         const hasReq = (resp.data.notifications || []).some(
           (n) => n.type === "follow_request" && n.fromUserId === viewingUser.id
         );
