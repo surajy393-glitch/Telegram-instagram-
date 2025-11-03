@@ -237,10 +237,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/users/list`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.get(`/users/list`);
       setUsers(response.data.users || []);
     } catch (error) {
       console.error("Error fetching users:", error);
