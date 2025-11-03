@@ -37,11 +37,7 @@ const PostDetailPage = ({ user }) => {
   }, [showMenuFor, showPostMenu]);
 
   const fetchPostDetails = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/posts/${postId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`${API}/posts/${postId}`);
       setPost(response.data);
       setLoading(false);
     } catch (error) {
@@ -51,11 +47,7 @@ const PostDetailPage = ({ user }) => {
   };
 
   const fetchComments = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API}/posts/${postId}/comments`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      const response = await httpClient.get(`${API}/posts/${postId}/comments`);
       setComments(response.data.comments || []);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -66,9 +58,7 @@ const PostDetailPage = ({ user }) => {
   const handleLike = async () => {
     if (!post) return;
     
-    try {
-      const token = localStorage.getItem("token");
-      const isLiked = post.userLiked;
+    try {      const isLiked = post.userLiked;
       const endpoint = isLiked ? 'unlike' : 'like';
       
       // Optimistic update
@@ -78,9 +68,7 @@ const PostDetailPage = ({ user }) => {
         likesCount: isLiked ? Math.max(0, prev.likesCount - 1) : prev.likesCount + 1
       }));
 
-      await axios.post(`${API}/posts/${postId}/${endpoint}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`${API}/posts/${postId}/${endpoint}`, {});
     } catch (error) {
       console.error("Error liking post:", error);
       // Rollback on error
@@ -95,9 +83,7 @@ const PostDetailPage = ({ user }) => {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      const formData = new FormData();
+    try {      const formData = new FormData();
       formData.append('text', newComment);
       
       const response = await axios.post(
@@ -123,9 +109,7 @@ const PostDetailPage = ({ user }) => {
   };
 
   const handleLikeComment = async (commentId) => {
-    try {
-      const token = localStorage.getItem("token");
-      
+    try {      
       // Optimistic update
       setComments(prev => prev.map(comment => {
         if (comment.id === commentId) {
@@ -156,9 +140,7 @@ const PostDetailPage = ({ user }) => {
   const handleReply = async (commentId) => {
     if (!replyText.trim()) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      const formData = new FormData();
+    try {      const formData = new FormData();
       formData.append('text', replyText);
       formData.append('parentCommentId', commentId);
       
@@ -182,11 +164,7 @@ const PostDetailPage = ({ user }) => {
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm("Delete this comment?")) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API}/posts/${postId}/comment/${commentId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      await httpClient.delete(`${API}/posts/${postId}/comment/${commentId}`);
 
       // Remove from local state
       setComments(prev => prev.filter(c => c.id !== commentId));
@@ -208,9 +186,7 @@ const PostDetailPage = ({ user }) => {
     const reason = window.prompt("Why are you reporting this comment?");
     if (!reason) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
+    try {      await axios.post(
         `${API}/posts/${postId}/comment/${commentId}/report`,
         { reason },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -227,9 +203,7 @@ const PostDetailPage = ({ user }) => {
   const handleBlockUser = async (userId, username) => {
     if (!window.confirm(`Block ${username}? You won't see their posts or comments.`)) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
+    try {      await axios.post(
         `${API}/users/${userId}/block`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
@@ -247,13 +221,9 @@ const PostDetailPage = ({ user }) => {
   };
 
   const handleSavePost = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const endpoint = post?.isSaved ? 'unsave' : 'save';
+    try {      const endpoint = post?.isSaved ? 'unsave' : 'save';
       
-      await axios.post(`${API}/posts/${postId}/${endpoint}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.post(`${API}/posts/${postId}/${endpoint}`, {});
 
       setPost(prev => ({
         ...prev,
@@ -271,11 +241,7 @@ const PostDetailPage = ({ user }) => {
   const handleArchivePost = async () => {
     if (!window.confirm("Archive this post? You can find it in your profile's archive tab.")) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/archive`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      await httpClient.post(`${API}/posts/${postId}/archive`, {});
 
       alert("Post archived");
       navigate(-1);
@@ -288,11 +254,7 @@ const PostDetailPage = ({ user }) => {
   const handleDeletePost = async () => {
     if (!window.confirm("Delete this post permanently?")) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API}/posts/${postId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      await httpClient.delete(`${API}/posts/${postId}`);
 
       alert("Post deleted");
       navigate(-1);
@@ -313,9 +275,7 @@ const PostDetailPage = ({ user }) => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
+    try {      await axios.post(
         `${API}/posts/${postId}/report`,
         { reason: reportReason },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -331,11 +291,7 @@ const PostDetailPage = ({ user }) => {
   };
 
   const handleHideLikes = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/hide-likes`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      await httpClient.post(`${API}/posts/${postId}/hide-likes`, {});
 
       setPost(prev => ({
         ...prev,
@@ -357,14 +313,10 @@ const PostDetailPage = ({ user }) => {
   };
 
   const submitEditCaption = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const formData = new FormData();
+    try {      const formData = new FormData();
       formData.append('caption', editedCaption);
       
-      await axios.put(`${API}/posts/${postId}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await httpClient.put(`${API}/posts/${postId}`, formData);
 
       setPost(prev => ({
         ...prev,
@@ -391,11 +343,7 @@ const PostDetailPage = ({ user }) => {
   };
 
   const handleTurnOffComments = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/toggle-comments`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    try {      await httpClient.post(`${API}/posts/${postId}/toggle-comments`, {});
 
       alert(post?.commentsDisabled ? "Comments enabled" : "Comments disabled");
       setPost(prev => ({
