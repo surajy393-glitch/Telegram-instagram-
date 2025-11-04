@@ -247,7 +247,7 @@ const LoginPage = ({ onLogin }) => {
     setVerifyLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/verify-existing-otp`, {
+      const response = await httpClient.post('/auth/verify-existing-otp', {
         email: verifyEmail.trim(),
         otp: verifyOtp.trim()
       });
