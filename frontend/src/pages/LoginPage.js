@@ -317,7 +317,7 @@ const LoginPage = ({ onLogin }) => {
       }
 
       try {
-        const response = await axios.post(`${API}/auth/forgot-password-mobile`, {
+        const response = await httpClient.post('/auth/forgot-password-mobile', {
           mobileNumber: forgotPasswordMobile.trim()
         });
 
