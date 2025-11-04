@@ -1,112 +1,86 @@
 <analysis>
-The previous AI engineer successfully stabilized the LuvHive application by addressing numerous critical bugs reported by the user. The primary focus involved a systematic modernization of authentication across the React frontend, migrating from outdated  and direct  calls to a centralized  leveraging Telegram-scoped storage. This was an iterative process, heavily reliant on the  for root cause analysis, identifying issues from incorrect URL prefixes ( missing),  dependency array errors, UI component omissions (), media URL construction (), and database-level notification persistence.
+The trajectory details the collaborative effort to build a messaging system for the LuvHive application. Initially, the AI engineer performed a comprehensive review of the existing Telegram bot and webapp, identifying core features and premium integrations, specifically noting the lack of a persistent messaging system. The user then requested to build a full-featured messaging system without immediate freemium restrictions, focusing on text and media.
 
-Key issues resolved include: ProfilePage authentication, Vibe Check UI, Chat Page authentication, Notification pages authentication, MyProfilePage authentication (including a critical syntax typo fix), PostDetailPage and CommentModal authentication, EditProfilePage authentication (and a  fix), Settings/Verification Status authentication, and SearchPage authentication. Media URL construction for posts was fixed to prevent double  prefixes. Post navigation from the profile page was also rectified. The Telegram bot was successfully started, and a user's email was manually verified. A persistent follow-back notification was resolved by implementing database deletion.
-
-The current work revolves around a new feature: a comprehensive messaging system. The AI engineer is in the process of thoroughly understanding the existing Telegram bot and webapp architecture, particularly regarding premium features, to propose an effective and user-centric messaging strategy based on a Freemium with Value model, where core messaging is free and premium unlocks enhanced experiences.
+The implementation faced numerous challenges: initial setup of backend APIs and frontend components, UI visibility issues for the Messages button due to routing problems ( vs ), inconsistent timestamp display (UTC vs IST,  serialization), auto-scrolling in the chat interface, and recurring 404 errors due to duplicate API routes. The  was frequently utilized to diagnose and provide solutions for these persistent issues, leading to iterative fixes in frontend (, , , ) and backend () code. The core task currently revolves around stabilizing these messaging features and addressing the last identified auto-scrolling bug.
 </analysis>
 
 <product_requirements>
-LuvHive is an Instagram-style dating and social web application with React frontend, FastAPI backend, and MongoDB, integrating a Telegram bot.
-Initial bugs and features tasked to the previous engineer included:
-1.  **Notification System**: Correct generation, display, and removal of like notifications for posts and stories.
-2.  **Registration & Profile Verification**: Fix  field, welcome emails, ensure accurate / storage and  display.
-3.  **Telegram Bot & Premium Payments**: Integrate bot, fix Premium page UI freeze, resolve WebAppInvoiceUrlInvalid for Telegram Stars.
-4.  **Session Management**: Isolate webapp sessions for multiple Telegram accounts.
-5.  **Vibe Check**: Fix 0% compatibility display due to missing data/logic.
-6.  **Profile Page Robustness**: Address auto-logout,  errors, and ensure reliable display of posts, following data, and Vibe Check.
+LuvHive is an Instagram-style dating and social web application with a React frontend, FastAPI backend, and MongoDB, integrating a Telegram bot. The user's primary goal is to enhance the application with a robust, persistent messaging system. Initially, the app included a notification system, registration/profile verification, Telegram bot integration (with premium features and Stars payment), session management, Vibe Check, and profile page robustness. Most initial bugs in these areas were resolved, with the previous engineer focusing on authentication and display issues across various frontend pages.
 
-Most issues were addressed. The current primary focus, now mostly resolved, was authentication and display issues on the , followed by the conceptualization of a new messaging system. The user is now emphasizing a Freemium with Value strategy for the messaging system.
+The current emphasis is on developing a comprehensive messaging system, following a Freemium with Value model. The user explicitly requested to build the entire feature-rich messaging system first, without immediate free/premium distinctions, to allow for thorough testing. The messaging system should feature persistent 1-on-1 conversations, an inbox for managing chats (accessible from both bot and webapp), and saved chat history. A key requirement was to replace ephemeral bot chats and the now-removed Mystery Match with a proper DM system.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack**: React, FastAPI, MongoDB.
--   **API**: Axios, JWT (via ),  prefix, environment variables.
--   **Deployment**: Kubernetes, Supervisor.
--   **Auth**: Telegram-scoped  ().
--   **Debugging**: .
--   **Telegram**: Bot API, Web Apps, Stars payment.
+- **Full-stack**: React, FastAPI, MongoDB, Python-Telegram-Bot.
+- **API**: Axios, JWT (via ),  prefix, environment variables, WebRTC (researched for calls).
+- **Deployment**: Kubernetes, Supervisor, Webpack.
+- **Auth**: Telegram-scoped .
+- **Debugging**: .
+- **Database**: MongoDB (UUIDs, datetime serialization to ISO strings).
+- **Real-time**: Polling (initial), WebSocket/Socket.IO (planned).
+- **UI/UX**: Responsive design, navigation.
 </key_technical_concepts>
 
 <code_architecture>
 
 -   **backend/server.py**: Main FastAPI application.
-    -   **Importance**: Handles core API routes, authentication, user profiles, social features, and notifications.
-    -   **Changes**:  logic verified, notification deletion added after follow-back in  (). Backend was returning media URLs with  prefix which was causing double prefixes on the frontend.
--   **backend/social_features.py**: Social features.
-    -   **Importance**: Contains functions related to posts, stories, likes, etc.
-    -   **Changes**: No new explicit changes mentioned in the recent trajectory.
--   **frontend/src/utils/authClient.js**: Centralized token/user handling.
-    -   **Importance**: Provides , , , , and  for authenticated API calls, crucial for Telegram-scoped sessions.
-    -   **Changes**: Not directly modified in the recent trajectory, but its methods were integrated across many frontend files.
--   **frontend/src/App.js**: Main React component.
-    -   **Importance**: Manages overall application state and routing.
-    -   **Changes**: No new explicit changes mentioned in the recent trajectory.
--   **frontend/src/pages/ProfilePage.js**: Displays user profiles.
-    -   **Importance**: Core page for viewing other users' details, posts, and social interactions.
-    -   **Changes**: Replaced  with  and direct  calls with  in numerous functions (, , , , , etc.). Added  to Vibe Check dialog. Fixed privacy check for post rendering (). Removed  from  dependency array to prevent infinite loops. Debug logs were temporarily added.  elements around posts were replaced with  components to enable navigation to .
--   **frontend/src/pages/ChatPage.js**: Handles 1-on-1 chat.
-    -   **Importance**: Enables direct messaging between users.
-    -   **Changes**: Replaced  with  and removed manual token handling in , , and .
--   **frontend/src/pages/NotificationsPage.js**: Displays notifications.
-    -   **Importance**: Shows user alerts for likes, follows, etc.
-    -   **Changes**: Replaced  with  and removed manual token handling in , , , . Modified  to filter both  and  notification types for UI removal.
--   **frontend/src/pages/MyProfilePage.js**: Displays the logged-in user's profile.
-    -   **Importance**: Allows users to view their own profile and settings.
-    -   **Changes**: Replaced  with  and removed manual token handling in , , . Fixed a critical syntax typo ( to ) at line 133.
--   **frontend/src/pages/PostDetailPage.js**: Displays a single post.
-    -   **Importance**: Shows individual posts and allows comments/likes.
-    -   **Changes**: Replaced all  and direct  calls with  methods.
--   **frontend/src/pages/EditProfilePage.js**: Allows users to edit their profile.
-    -   **Importance**: Crucial for user data management.
-    -   **Changes**: Replaced  with  and  calls with  methods in , , . Fixed  at line 165 by changing  to .
--   **frontend/src/pages/SettingsPage.js**: General application settings.
-    -   **Importance**: Provides access to various user settings.
-    -   **Changes**: Replaced  and  calls with  methods.
--   **frontend/src/pages/SocialSettingsPage.js**: Social-related settings.
-    -   **Importance**: Manages social preferences and premium status.
-    -   **Changes**: Replaced  and  calls with  methods.
--   **frontend/src/pages/VerificationStatusPage.js**: Displays user verification status.
-    -   **Importance**: Shows email and mobile verification status.
-    -   **Changes**: Replaced  and  calls with  methods.
--   **frontend/src/pages/SearchPage.js**: Allows searching for other users.
-    -   **Importance**: Enables user discovery.
-    -   **Changes**: Replaced  and  calls with  methods.
--   **frontend/src/utils/media.js**: Utility for constructing media URLs.
-    -   **Importance**: Generates correct URLs for post and story images/videos.
-    -   **Changes**: Modified  to prevent double  prefixes by conditionally adding  only if the URL doesn't already start with it. This was critical for media loading.
--   **frontend/.env**: Environment variables for frontend.
-    -   **Importance**: Stores configuration like backend URL.
-    -   **Changes**: Updated  to include  suffix.
--   **telegram_bot/main.py**: Main Telegram bot file.
-    -   **Importance**: Initializes and runs the Telegram bot, registers handlers.
-    -   **Changes**: Read for analysis of bot's premium implementation.
--   **telegram_bot/handlers/premium_handlers.py**: Handles premium-related logic in the bot.
-    -   **Importance**: Manages Telegram Stars payments and premium features.
-    -   **Changes**: Read for analysis of bot's premium implementation.
--   **telegram_bot/start_bot.sh**: Script to start the Telegram bot.
-    -   **Importance**: Executes the bot's main script.
-    -   **Changes**: Executed to start the bot.
+    -   **Importance**: Handles core API routes, authentication, and now messaging endpoints.
+    -   **Changes**: Added , , , and  endpoints. Fixed  to  calls within messaging endpoints. Implemented  helper to ensure UTC timestamps include 'Z' suffix and correctly handle datetime objects, strings, and None values for MongoDB serialization. Duplicate notification routes were removed to resolve 404 errors.
 -   **backend/.env**: Environment variables for backend.
-    -   **Importance**: Stores backend-specific configurations.
-    -   **Changes**: Not explicitly mentioned in the recent trajectory.
--   **frontend/src/components/CommentModal.js**: Component for displaying and adding comments.
-    -   **Importance**: Part of the post interaction system.
-    -   **Changes**: Replaced  and direct  calls with  methods.
+    -   **Importance**: Stores backend-specific configurations like .
+    -   **Changes**: Not explicitly mentioned in recent trajectory.
+-   **frontend/src/App.js**: Main React component, routing.
+    -   **Importance**: Defines application routes and entry points.
+    -   **Changes**: Added routes for  (MessagesPage) and  (ChatPage). Temporarily modified to use HomePage instead of FeedPage for authenticated users, then reverted.
+-   **frontend/src/pages/HomePage.js**: User's homepage feed.
+    -   **Importance**: Displays main feed and primary navigation.
+    -   **Changes**: Added  icon and Messages button in the top navigation between Search and Notifications. Implemented  state and  function for unread badge.
+-   **frontend/src/pages/FeedPage.js**: Displays user feed.
+    -   **Importance**: This was the primary page for authenticated users.
+    -   **Changes**: After  routing issues, the Messages button was re-added here, along with  icon import,  state, and  for unread badge, ensuring it appeared correctly when FeedPage was rendered.
+-   **frontend/src/pages/MessagesPage.js**: NEW component for the inbox list.
+    -   **Importance**: Displays a list of user conversations.
+    -   **Changes**: Created. Implemented  function for IST conversion, which required several iterations and fixes to display relative times correctly.
+-   **frontend/src/pages/ChatPage.js**: NEW component for 1-on-1 chat.
+    -   **Importance**: Handles real-time messaging with a specific user.
+    -   **Changes**: Created. Updated back button from  to . Implemented Instagram-style message status (no ticks, Seen [time] below bubble). Fixed an auto-scroll bug where  triggered scroll on every polling interval; modified to scroll only on new messages. Fixed IST conversion logic by removing / and relying on / after applying offset.
+-   **frontend/src/pages/ChatPage_OLD.js**: Renamed from .
+    -   **Importance**: Retains previous chat functionality, likely for the Telegram bot's ephemeral chats.
+    -   **Changes**: Renamed to prevent conflict with the new .
+-   **frontend/src/pages/ProfilePage.js**: Displays user profiles.
+    -   **Importance**: Allows viewing other users' details and initiating actions.
+    -   **Changes**: Replaced previous Chat button with a Message button linking to the new . Imported  icon.
+-   **frontend/.env**: Environment variables for frontend.
+    -   **Importance**: Stores .
+    -   **Changes**:  was updated to include  suffix to fix 404 authentication errors.
+-   **telegram_bot/main.py**: Main Telegram bot file.
+    -   **Importance**: Initializes bot, registers handlers, and contains core logic.
+    -   **Changes**: Small additions for  and  import. Critically, the  function logic for Find a Partner was deleted and replaced with , then restored. The  handler was commented out/deleted as it was causing a .  was added and fixed to point to Neon PostgreSQL.
+-   **telegram_bot/chat.py**: Core chat logic for the bot.
+    -   **Importance**: Handles the actual chat interactions within the Telegram bot.
+    -   **Changes**: Compared with user's provided version, no changes found.
+-   **telegram_bot/handlers/chat_handlers.py**: Chat-related handlers for the bot.
+    -   **Importance**: Manages various chat commands and interactions.
+    -   **Changes**: Compared with user's provided version, no changes found.
+-   **telegram_bot/.env**: Environment variables for Telegram bot.
+    -   **Importance**: Stores  and .
+    -   **Changes**:  was added and then updated to the correct Neon PostgreSQL URL to resolve bot startup issues.
 </code_architecture>
 
 <pending_tasks>
--   **Homepage Post Visibility**: User's own old posts not appearing on the main homepage feed (behavior identified as intended, but user confirmation on desired behavior is pending).
--   **Email OTP Sending**: SendGrid API key is likely invalid/expired, preventing email OTPs. Requires a new API key from the user.
--   **Messaging System Implementation**: Design and implementation of a comprehensive messaging system, including an inbox, and defining premium/free user access to chat features.
+- **Messages Inbox Ordering**: New messages should appear at the top, old messages below.
+- **Video/Voice Calling Implementation**: User inquired about this, and it was researched, but implementation is deferred until core messaging is stable.
+- **Instagram-style message context menu**: User asked about implementing pin, delete, mute messages/calls on long-press in the inbox.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was engaged in a deep dive into the existing Telegram bot and webapp architecture to understand all implemented features, with a particular focus on how premium status is currently utilized. This comprehensive exploration was requested by the user to inform the design of a new messaging system. The user expressed a strong desire for the messaging system to be a compelling reason for users to pay, rather than a restrictive one.
+Immediately before this summary request, the AI engineer was deep into debugging persistent issues with the newly implemented messaging system. The user had reported that after entering the chat, scrolling up would automatically force the view back down to the latest message, preventing them from reading older messages. This was identified as an auto-scrolling bug.
 
-The AI engineer has conducted research into whether disappearing messages are natively supported by Telegram Web Apps (concluding they are not, requiring custom implementation). Following this, the engineer has started reviewing the Telegram bot's core files, specifically  and , and is about to inspect the chat handlers to gain a full understanding of the current messaging ecosystem and premium integration points. This deep architectural understanding is crucial before proposing and implementing the detailed messaging strategy that aligns with the user's Freemium with VALUE business model.
+The  was called twice to analyze this specific issue, identifying the root cause in . The  hook, which triggered  whenever the  dependency array changed (i.e., on every polling fetch), was causing the unwanted behavior. The proposed and applied fix involved modifying this  to only call  if the  had actually increased, indicating new messages had arrived. A  was used to track the .
+
+The last action performed was applying this fix to  and compiling the frontend, with hot reload active. This was part of a long series of fixes for the messaging system, which included: correcting 404 API errors, fixing incorrect timestamp displays (IST conversion,  serialization), ensuring the Messages button visibility, and implementing Instagram-style message read statuses.
 </current_work>
 
 <optional_next_step>
-The next step is to continue the comprehensive tour of the Telegram bot by checking its chat handlers.
+Verify the auto-scroll fix by testing the chat page: scroll up, wait, and send a new message to confirm it only scrolls on new messages.
 </optional_next_step>
