@@ -337,7 +337,6 @@ const FeedPage = ({ user, onLogout }) => {
     if (mentions.length > 0) {
       try {
         // Send notifications to mentioned users
-        const token = localStorage.getItem("token");
         await httpClient.post('/notifications/mentions', {
           mentionedUsernames: mentions,
           type: 'story_mention',
@@ -987,7 +986,6 @@ const FeedPage = ({ user, onLogout }) => {
                   if (lastWord.startsWith('@') && lastWord.length > 1) {
                     const searchTerm = lastWord.substring(1);
                     try {
-                      const token = localStorage.getItem("token");
                       const response = await httpClient.get(`/search?query=${searchTerm}`, {
                         headers: { Authorization: `Bearer ${token}` }
                       });
@@ -1127,7 +1125,6 @@ const FeedPage = ({ user, onLogout }) => {
                           onClick={async () => {
                             if (window.confirm('Delete this story?')) {
                               try {
-                                const token = localStorage.getItem("token");
                                 const storyId = viewingStories.stories[currentStoryIndex]?.id;
                                 await httpClient.delete(`/stories/${storyId}`, {
                                   headers: { Authorization: `Bearer ${token}` }
@@ -1151,7 +1148,6 @@ const FeedPage = ({ user, onLogout }) => {
                         <button 
                           onClick={async () => {
                             try {
-                              const token = localStorage.getItem("token");
                               const storyId = viewingStories.stories[currentStoryIndex]?.id;
                               await httpClient.post(`/stories/${storyId}/archive`, {}, {
                                 headers: { Authorization: `Bearer ${token}` }
@@ -1239,7 +1235,6 @@ const FeedPage = ({ user, onLogout }) => {
                         <button 
                           onClick={async () => {
                             try {
-                              const token = localStorage.getItem("token");
                               await httpClient.post(`/users/${viewingStories.userId}/mute`, {}, {
                                 headers: { Authorization: `Bearer ${token}` }
                               });
@@ -1327,7 +1322,6 @@ const FeedPage = ({ user, onLogout }) => {
                   <button
                     onClick={async () => {
                       try {
-                        const token = localStorage.getItem("token");
                         const storyId = viewingStories.stories[currentStoryIndex]?.id;
                         const isLiked = storyLikes[storyId];
                         
@@ -1422,7 +1416,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "I just don't like it" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1443,7 +1436,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Harassment or bullying" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1464,7 +1456,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Self-harm or dangerous content" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1485,7 +1476,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Hate speech or violence" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1506,7 +1496,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Illegal activities" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1527,7 +1516,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Adult content" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1548,7 +1536,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Spam or scam" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1569,7 +1556,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Misinformation" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
@@ -1590,7 +1576,6 @@ const FeedPage = ({ user, onLogout }) => {
               <button
                 onClick={async () => {
                   try {
-                    const token = localStorage.getItem("token");
                     await httpClient.post(`/stories/${reportingStory?.id}/report`, 
                       { reason: "Copyright violation" }, 
                       { headers: { Authorization: `Bearer ${token}` }}
