@@ -5953,7 +5953,7 @@ async def send_message(
             {
                 "$set": {
                     "last_message": request.content if request.type == "text" else f"Sent a {request.type}",
-                    "last_message_at": datetime.now(timezone.utc).isoformat()
+                    "last_message_at": datetime.now(timezone.utc)
                 },
                 "$inc": {f"unread_count.{receiver_id}": 1}
             }
