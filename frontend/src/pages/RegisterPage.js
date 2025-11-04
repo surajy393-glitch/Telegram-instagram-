@@ -215,7 +215,7 @@ const RegisterPage = ({ onLogin }) => {
     setMobileOtpLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/send-mobile-otp`, {
+      const response = await httpClient.post('/auth/send-mobile-otp', {
         mobileNumber: formData.mobileNumber
       });
       
