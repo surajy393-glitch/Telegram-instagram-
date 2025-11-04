@@ -1333,7 +1333,7 @@ const FeedPage = ({ user, onLogout }) => {
                         
                         if (isLiked) {
                           // Unlike
-                          await axios.delete(`/api/stories/${storyId}/like`, {
+                          await httpClient.delete(`/stories/${storyId}/like`, {
                             headers: { Authorization: `Bearer ${token}` }
                           });
                           setStoryLikes({ ...storyLikes, [storyId]: false });
