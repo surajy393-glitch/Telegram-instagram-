@@ -5942,7 +5942,7 @@ async def send_message(
                 "read": False
             },
             "read_at": None,
-            "created_at": datetime.now(timezone.utc)
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.messages.insert_one(message)
