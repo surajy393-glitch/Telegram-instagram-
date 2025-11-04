@@ -242,7 +242,7 @@ const DatingRegisterPage = ({ onLogin }) => {
     setMobileMessage("Checking mobile number...");
     
     try {
-      const response = await axios.get(`${API}/auth/check-mobile/${encodeURIComponent(mobile)}`);
+      const response = await httpClient.get(`/auth/check-mobile/${encodeURIComponent(mobile)}`);
       const data = response.data;
       
       if (data.available) {
