@@ -483,7 +483,7 @@ const HomePage = ({ user, onLogout }) => {
     
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${reportingPost.id}/report`, 
+      await httpClient.post(`/posts/${reportingPost.id}/report`, 
         { reason }, 
         {
           headers: { 
