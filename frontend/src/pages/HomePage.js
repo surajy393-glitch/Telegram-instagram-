@@ -148,8 +148,8 @@ const HomePage = ({ user, onLogout }) => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [storiesRes, postsRes] = await Promise.all([
-        axios.get(`${API}/stories/feed`, { headers }),
-        axios.get(`${API}/posts/feed`, { headers })
+        httpClient.get('/stories/feed', { headers }),
+        httpClient.get('/posts/feed', { headers })
       ]);
 
       setStories(storiesRes.data.stories || []);
