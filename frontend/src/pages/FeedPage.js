@@ -238,32 +238,28 @@ const FeedPage = ({ user, onLogout }) => {
 
     try {
       const formData = new FormData();
-      formData.append('content', newPost || 'Photo post');  // Default text if empty
-      formData.append('userId', user.id);
-      formData.append('postType', selectedImage ? 'image' : 'text');
-      formData.append('isAnonymous', isAnonymous);
+      formData.append('caption', newPost || 'Photo post');
+      formData.append('media_type', selectedImage ? 'image' : 'text');
       
       if (selectedImage) {
-        formData.append('image', selectedImage);
+        formData.append('media', selectedImage);
       }
 
       const response = await httpClient.post('/posts', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (response.data.success) {
+      if (response.data.message === "Post created successfully") {
         setNewPost('');
         setSelectedImage(null);
         setIsAnonymous(false);
         setShowCreatePost(false);
-        // Wait a moment for backend to process, then refresh feed
-        setTimeout(() => {
-          fetchFeed();
-        }, 500);
+        await fetchFeed();
+        alert('Post created successfully!');
       }
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Failed to create post');
+      alert('Failed to create post: ' + (error.response?.data?.detail || error.message));
     }
   };
 
