@@ -202,9 +202,18 @@ const FeedPage = ({ user, onLogout }) => {
       setSeenPostIds(newSeenIds);
       
       if (append) {
-        setPosts(prev => [...prev, ...newPosts]);
+        // Filter out duplicates before appending
+        setPosts(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
+          return [...prev, ...uniqueNewPosts];
+        });
       } else {
-        setPosts(newPosts);
+        // Deduplicate posts in replace mode
+        const uniquePosts = Array.from(
+          new Map(newPosts.map(p => [p.id, p])).values()
+        );
+        setPosts(uniquePosts);
       }
       
       // Check if there are more posts
