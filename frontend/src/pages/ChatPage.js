@@ -194,7 +194,7 @@ const ChatPage = () => {
               {messageGroups[dateKey].map((message) => (
                 <div
                   key={message.id}
-                  className={`flex mb-4 ${message.isMine ? 'justify-end' : 'justify-start'}`}
+                  className={`flex flex-col mb-4 ${message.isMine ? 'items-end' : 'items-start'}`}
                 >
                   <div
                     className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
@@ -212,13 +212,14 @@ const ChatPage = () => {
                       >
                         {formatTimestamp(message.createdAt)}
                       </span>
-                      {message.isMine && (
-                        <span className="text-xs text-pink-100">
-                          {message.status?.read ? '✓✓' : '✓'}
-                        </span>
-                      )}
                     </div>
                   </div>
+                  {/* Instagram-style "Seen" status */}
+                  {message.isMine && message.status?.read && message.readAt && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Seen {formatTimestamp(message.readAt)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
