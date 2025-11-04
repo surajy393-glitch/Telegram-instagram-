@@ -44,7 +44,7 @@ const EditProfilePage = ({ user, onLogin, onLogout }) => {
     try {      // Token check removed - httpClient handles auth
       
       console.log("📝 EditProfile: Fetching profile with token...");
-      const response = await httpClient.get(`auth/me`);
+      const response = await httpClient.get(`/auth/me`);
       
       console.log("✅ EditProfile: Profile data received");
       console.log("   Full Name:", response.data.fullName);
