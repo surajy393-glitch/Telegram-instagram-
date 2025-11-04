@@ -5999,7 +5999,8 @@ async def get_conversations(
                 },
                 "lastMessage": conv.get("last_message", ""),
                 "lastMessageAt": serialize_datetime(conv.get("last_message_at")),
-                "unreadCount": conv.get("unread_count", {}).get(user_id, 0)
+                "unreadCount": conv.get("unread_count", {}).get(user_id, 0),
+                "isRequest": is_request  # Add request status
             })
         
         return {"conversations": formatted_conversations}
