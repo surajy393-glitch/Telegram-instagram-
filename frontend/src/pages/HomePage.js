@@ -197,7 +197,6 @@ const HomePage = ({ user, onLogout }) => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post('/stories/create', newStory, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -240,7 +239,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleSavePost = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/posts/${postId}/save`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -332,7 +330,6 @@ const HomePage = ({ user, onLogout }) => {
     if (!storyToDelete) return;
 
     try {
-      const token = localStorage.getItem("token");
       await httpClient.delete(`/stories/${storyToDelete}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -413,7 +410,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleUnfollowFromPost = async (postUserId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/users/${postUserId}/unfollow`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -427,7 +423,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleFollowFromPost = async (postUserId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/users/${postUserId}/follow`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -441,7 +436,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleMuteUser = async (postUserId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/users/${postUserId}/mute`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -456,7 +450,6 @@ const HomePage = ({ user, onLogout }) => {
   const handleBlockUser = async (postUserId) => {
     if (window.confirm("Are you sure you want to block this user? They won't be able to see your posts or follow you.")) {
       try {
-        const token = localStorage.getItem("token");
         await httpClient.post(`/users/${postUserId}/block`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -473,7 +466,6 @@ const HomePage = ({ user, onLogout }) => {
     if (!reportingPost) return;
     
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/posts/${reportingPost.id}/report`, 
         { reason }, 
         {
@@ -494,7 +486,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleArchivePost = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/posts/${postId}/archive`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -507,7 +498,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleHideLikes = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/posts/${postId}/hide-likes`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -519,7 +509,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleToggleComments = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/posts/${postId}/toggle-comments`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -533,7 +522,6 @@ const HomePage = ({ user, onLogout }) => {
     if (!editingPost) return;
 
     try {
-      const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("caption", editCaption);
       
@@ -555,7 +543,6 @@ const HomePage = ({ user, onLogout }) => {
     if (!deletingPost) return;
 
     try {
-      const token = localStorage.getItem("token");
       await httpClient.delete(`/posts/${deletingPost}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -571,7 +558,6 @@ const HomePage = ({ user, onLogout }) => {
 
   const handlePinPost = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post(`/posts/${postId}/pin`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
