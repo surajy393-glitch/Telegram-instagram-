@@ -546,7 +546,7 @@ const HomePage = ({ user, onLogout }) => {
       const formData = new FormData();
       formData.append("caption", editCaption);
       
-      await axios.put(`${API}/posts/${editingPost.id}/caption`, formData, {
+      await httpClient.put(`/posts/${editingPost.id}/caption`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
