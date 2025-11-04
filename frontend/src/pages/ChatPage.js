@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { httpClient, getUser } from '../utils/authClient';
-import { ArrowLeft, Send, Image as ImageIcon, Smile } from 'lucide-react';
+import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X } from 'lucide-react';
 
 const ChatPage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [otherUser, setOtherUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [isRequest, setIsRequest] = useState(location.state?.isRequest || false);
+  const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
   const prevMessageCount = useRef(0);
   const currentUser = getUser();
