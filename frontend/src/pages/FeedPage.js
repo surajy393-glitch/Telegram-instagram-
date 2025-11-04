@@ -134,6 +134,15 @@ const FeedPage = ({ user, onLogout }) => {
     }
   };
 
+  const fetchMessageCount = async () => {
+    try {
+      const response = await httpClient.get(`/messages/unread-count`);
+      setMessageCount(response.data.count);
+    } catch (error) {
+      console.error("Error fetching message count:", error);
+    }
+  };
+
   const fetchStories = async () => {
     try {
       const response = await axios.get(`/api/social/stories?userId=${user.id}`);
