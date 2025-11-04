@@ -437,7 +437,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleFollowFromPost = async (postUserId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${postUserId}/follow`, {}, {
+      await httpClient.post(`/users/${postUserId}/follow`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("Following successfully!");
