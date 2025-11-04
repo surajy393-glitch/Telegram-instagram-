@@ -3827,7 +3827,7 @@ async def get_posts_feed(current_user: User = Depends(get_current_user)):
             "likes": post.get("likes", []),
             "comments": post.get("comments", []),
             "createdAt": post["createdAt"].isoformat() if hasattr(post["createdAt"], 'isoformat') else post["createdAt"],
-            "isLiked": current_user.id in post.get("likes", []),
+            "userLiked": current_user.id in post.get("likes", []),
             "isSaved": post["id"] in saved_posts
         }
         
@@ -3913,7 +3913,7 @@ async def like_post(post_id: str, current_user: User = Depends(get_current_user)
         "success": True,
         "message": "Success",
         "likeCount": len(likes),
-        "isLiked": current_user.id in likes
+        "userLiked": current_user.id in likes
     }
 
 @api_router.post("/posts/{post_id}/unlike")
@@ -4013,7 +4013,7 @@ async def like_comment(post_id: str, comment_id: str, current_user: User = Depen
         "success": True,
         "message": "Success",
         "likeCount": len(likes),
-        "isLiked": current_user.id in likes
+        "userLiked": current_user.id in likes
     }
 
 @api_router.delete("/posts/{post_id}/comment/{comment_id}")
@@ -4462,7 +4462,7 @@ async def get_my_posts(current_user: User = Depends(get_current_user)):
             "createdAt": post["createdAt"].isoformat(),
             "likesCount": len(post.get("likes", [])),
             "commentsCount": len(post.get("comments", [])),
-            "isLiked": current_user.id in post.get("likes", []),
+            "userLiked": current_user.id in post.get("likes", []),
             "isSaved": post["id"] in current_user.savedPosts
         })
     
@@ -4492,7 +4492,7 @@ async def get_saved_posts(current_user: User = Depends(get_current_user)):
             "likesCount": len(post.get("likes", [])),
             "commentsCount": len(post.get("comments", [])),
             "createdAt": post["createdAt"].isoformat(),
-            "isLiked": current_user.id in post.get("likes", []),
+            "userLiked": current_user.id in post.get("likes", []),
             "isSaved": True
         })
     
@@ -4896,7 +4896,7 @@ async def get_user_posts(userId: str, current_user: User = Depends(get_current_u
             "caption": post.get("caption", ""),
             "likes": post.get("likes", []),
             "comments": post.get("comments", []),
-            "isLiked": is_liked,
+            "userLiked": is_liked,
             "isSaved": is_saved,
             "likesHidden": post.get("likesHidden", False),
             "commentsDisabled": post.get("commentsDisabled", False),
@@ -5266,7 +5266,7 @@ async def search_content(search_request: SearchRequest, current_user: User = Dep
                 "likes": len(post.get("likes", [])),
                 "comments": len(post.get("comments", [])),
                 "createdAt": post["createdAt"].isoformat() if "createdAt" in post else None,
-                "isLiked": current_user.id in post.get("likes", []),
+                "userLiked": current_user.id in post.get("likes", []),
                 "isSaved": post["id"] in current_user.savedPosts
             })
     
