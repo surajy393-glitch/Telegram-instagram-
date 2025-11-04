@@ -466,7 +466,7 @@ const HomePage = ({ user, onLogout }) => {
     if (window.confirm("Are you sure you want to block this user? They won't be able to see your posts or follow you.")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.post(`${API}/users/${postUserId}/block`, {}, {
+        await httpClient.post(`/users/${postUserId}/block`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert("User blocked successfully");
