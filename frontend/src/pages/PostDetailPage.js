@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, MessageCircle, Send, Image as ImageIcon, MoreVertical, Trash2, Flag, Ban, Bookmark, Archive, Link as LinkIcon, Edit } from "lucide-react";
 import { httpClient } from "../utils/authClient";
+import { getPostMediaUrl } from "../utils/media";
 
 const PostDetailPage = ({ user }) => {
   const { postId } = useParams();
