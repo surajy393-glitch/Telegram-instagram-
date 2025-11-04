@@ -747,7 +747,7 @@ const FeedPage = ({ user, onLogout }) => {
                             <>
                               <button onClick={async () => { 
                                 try {
-                                  await axios.post(`/api/users/${post.userId}/follow`, {}, {
+                                  await httpClient.post(`/users/${post.userId}/follow`, {}, {
                                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                                   });
                                   alert('Following user');
