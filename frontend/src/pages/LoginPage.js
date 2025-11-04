@@ -212,7 +212,7 @@ const LoginPage = ({ onLogin }) => {
     setVerifyLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/verify-existing-account`, {
+      const response = await httpClient.post('/auth/verify-existing-account', {
         email: verifyEmail.trim()
       });
       
