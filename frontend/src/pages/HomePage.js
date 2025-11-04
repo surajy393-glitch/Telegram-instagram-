@@ -144,12 +144,9 @@ const HomePage = ({ user, onLogout }) => {
 
   const fetchFeed = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-
       const [storiesRes, postsRes] = await Promise.all([
-        httpClient.get('/stories/feed', { headers }),
-        httpClient.get('/posts/feed', { headers })
+        httpClient.get('/stories/feed'),
+        httpClient.get('/posts/feed')
       ]);
 
       setStories(storiesRes.data.stories || []);
