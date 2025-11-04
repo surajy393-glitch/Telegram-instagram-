@@ -1339,7 +1339,7 @@ const FeedPage = ({ user, onLogout }) => {
                           setStoryLikes({ ...storyLikes, [storyId]: false });
                         } else {
                           // Like
-                          await axios.post(`/api/stories/${storyId}/like`, {}, {
+                          await httpClient.post(`/stories/${storyId}/like`, {}, {
                             headers: { Authorization: `Bearer ${token}` }
                           });
                           setStoryLikes({ ...storyLikes, [storyId]: true });
