@@ -126,7 +126,7 @@ const RegisterPage = ({ onLogin }) => {
     setOtpLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/send-email-otp`, {
+      const response = await httpClient.post('/auth/send-email-otp', {
         email: formData.email
       });
       
