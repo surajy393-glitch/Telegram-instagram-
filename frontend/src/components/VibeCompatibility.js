@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
-const API = "/api";
+import { httpClient } from "@/utils/authClient";
 
 const VibeCompatibility = ({ partnerUserId, messageCount, showAt = 30 }) => {
   const [compatibility, setCompatibility] = useState(null);
