@@ -349,7 +349,7 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      await axios.post(`${API}/auth/reset-password-mobile`, {
+      await httpClient.post('/auth/reset-password-mobile', {
         mobileNumber: forgotPasswordMobile.trim(),
         otp: resetOtp.trim(),
         new_password: newPassword
