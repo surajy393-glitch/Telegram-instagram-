@@ -36,7 +36,7 @@ const TelegramAuthHandler = ({ onAuthSuccess }) => {
         const formData = new FormData();
         formData.append('initData', initData);
         
-        const response = await axios.post(`${API}/auth/telegram-webapp`, formData);
+        const response = await httpClient.post('/auth/telegram-webapp', formData);
         
         if (response.data.success) {
           console.log('✅ Telegram authentication successful');
