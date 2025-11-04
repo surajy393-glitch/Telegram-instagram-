@@ -423,7 +423,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleUnfollowFromPost = async (postUserId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${postUserId}/unfollow`, {}, {
+      await httpClient.post(`/users/${postUserId}/unfollow`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("Unfollowed successfully!");
