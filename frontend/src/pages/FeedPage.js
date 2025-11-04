@@ -790,7 +790,7 @@ const FeedPage = ({ user, onLogout }) => {
                               <button onClick={async () => { 
                                 if (window.confirm('Block this user?')) {
                                   try {
-                                    await axios.post(`/api/users/${post.userId}/block`, {}, {
+                                    await httpClient.post(`/users/${post.userId}/block`, {}, {
                                       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                                     });
                                     alert('User blocked');
