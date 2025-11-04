@@ -4542,6 +4542,9 @@ async def delete_post(post_id: str, current_user: User = Depends(get_current_use
     
     await db.posts.delete_one({"id": post_id})
     
+    # Delete all notifications related to this post (likes and comments)
+    await db.notifications.delete_many({"postId": post_id})
+    
     return {"message": "Post deleted successfully"}
 
 # Post Management (Own Posts)
