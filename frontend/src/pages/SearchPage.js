@@ -76,8 +76,7 @@ const SearchPage = ({ user, onLogout }) => {
       return;
     }
 
-    try {      console.log('Fetching trending content with token:', token ? 'present' : 'missing');
-      
+    try {
       const response = await httpClient.get(`/search/trending`);
       
       console.log('Trending response:', response.data);
