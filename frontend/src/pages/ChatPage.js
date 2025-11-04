@@ -44,9 +44,9 @@ const ChatPage = () => {
       setMessages(response.data.messages || []);
       setOtherUser(response.data.otherUser);
       
-      // Get conversation ID from messages
-      if (response.data.messages && response.data.messages.length > 0) {
-        setConversationId(response.data.messages[0].conversation_id);
+      // Get conversation ID from response
+      if (response.data.conversationId) {
+        setConversationId(response.data.conversationId);
       }
       
       setLoading(false);
