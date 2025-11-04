@@ -121,7 +121,7 @@ const LoginPage = ({ onLogin }) => {
     setTelegramLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/telegram-signin`, {
+      const response = await httpClient.post('/auth/telegram-signin', {
         telegramId: parseInt(idString)
       });
       
