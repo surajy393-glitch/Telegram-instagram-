@@ -145,7 +145,7 @@ const FeedPage = ({ user, onLogout }) => {
 
   const fetchStories = async () => {
     try {
-      const response = await httpClient.get(`/stories?userId=${user.id}`);
+      const response = await httpClient.get(`/social/stories?userId=${user.id}`);
       
       const stories = response.data.stories || [];
       
