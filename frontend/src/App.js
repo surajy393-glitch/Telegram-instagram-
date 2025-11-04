@@ -128,7 +128,7 @@ function App() {
             path="/" 
             element={
               isAuthenticated ? (
-                <Navigate to="/home" replace />
+                <Navigate to="/feed" replace />
               ) : (
                 <LandingPage />
               )
@@ -138,7 +138,7 @@ function App() {
             path="/register" 
             element={
               isAuthenticated ? (
-                <Navigate to="/home" replace />
+                <Navigate to="/feed" replace />
               ) : (
                 <DatingRegisterPage onLogin={handleLogin} />
               )
@@ -148,7 +148,7 @@ function App() {
             path="/login" 
             element={
               isAuthenticated ? (
-                <Navigate to="/home" replace />
+                <Navigate to="/feed" replace />
               ) : (
                 <LoginPage onLogin={handleLogin} />
               )
@@ -156,17 +156,17 @@ function App() {
           />
           <Route 
             path="/home" 
-            element={
-              isAuthenticated ? (
-                <HomePage user={user} onLogout={handleLogout} />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
+            element={<Navigate to="/feed" replace />}
           />
           <Route 
             path="/feed" 
-            element={<Navigate to="/home" replace />}
+            element={
+              isAuthenticated ? (
+                <FeedPage user={user} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            } 
           />
           <Route 
             path="/stories" 
