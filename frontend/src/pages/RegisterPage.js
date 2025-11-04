@@ -584,7 +584,7 @@ const RegisterPage = ({ onLogin }) => {
           }
 
           // User doesn't exist, proceed with registration
-          const response = await axios.post(`${API}/auth/telegram`, {
+          const response = await httpClient.post('/auth/telegram', {
             id: user.id,
             first_name: user.first_name,
             last_name: user.last_name || "",
