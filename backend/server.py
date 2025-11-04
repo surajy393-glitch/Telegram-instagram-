@@ -3909,7 +3909,12 @@ async def like_post(post_id: str, current_user: User = Depends(get_current_user)
         {"$set": {"likes": likes}}
     )
     
-    return {"message": "Success", "likes": len(likes)}
+    return {
+        "success": True,
+        "message": "Success",
+        "likeCount": len(likes),
+        "isLiked": current_user.id in likes
+    }
 
 @api_router.post("/posts/{post_id}/unlike")
 async def unlike_post(post_id: str, current_user: User = Depends(get_current_user)):
