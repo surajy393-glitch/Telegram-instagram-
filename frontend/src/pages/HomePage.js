@@ -618,6 +618,21 @@ const HomePage = ({ user, onLogout }) => {
             {user?.isPremium && (
               <span className="premium-badge">PREMIUM</span>
             )}
+            <Link to="/search">
+              <Button variant="ghost" className="hover:bg-pink-50 p-2" data-testid="search-btn">
+                <Search className="w-5 h-5 text-pink-600" />
+              </Button>
+            </Link>
+            <Link to="/messages">
+              <Button variant="ghost" className="hover:bg-pink-50 relative p-2" data-testid="messages-btn">
+                <MessageSquare className="w-5 h-5 text-pink-600" />
+                {messageCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {messageCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Link to="/notifications">
               <Button variant="ghost" className="hover:bg-pink-50 relative p-2" data-testid="notifications-btn">
                 <Bell className="w-5 h-5 text-pink-600" />
@@ -626,11 +641,6 @@ const HomePage = ({ user, onLogout }) => {
                     {notificationCount}
                   </span>
                 )}
-              </Button>
-            </Link>
-            <Link to="/search">
-              <Button variant="ghost" className="hover:bg-pink-50 p-2" data-testid="search-btn">
-                <Search className="w-5 h-5 text-pink-600" />
               </Button>
             </Link>
             <Link to="/profile">
