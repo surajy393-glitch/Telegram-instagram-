@@ -1153,7 +1153,7 @@ const FeedPage = ({ user, onLogout }) => {
                             try {
                               const token = localStorage.getItem("token");
                               const storyId = viewingStories.stories[currentStoryIndex]?.id;
-                              await axios.post(`/api/stories/${storyId}/archive`, {}, {
+                              await httpClient.post(`/stories/${storyId}/archive`, {}, {
                                 headers: { Authorization: `Bearer ${token}` }
                               });
                               alert('Story archived');
