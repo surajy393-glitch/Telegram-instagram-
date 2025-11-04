@@ -5881,6 +5881,13 @@ async def send_message(
         conversation = await db.conversations.find_one({"_id": conversation_id})
         
         if not conversation:
+            # Check if sender follows receiver (for request logic)
+            sender_follows_receiver = receiver.get("followers", [])
+            is_following = sender_id in sender_follows_receiver
+            
+            # Message goes to requests if sender doesn't follow receiver
+            is_request = not is_following
+            
             # Create new conversation
             conversation = {
                 "_id": conversation_id,
@@ -5902,7 +5909,9 @@ async def send_message(
                 "last_message": request.content,
                 "last_message_at": datetime.now(timezone.utc),
                 "unread_count": {sender_id: 0, receiver_id: 0},
-                "created_at": datetime.now(timezone.utc)
+                "created_at": datetime.now(timezone.utc),
+                "isRequest": {receiver_id: is_request},  # Track request status per user
+                "acceptedBy": []  # Track who has accepted the request
             }
             await db.conversations.insert_one(conversation)
         
