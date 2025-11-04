@@ -136,6 +136,15 @@ const HomePage = ({ user, onLogout }) => {
     }
   };
 
+  const fetchMessageCount = async () => {
+    try {
+      const response = await httpClient.get(`/messages/unread-count`);
+      setMessageCount(response.data.count);
+    } catch (error) {
+      console.error("Error fetching message count:", error);
+    }
+  };
+
   const fetchFeed = async () => {
     try {
       const token = localStorage.getItem("token");
