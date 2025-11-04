@@ -565,7 +565,7 @@ const HomePage = ({ user, onLogout }) => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API}/posts/${deletingPost}`, {
+      await httpClient.delete(`/posts/${deletingPost}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
