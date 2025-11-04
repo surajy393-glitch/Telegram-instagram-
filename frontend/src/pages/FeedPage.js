@@ -988,7 +988,7 @@ const FeedPage = ({ user, onLogout }) => {
                     const searchTerm = lastWord.substring(1);
                     try {
                       const token = localStorage.getItem("token");
-                      const response = await axios.get(`/api/search?query=${searchTerm}`, {
+                      const response = await httpClient.get(`/search?query=${searchTerm}`, {
                         headers: { Authorization: `Bearer ${token}` }
                       });
                       setMentionSuggestions(response.data.users || []);
