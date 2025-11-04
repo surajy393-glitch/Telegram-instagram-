@@ -193,7 +193,7 @@ const FeedPage = ({ user, onLogout }) => {
       if (!append) setLoading(true);
       else setLoadingMore(true);
       
-      const response = await axios.get(`/api/social/feed?userId=${user.id}&page=${pageNum}&limit=10`);
+      const response = await httpClient.get(`/posts/feed?userId=${user.id}&page=${pageNum}&limit=10`);
       const newPosts = response.data.posts || [];
       
       // Mark these posts as seen
