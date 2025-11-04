@@ -273,13 +273,13 @@ const FeedPage = ({ user, onLogout }) => {
       const response = await httpClient.post(`/posts/${postId}/like`, formData);
       
       if (response.data.success) {
-        // Update local state
-        setPosts(posts.map(post => 
+        // Update local state using functional update to prevent stale closure
+        setPosts(prevPosts => prevPosts.map(post => 
           post.id === postId 
             ? { 
                 ...post, 
                 userLiked: !post.userLiked, 
-                likes: response.data.likeCount 
+                likesCount: response.data.likeCount || post.likesCount || 0
               }
             : post
         ));
