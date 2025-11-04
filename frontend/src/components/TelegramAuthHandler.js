@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { httpClient } from '../utils/authClient';
 import { isTelegramWebApp, getTelegramInitData, expandTelegramWebApp } from '../utils/telegramWebApp';
 import { setToken, setUser as setUserStorage } from '../utils/authClient';
-
-const API = "/api";
 
 const TelegramAuthHandler = ({ onAuthSuccess }) => {
   const navigate = useNavigate();
