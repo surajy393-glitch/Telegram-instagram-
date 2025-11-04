@@ -6079,6 +6079,7 @@ async def get_conversation_messages(
         other_user = await db.users.find_one({"id": other_user_id})
         
         return {
+            "conversationId": conversation_id,
             "messages": formatted_messages,
             "otherUser": {
                 "id": other_user_id,
