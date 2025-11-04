@@ -86,7 +86,7 @@ const PostDetailPage = ({ user }) => {
     try {      const formData = new FormData();
       formData.append('text', newComment);
       
-      const response = await httpClient.post(`/posts/${postId}/comment`, formData);
+      const response = await httpClient.post(`posts/${postId}/comment`, formData);
 
       // Add new comment to list
       setComments(prev => [...prev, response.data.comment]);
