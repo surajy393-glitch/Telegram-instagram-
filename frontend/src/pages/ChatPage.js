@@ -13,7 +13,7 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [isRequest, setIsRequest] = useState(location.state?.isRequest || false);
-  const [conversationId, setConversationId] = useState(null);
+  const [conversationId, setConversationId] = useState(location.state?.conversationId || null);
   const messagesEndRef = useRef(null);
   const prevMessageCount = useRef(0);
   const currentUser = getUser();
