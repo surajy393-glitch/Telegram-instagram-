@@ -219,7 +219,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleLike = async (postId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${API}/posts/${postId}/like`, {}, {
+      const response = await httpClient.post(`/posts/${postId}/like`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log("Like response:", response.data);
