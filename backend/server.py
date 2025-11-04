@@ -5881,7 +5881,7 @@ async def send_message(
     """Send a message to another user"""
     try:
         # Get current user
-        current_user = await get_current_user_from_token(authorization)
+        current_user = await get_current_user(authorization)
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
@@ -5979,7 +5979,7 @@ async def get_conversations(
     """Get all conversations for current user (inbox)"""
     try:
         # Get current user
-        current_user = await get_current_user_from_token(authorization)
+        current_user = await get_current_user(authorization)
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
@@ -6026,7 +6026,7 @@ async def get_conversation_messages(
     """Get all messages in a conversation with a specific user"""
     try:
         # Get current user
-        current_user = await get_current_user_from_token(authorization)
+        current_user = await get_current_user(authorization)
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
@@ -6104,7 +6104,7 @@ async def get_unread_count(
     """Get total unread message count for current user"""
     try:
         # Get current user
-        current_user = await get_current_user_from_token(authorization)
+        current_user = await get_current_user(authorization)
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
