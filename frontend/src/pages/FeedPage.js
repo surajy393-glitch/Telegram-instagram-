@@ -807,7 +807,7 @@ const FeedPage = ({ user, onLogout }) => {
                                 const reason = prompt('Report reason:');
                                 if (reason) {
                                   try {
-                                    await axios.post(`/api/posts/${post.id}/report`, 
+                                    await httpClient.post(`/posts/${post.id}/report`, 
                                       { reason }, 
                                       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
                                     );
