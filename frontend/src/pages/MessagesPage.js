@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { httpClient } from '../utils/authClient';
-import { ArrowLeft, MessageCircle, Search, Check, X } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Search, Check, X, ChevronDown } from 'lucide-react';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -9,6 +9,7 @@ const MessagesPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('messages'); // 'messages' or 'requests'
+  const [expandedRequestId, setExpandedRequestId] = useState(null); // Track expanded request
 
   useEffect(() => {
     fetchConversations();
