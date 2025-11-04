@@ -690,10 +690,10 @@ const FeedPage = ({ user, onLogout }) => {
                       src={
                         post.isAnonymous 
                           ? "https://via.placeholder.com/40?text=?" 
-                          : (post.userAvatar 
-                              ? (post.userAvatar.startsWith('data:') || post.userAvatar.startsWith('http') 
-                                  ? post.userAvatar 
-                                  : `${post.userAvatar}`)
+                          : (post.userProfileImage 
+                              ? (post.userProfileImage.startsWith('data:') || post.userProfileImage.startsWith('http') 
+                                  ? post.userProfileImage 
+                                  : `${post.userProfileImage}`)
                               : "https://via.placeholder.com/40")
                       }
                       alt={post.username}
