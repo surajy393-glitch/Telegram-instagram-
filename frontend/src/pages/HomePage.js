@@ -184,7 +184,7 @@ const HomePage = ({ user, onLogout }) => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/create`, newPost, {
+      await httpClient.post('/posts/create', newPost, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
