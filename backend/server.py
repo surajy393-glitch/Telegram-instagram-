@@ -5864,6 +5864,16 @@ async def serve_upload(file_type: str, filename: str):
 # MESSAGING SYSTEM
 # =============================================================================
 
+def serialize_datetime(dt):
+    """Helper function to safely serialize datetime objects to ISO format string"""
+    if dt is None:
+        return None
+    if isinstance(dt, str):
+        return dt
+    if hasattr(dt, 'isoformat'):
+        return dt.isoformat()
+    return str(dt)
+
 class SendMessageRequest(BaseModel):
     receiverId: str
     content: str
