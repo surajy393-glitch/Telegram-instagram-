@@ -71,7 +71,7 @@ const ChatPage = () => {
     if (!window.confirm('Delete this conversation?')) return;
     
     try {
-      await httpClient.delete('/messages/request/decline', { data: { conversationId } });
+      await httpClient.post('/messages/request/decline', { conversationId });
       navigate('/messages'); // Go back to messages list
     } catch (error) {
       console.error('Error declining request:', error);
