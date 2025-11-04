@@ -5680,11 +5680,11 @@ async def get_notifications(
 @api_router.put("/notifications/{notification_id}/read")
 async def mark_notification_read(
     notification_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     try:
         result = await db.notifications.update_one(
-            {"id": notification_id, "userId": current_user["id"]},
+            {"id": notification_id, "userId": current_user.id},
             {"$set": {"isRead": True}}
         )
         
