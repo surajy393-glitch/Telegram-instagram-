@@ -171,12 +171,14 @@ const MessagesPage = () => {
         ) : (
           <div className="space-y-2">
             {filteredConversations.map((conversation) => (
-              <Link
+              <div
                 key={conversation.conversationId}
-                to={`/chat/${conversation.otherUser.id}`}
-                className="block bg-white rounded-lg p-4 hover:bg-pink-50 transition border border-pink-100"
+                className="block bg-white rounded-lg p-4 border border-pink-100"
               >
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 cursor-pointer hover:bg-pink-50 -m-4 p-4 rounded-lg transition"
+                  onClick={() => activeTab === 'messages' && navigate(`/chat/${conversation.otherUser.id}`)}
+                >
                   {/* Profile Image */}
                   <img
                     src={
