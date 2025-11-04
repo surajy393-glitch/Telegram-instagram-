@@ -167,7 +167,7 @@ const FeedPage = ({ user, onLogout }) => {
           storyGroups[userId] = {
             userId: userId,
             username: story.username,
-            userProfileImage: story.userAvatar,
+            userProfileImage: story.userProfileImage,
             isVerified: story.isVerified || false,
             isFounder: story.isFounder || false,
             stories: []
