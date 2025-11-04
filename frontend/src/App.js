@@ -168,11 +168,6 @@ function App() {
             path="/feed" 
             element={<Navigate to="/home" replace />}
           />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            } 
-          />
           <Route 
             path="/stories" 
             element={
