@@ -866,7 +866,7 @@ const FeedPage = ({ user, onLogout }) => {
                     } hover:text-pink-600`}
                   >
                     <Heart size={20} fill={post.userLiked ? 'currentColor' : 'none'} />
-                    <span>{post.likes}</span>
+                    <span>{post.likesCount || post.likes?.length || 0}</span>
                   </button>
 
                   <button
@@ -874,7 +874,7 @@ const FeedPage = ({ user, onLogout }) => {
                     className="flex items-center space-x-2 text-gray-600 hover:text-pink-600"
                   >
                     <MessageCircle size={20} />
-                    <span>{post.comments}</span>
+                    <span>{post.commentsCount || post.comments?.length || 0}</span>
                   </button>
 
                   <button 
