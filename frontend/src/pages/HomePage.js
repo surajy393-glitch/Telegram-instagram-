@@ -250,7 +250,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleSavePost = async (postId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/save`, {}, {
+      await httpClient.post(`/posts/${postId}/save`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchFeed();
