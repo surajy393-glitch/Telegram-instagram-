@@ -77,7 +77,7 @@ const StoriesPage = ({ user }) => {
     try {
       const formData = new FormData();
       formData.append('userId', user.id);
-      await axios.post(`${API}/social/stories/${story.id}/view`, formData);
+      await httpClient.post(`/stories/${story.id}/view`, formData);
       
       // Update local state
       setStories(stories.map(s => 
