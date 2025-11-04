@@ -614,12 +614,12 @@ const HomePage = ({ user, onLogout }) => {
           <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-500">
             LuvHive
           </h1>
-          <div className="flex items-center gap-3">
-            {user?.isPremium && (
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto flex-nowrap">{
+            user?.isPremium && (
               <span className="premium-badge">PREMIUM</span>
             )}
             <Link to="/search">
-              <Button variant="ghost" className="hover:bg-pink-50 p-2" data-testid="search-btn">
+              <Button variant="ghost" className="hover:bg-pink-50 p-2 flex-shrink-0" data-testid="search-btn">
                 <Search className="w-5 h-5 text-pink-600" />
               </Button>
             </Link>
