@@ -19,6 +19,7 @@ const FeedPage = ({ user, onLogout }) => {
   const [commentingOn, setCommentingOn] = useState(null);
   const [commentText, setCommentText] = useState('');
   const [notificationCount, setNotificationCount] = useState(0);
+  const [messageCount, setMessageCount] = useState(0);
   const [showCreateStory, setShowCreateStory] = useState(false);
   const [myStories, setMyStories] = useState(null);
   const [openStoryMenu, setOpenStoryMenu] = useState(false);
