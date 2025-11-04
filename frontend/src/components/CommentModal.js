@@ -57,7 +57,7 @@ const CommentModal = ({ post, user, isOpen, onClose, onCommentAdded }) => {
       const formData = new FormData();
       formData.append('userId', user.id);
       
-      await httpClient.post(`/social/comments/${commentId}/like`, formData, {
+      await httpClient.post(`/posts/${post.id}/comment/${commentId}/like`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data'
         }
