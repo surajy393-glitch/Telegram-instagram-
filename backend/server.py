@@ -6118,6 +6118,74 @@ async def get_unread_count(
         logger.error(f"Error getting unread count: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# Message Request Management Endpoints
+@api_router.post("/messages/request/accept")
+async def accept_message_request(
+    request: dict,
+    authorization: str = Header(None)
+):
+    """Accept a message request"""
+    try:
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        conversation_id = request.get("conversationId")
+        user_id = current_user.id
+        
+        # Update conversation to mark as accepted
+        result = await db.conversations.update_one(
+            {"_id": conversation_id},
+            {
+                "$set": {f"isRequest.{user_id}": False},
+                "$addToSet": {"acceptedBy": user_id}
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        return {
+            "success": True,
+            "message": "Request accepted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error accepting request: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/messages/request/decline")
+async def decline_message_request(
+    request: dict,
+    authorization: str = Header(None)
+):
+    """Decline and delete a message request"""
+    try:
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        conversation_id = request.get("conversationId")
+        
+        # Delete the conversation and all its messages
+        await db.conversations.delete_one({"_id": conversation_id})
+        await db.messages.delete_many({"conversation_id": conversation_id})
+        
+        return {
+            "success": True,
+            "message": "Request declined and deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error declining request: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
