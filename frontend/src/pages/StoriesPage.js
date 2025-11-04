@@ -23,7 +23,7 @@ const StoriesPage = ({ user }) => {
   const fetchStories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/social/stories?userId=${user.id}&limit=50`);
+      const response = await httpClient.get(`/stories?userId=${user.id}&limit=50`);
       if (response.data.success) {
         setStories(response.data.stories);
       }
