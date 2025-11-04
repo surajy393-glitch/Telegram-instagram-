@@ -43,7 +43,7 @@ const NotificationsPage = ({ user, onLogout }) => {
       setNotifications(response.data.notifications || []);
       
       // Mark all as read
-      await httpClient.post(`/notifications/read-all`, {});
+      await httpClient.put(`/notifications/read-all`, {});
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
