@@ -12,6 +12,7 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
+  const prevMessageCount = useRef(0);
   const currentUser = getUser();
 
   useEffect(() => {
@@ -23,7 +24,11 @@ const ChatPage = () => {
   }, [userId]);
 
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if new messages were added
+    if (messages.length > prevMessageCount.current) {
+      scrollToBottom();
+    }
+    prevMessageCount.current = messages.length;
   }, [messages]);
 
   const scrollToBottom = () => {
