@@ -18,13 +18,17 @@ export function getMediaSrc(url) {
     path = `/${path}`;
   }
   
+  // Static uploads are served at /uploads (not /api/uploads)
+  // Remove /api prefix from upload paths
+  if (path.startsWith('/api/uploads/')) {
+    path = path.replace('/api/uploads/', '/uploads/');
+  }
+  
   // Prepend backend URL if provided (e.g. production domain)
   if (BACKEND_URL) {
-    // If BACKEND_URL already ends with /api and path starts with /api, remove duplicate
-    if (BACKEND_URL.endsWith('/api') && path.startsWith('/api/')) {
-      path = path.substring(4); // Remove the first /api
-    }
-    return `${BACKEND_URL}${path}`;
+    // Remove /api suffix from BACKEND_URL for static file paths
+    const baseUrl = BACKEND_URL.replace(/\/api$/, '');
+    return `${baseUrl}${path}`;
   }
   return path;
 }
