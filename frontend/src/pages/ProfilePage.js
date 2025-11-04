@@ -20,9 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Use a fallback so API calls don't break when the env var is missing
-const API = "/api";
-
 // Utility function to linkify bio text (mentions and URLs)
 const LinkifyBio = ({ text }) => {
   if (!text) return null;
