@@ -4613,17 +4613,6 @@ async def edit_caption(post_id: str, caption: str = Form(...), current_user: Use
     )
     return {"message": "Caption updated successfully"}
 
-@api_router.delete("/posts/{post_id}")
-async def delete_post(post_id: str, current_user: User = Depends(get_current_user)):
-    post = await db.posts.find_one({"id": post_id})
-    if not post:
-        raise HTTPException(status_code=404, detail="Post not found")
-    if post["userId"] != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    await db.posts.delete_one({"id": post_id})
-    return {"message": "Post deleted successfully"}
-
 @api_router.post("/posts/{post_id}/pin")
 async def pin_post(post_id: str, current_user: User = Depends(get_current_user)):
     post = await db.posts.find_one({"id": post_id})
