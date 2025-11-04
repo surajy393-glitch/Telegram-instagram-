@@ -38,7 +38,7 @@ const CommentModal = ({ post, user, isOpen, onClose, onCommentAdded }) => {
         formData.append('parentCommentId', replyingTo.id);
       }
 
-      await httpClient.post(`/social/posts/${post.id}/comment`, formData);
+      await httpClient.post(`/posts/${post.id}/comment`, formData);
 
       setNewComment('');
       setReplyingTo(null);
