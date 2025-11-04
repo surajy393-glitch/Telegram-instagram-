@@ -338,7 +338,7 @@ const FeedPage = ({ user, onLogout }) => {
       try {
         // Send notifications to mentioned users
         const token = localStorage.getItem("token");
-        await axios.post(`/api/notifications/mentions`, {
+        await httpClient.post('/notifications/mentions', {
           mentionedUsernames: mentions,
           type: 'story_mention',
           content: text
