@@ -132,7 +132,8 @@ const PostDetailPage = ({ user }) => {
   const handleReply = async (commentId) => {
     if (!replyText.trim()) return;
 
-    try:      const formData = new FormData();
+    try {
+      const formData = new FormData();
       formData.append('text', replyText);
       formData.append('parentCommentId', commentId);
       
