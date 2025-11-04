@@ -5920,9 +5920,9 @@ async def send_message(
                     }
                 },
                 "last_message": request.content,
-                "last_message_at": datetime.now(timezone.utc).isoformat(),
+                "last_message_at": datetime.now(timezone.utc),
                 "unread_count": {sender_id: 0, receiver_id: 0},
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": datetime.now(timezone.utc)
             }
             await db.conversations.insert_one(conversation)
         
