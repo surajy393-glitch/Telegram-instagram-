@@ -7,9 +7,6 @@ import { ArrowLeft, Grid, Bookmark, Crown, Settings, Shield } from "lucide-react
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { httpClient, getUser, setUser as setUserStorage } from "../utils/authClient";
 
-// Use a fallback so API calls don't break when the env var is missing
-const API = "/api";
-
 const MyProfilePage = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
