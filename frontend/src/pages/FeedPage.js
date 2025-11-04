@@ -262,7 +262,7 @@ const FeedPage = ({ user, onLogout }) => {
       const formData = new FormData();
       formData.append('userId', user.id);
       
-      const response = await axios.post(`/api/social/posts/${postId}/like`, formData);
+      const response = await httpClient.post(`/posts/${postId}/like`, formData);
       
       if (response.data.success) {
         // Update local state
