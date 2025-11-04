@@ -76,11 +76,11 @@ const FeedPage = ({ user, onLogout }) => {
         window.history.replaceState({}, document.title);
       }
     }
-  }, [location.state, myStories, otherStories]);
+  }, [location.state?.openStoryId, myStories, otherStories]);
 
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchFeed();
       fetchNotificationCount();
       fetchMessageCount();
@@ -103,7 +103,7 @@ const FeedPage = ({ user, onLogout }) => {
         clearInterval(feedRefreshInterval);
       };
     }
-  }, [user]);
+  }, [user?.id]);
 
   // Infinite scroll detection
   useEffect(() => {
