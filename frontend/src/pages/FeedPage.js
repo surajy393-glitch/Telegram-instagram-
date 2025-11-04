@@ -1129,7 +1129,7 @@ const FeedPage = ({ user, onLogout }) => {
                               try {
                                 const token = localStorage.getItem("token");
                                 const storyId = viewingStories.stories[currentStoryIndex]?.id;
-                                await axios.delete(`/api/stories/${storyId}`, {
+                                await httpClient.delete(`/stories/${storyId}`, {
                                   headers: { Authorization: `Bearer ${token}` }
                                 });
                                 alert('Story deleted');
