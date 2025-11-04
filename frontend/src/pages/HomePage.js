@@ -451,7 +451,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleMuteUser = async (postUserId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/users/${postUserId}/mute`, {}, {
+      await httpClient.post(`/users/${postUserId}/mute`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("User muted. You won't see their posts anymore.");
