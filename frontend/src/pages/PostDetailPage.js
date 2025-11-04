@@ -191,7 +191,7 @@ const PostDetailPage = ({ user }) => {
   const handleBlockUser = async (userId, username) => {
     if (!window.confirm(`Block ${username}? You won't see their posts or comments.`)) return;
 
-    try {      await httpClient.post(`/users/${userId}/block`, {});
+    try {      await httpClient.post(`users/${userId}/block`, {});
 
       alert(`${username} has been blocked`);
       
