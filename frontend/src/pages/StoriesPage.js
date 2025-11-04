@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { httpClient } from '@/utils/authClient';
 import { Plus, X, Eye, ArrowLeft, Image as ImageIcon } from 'lucide-react';
-
-const API = '/api';
 
 const StoriesPage = ({ user }) => {
   const navigate = useNavigate();
