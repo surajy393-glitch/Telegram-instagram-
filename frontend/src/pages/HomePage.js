@@ -581,7 +581,7 @@ const HomePage = ({ user, onLogout }) => {
   const handlePinPost = async (postId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/pin`, {}, {
+      await httpClient.post(`/posts/${postId}/pin`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("Post pinned successfully!");
