@@ -74,8 +74,8 @@ const ChatPage = () => {
     const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
     const istDate = new Date(date.getTime() + istOffset);
     
-    const hours = istDate.getUTCHours();
-    const minutes = istDate.getUTCMinutes();
+    const hours = istDate.getHours();
+    const minutes = istDate.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 || 12;
     const formattedMinutes = minutes.toString().padStart(2, '0');
