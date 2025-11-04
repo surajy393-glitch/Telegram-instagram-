@@ -3509,6 +3509,9 @@ async def delete_story(story_id: str, current_user: User = Depends(get_current_u
     
     await db.stories.delete_one({"id": story_id})
     
+    # Delete all notifications related to this story
+    await db.notifications.delete_many({"storyId": story_id})
+    
     return {"message": "Story deleted successfully"}
 
 @api_router.post("/stories/{story_id}/like")
