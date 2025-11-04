@@ -43,10 +43,39 @@ const ChatPage = () => {
       const response = await httpClient.get(`/messages/conversation/${userId}`);
       setMessages(response.data.messages || []);
       setOtherUser(response.data.otherUser);
+      
+      // Get conversation ID from messages
+      if (response.data.messages && response.data.messages.length > 0) {
+        setConversationId(response.data.messages[0].conversation_id);
+      }
+      
       setLoading(false);
     } catch (error) {
       console.error('Error fetching messages:', error);
       setLoading(false);
+    }
+  };
+
+  const handleAcceptRequest = async () => {
+    try {
+      await httpClient.post('/messages/request/accept', { conversationId });
+      setIsRequest(false); // Change to regular chat instantly
+      alert('Request accepted! You can now chat.');
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      alert('Failed to accept request');
+    }
+  };
+
+  const handleDeclineRequest = async () => {
+    if (!window.confirm('Delete this conversation?')) return;
+    
+    try {
+      await httpClient.delete('/messages/request/decline', { data: { conversationId } });
+      navigate('/messages'); // Go back to messages list
+    } catch (error) {
+      console.error('Error declining request:', error);
+      alert('Failed to delete request');
     }
   };
 
