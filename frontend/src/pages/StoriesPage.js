@@ -52,7 +52,7 @@ const StoriesPage = ({ user }) => {
         formData.append('image', selectedImage);
       }
 
-      const response = await axios.post(`${API}/social/stories`, formData, {
+      const response = await httpClient.post('/stories', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
