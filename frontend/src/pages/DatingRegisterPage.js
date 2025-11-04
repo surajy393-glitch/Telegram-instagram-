@@ -587,7 +587,7 @@ const DatingRegisterPage = ({ onLogin }) => {
       let fullUser;
       try {
         // Attempt to fetch the complete user record using the new token.
-        const meResponse = await axios.get(`${API}/auth/me`, {
+        const meResponse = await httpClient.get('/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
         fullUser = meResponse.data.user || meResponse.data;
