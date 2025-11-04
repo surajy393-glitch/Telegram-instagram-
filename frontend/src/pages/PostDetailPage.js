@@ -132,11 +132,11 @@ const PostDetailPage = ({ user }) => {
   const handleReply = async (commentId) => {
     if (!replyText.trim()) return;
 
-    try {      const formData = new FormData();
+    try:      const formData = new FormData();
       formData.append('text', replyText);
       formData.append('parentCommentId', commentId);
       
-      const response = await httpClient.post(`/posts/${postId}/comment`, formData);
+      const response = await httpClient.post(`posts/${postId}/comment`, formData);
 
       // Add reply to comments list
       setComments(prev => [...prev, response.data.comment]);
