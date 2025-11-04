@@ -203,17 +203,19 @@ const FeedPage = ({ user, onLogout }) => {
       setSeenPostIds(newSeenIds);
       
       if (append) {
-        // Filter out duplicates before appending
+        // Filter out duplicates AND own posts before appending
         setPosts(prev => {
           const existingIds = new Set(prev.map(p => p.id));
-          const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
+          const uniqueNewPosts = newPosts.filter(p => 
+            !existingIds.has(p.id) && p.userId !== user?.id
+          );
           return [...prev, ...uniqueNewPosts];
         });
       } else {
-        // Deduplicate posts in replace mode
+        // Deduplicate posts and filter own posts in replace mode
         const uniquePosts = Array.from(
           new Map(newPosts.map(p => [p.id, p])).values()
-        );
+        ).filter(p => p.userId !== user?.id);
         setPosts(uniquePosts);
       }
       
