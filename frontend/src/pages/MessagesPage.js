@@ -215,7 +215,27 @@ const MessagesPage = () => {
                     </div>
                   </div>
                 </div>
-              </Link>
+                
+                {/* Request Actions (only show in Requests tab) */}
+                {activeTab === 'requests' && (
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-pink-100">
+                    <button
+                      onClick={(e) => handleAcceptRequest(conversation.conversationId, e)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition font-medium"
+                    >
+                      <Check className="w-4 h-4" />
+                      Accept
+                    </button>
+                    <button
+                      onClick={(e) => handleDeclineRequest(conversation.conversationId, e)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
+                    >
+                      <X className="w-4 h-4" />
+                      Decline
+                    </button>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
