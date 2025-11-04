@@ -5869,9 +5869,13 @@ def serialize_datetime(dt):
     if dt is None:
         return None
     if isinstance(dt, str):
+        # If already a string, check if it needs 'Z' suffix for UTC
+        if dt and not dt.endswith('Z') and 'T' in dt and not any(tz in dt for tz in ['+', '-']):
+            return dt + 'Z'
         return dt
     if hasattr(dt, 'isoformat'):
-        return dt.isoformat()
+        # Add 'Z' suffix to indicate UTC timezone
+        return dt.isoformat() + 'Z'
     return str(dt)
 
 class SendMessageRequest(BaseModel):
