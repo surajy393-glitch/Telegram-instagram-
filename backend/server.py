@@ -4009,7 +4009,12 @@ async def like_comment(post_id: str, comment_id: str, current_user: User = Depen
         {"$set": {"comments": comments}}
     )
     
-    return {"message": "Success", "likes": len(likes)}
+    return {
+        "success": True,
+        "message": "Success",
+        "likeCount": len(likes),
+        "isLiked": current_user.id in likes
+    }
 
 @api_router.delete("/posts/{post_id}/comment/{comment_id}")
 async def delete_comment(post_id: str, comment_id: str, current_user: User = Depends(get_current_user)):
