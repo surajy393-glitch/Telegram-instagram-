@@ -177,7 +177,7 @@ const DatingRegisterPage = ({ onLogin }) => {
     setUsernameMessage("Checking availability...");
     
     try {
-      const response = await axios.get(`${API}/auth/check-username/${encodeURIComponent(username)}`);
+      const response = await httpClient.get(`/auth/check-username/${encodeURIComponent(username)}`);
       const data = response.data;
       
       if (data.available) {
