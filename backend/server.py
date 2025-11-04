@@ -5986,6 +5986,9 @@ async def get_conversations(
             other_user_id = conv["participants"][0] if conv["participants"][0] != user_id else conv["participants"][1]
             other_user_details = conv["participantDetails"].get(other_user_id, {})
             
+            # Check if this is a request for current user
+            is_request = conv.get("isRequest", {}).get(user_id, False)
+            
             formatted_conversations.append({
                 "conversationId": conv["_id"],
                 "otherUser": {
