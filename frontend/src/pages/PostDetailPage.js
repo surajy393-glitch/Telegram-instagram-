@@ -514,17 +514,20 @@ const PostDetailPage = ({ user }) => {
           <div className="md:flex">
             {/* Post Image */}
             <div className="md:w-3/5 bg-black flex items-center justify-center">
-              {post.imageUrl || post.mediaUrl ? (
-                <img
-                  src={post.imageUrl || post.mediaUrl}
-                  alt={post.caption || "Post"}
-                  className="w-full object-contain max-h-[80vh]"
-                />
-              ) : (
-                <div className="w-full h-96 bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
-                  <ImageIcon className="w-20 h-20 text-pink-300" />
-                </div>
-              )}
+              {(() => {
+                const mediaUrl = getPostMediaUrl(post);
+                return mediaUrl ? (
+                  <img
+                    src={mediaUrl}
+                    alt={post.caption || "Post"}
+                    className="w-full object-contain max-h-[80vh]"
+                  />
+                ) : (
+                  <div className="w-full h-96 bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                    <ImageIcon className="w-20 h-20 text-pink-300" />
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Post Details */}
