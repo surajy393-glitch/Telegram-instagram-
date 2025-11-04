@@ -215,7 +215,7 @@ const DatingRegisterPage = ({ onLogin }) => {
     setEmailMessage("Checking email...");
     
     try {
-      const response = await axios.get(`${API}/auth/check-email/${encodeURIComponent(email)}`);
+      const response = await httpClient.get(`/auth/check-email/${encodeURIComponent(email)}`);
       const data = response.data;
       
       if (data.available) {
