@@ -690,20 +690,20 @@ const SearchPage = ({ user, onLogout }) => {
                     className="aspect-square relative group overflow-hidden rounded-sm hover:opacity-90 transition-opacity cursor-pointer"
                   >
                     {/* Post Image */}
-                    {post.imageUrl || post.mediaUrl ? (
-                      <img
-                        src={post.imageUrl || post.mediaUrl}
-                        alt={post.caption || "Post"}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = "https://via.placeholder.com/400x400?text=No+Image";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
-                        <Image className="w-12 h-12 text-pink-300" />
-                      </div>
-                    )}
+                    {(() => {
+                      const mediaUrl = getPostMediaUrl(post);
+                      return mediaUrl ? (
+                        <img
+                          src={mediaUrl}
+                          alt={post.caption || "Post"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                          <Image className="w-12 h-12 text-pink-300" />
+                        </div>
+                      );
+                    })()}
                     
                     {/* Hover Overlay with Stats */}
                     <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6">
