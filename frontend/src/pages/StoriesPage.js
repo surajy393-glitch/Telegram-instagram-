@@ -190,7 +190,7 @@ const StoriesPage = ({ user }) => {
                   {/* Views */}
                   <div className="flex items-center space-x-1 text-white/90 text-xs">
                     <Eye size={14} />
-                    <span>{story.views}</span>
+                    <span>{story.viewsCount || story.views?.length || story.views || 0}</span>
                   </div>
                 </div>
 
