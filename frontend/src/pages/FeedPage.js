@@ -461,6 +461,21 @@ const FeedPage = ({ user, onLogout }) => {
               LuvHive
             </h1>
             <div className="flex items-center gap-2">
+              <Link to="/search">
+                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <Search className="w-5 h-5 text-gray-700" />
+                </button>
+              </Link>
+              <Link to="/messages">
+                <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <MessageSquare className="w-5 h-5 text-gray-700" />
+                  {messageCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {messageCount}
+                    </span>
+                  )}
+                </button>
+              </Link>
               <Link to="/notifications">
                 <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <Bell className="w-5 h-5 text-gray-700" />
@@ -469,11 +484,6 @@ const FeedPage = ({ user, onLogout }) => {
                       {notificationCount}
                     </span>
                   )}
-                </button>
-              </Link>
-              <Link to="/search">
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <Search className="w-5 h-5 text-gray-700" />
                 </button>
               </Link>
               <button
