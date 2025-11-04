@@ -4699,46 +4699,6 @@ async def archive_story(story_id: str, current_user: User = Depends(get_current_
     )
     return {"message": "Story archived" if not is_archived else "Story unarchived", "isArchived": not is_archived}
 
-# Notifications
-@api_router.get("/notifications")
-async def get_notifications(current_user: User = Depends(get_current_user)):
-    notifications = await db.notifications.find(
-        {"userId": current_user.id}
-    ).sort("createdAt", -1).to_list(100)
-    
-    notifications_list = []
-    for notif in notifications:
-        created_at = notif.get("createdAt")
-
-        # Normalize createdAt -> string
-        if hasattr(created_at, "isoformat"):
-            created_at_str = created_at.isoformat()
-        else:
-            # already a string or missing; keep or default to now
-            created_at_str = created_at if isinstance(created_at, str) \
-                else datetime.now(timezone.utc).isoformat()
-
-        notifications_list.append({
-            "id": notif.get("id") or str(uuid4()),
-            "fromUserId": notif.get("fromUserId"),
-            "fromUsername": notif.get("fromUsername"),
-            "fromUserImage": notif.get("fromUserImage"),
-            "type": notif.get("type"),
-            # support both post notifications and story notifications:
-            "postId": notif.get("postId") or notif.get("storyId"),
-            "postImage": notif.get("postImage"),  # Include post image for notification preview
-            # some old docs used "read" instead of "isRead"
-            "isRead": notif.get("isRead", notif.get("read", False)),
-            "createdAt": created_at_str,
-        })
-    
-    return {"notifications": notifications_list}
-
-@api_router.get("/notifications/unread-count")
-async def get_unread_count(current_user: User = Depends(get_current_user)):
-    count = await db.notifications.count_documents({"userId": current_user.id, "isRead": False})
-    return {"count": count}
-
 @api_router.post("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
     await db.notifications.update_one(
