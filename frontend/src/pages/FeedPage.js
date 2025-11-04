@@ -290,7 +290,7 @@ const FeedPage = ({ user, onLogout }) => {
       formData.append('content', commentText);
       formData.append('isAnonymous', false);
 
-      const response = await axios.post(`/api/social/posts/${postId}/comment`, formData);
+      const response = await httpClient.post(`/posts/${postId}/comment`, formData);
 
       if (response.data.success) {
         setCommentText('');
