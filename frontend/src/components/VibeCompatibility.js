@@ -16,12 +16,8 @@ const VibeCompatibility = ({ partnerUserId, messageCount, showAt = 30 }) => {
   const fetchCompatibility = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${API}/auth/calculate-compatibility/${partnerUserId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      const response = await httpClient.get(
+        `/auth/calculate-compatibility/${partnerUserId}`
       );
       setCompatibility(response.data);
       setVisible(true);
