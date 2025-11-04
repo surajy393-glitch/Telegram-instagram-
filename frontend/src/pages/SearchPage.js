@@ -392,22 +392,19 @@ const SearchPage = ({ user, onLogout }) => {
       </div>
 
       {/* Post Media */}
-      {post.imageUrl && (
-        <div className="aspect-square">
-          <img 
-            src={
-              post.imageUrl
-                ? (post.imageUrl.startsWith('data:') || post.imageUrl.startsWith('http')
-                    ? post.imageUrl
-                    : post.imageUrl)
-                : "https://via.placeholder.com/400"
-            }
-            alt="Post" 
-            className="w-full h-full object-cover"
-            onError={(e) => e.target.src = "https://via.placeholder.com/400"}
-          />
-        </div>
-      )}
+      {(() => {
+        const mediaUrl = getPostMediaUrl(post);
+        if (!mediaUrl) return null;
+        return (
+          <div className="aspect-square">
+            <img 
+              src={mediaUrl}
+              alt="Post" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        );
+      })()}
 
       {/* Post Actions */}
       <div className="p-4">
