@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { httpClient } from '../utils/authClient';
-import { ArrowLeft, MessageCircle, Search } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Search, Check, X } from 'lucide-react';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('messages'); // 'messages' or 'requests'
 
   useEffect(() => {
     fetchConversations();
@@ -28,10 +29,44 @@ const MessagesPage = () => {
     }
   };
 
-  const filteredConversations = conversations.filter(conv =>
+  // Separate conversations into messages and requests
+  const regularMessages = conversations.filter(conv => !conv.isRequest);
+  const requestMessages = conversations.filter(conv => conv.isRequest);
+
+  const activeConversations = activeTab === 'messages' ? regularMessages : requestMessages;
+  
+  const filteredConversations = activeConversations.filter(conv =>
     conv.otherUser.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     conv.otherUser.fullName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleAcceptRequest = async (conversationId, e) => {
+    e.stopPropagation(); // Prevent navigation
+    try {
+      await httpClient.post('/messages/request/accept', { conversationId });
+      // Refresh conversations to move from requests to messages
+      await fetchConversations();
+      alert('Request accepted!');
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      alert('Failed to accept request');
+    }
+  };
+
+  const handleDeclineRequest = async (conversationId, e) => {
+    e.stopPropagation(); // Prevent navigation
+    if (!window.confirm('Delete this conversation?')) return;
+    
+    try {
+      await httpClient.delete('/messages/request/decline', { data: { conversationId } });
+      // Remove from local state immediately
+      setConversations(prev => prev.filter(c => c.conversationId !== conversationId));
+      alert('Request declined');
+    } catch (error) {
+      console.error('Error declining request:', error);
+      alert('Failed to decline request');
+    }
+  };
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
