@@ -4688,22 +4688,6 @@ async def archive_story(story_id: str, current_user: User = Depends(get_current_
     )
     return {"message": "Story archived" if not is_archived else "Story unarchived", "isArchived": not is_archived}
 
-@api_router.post("/notifications/{notification_id}/read")
-async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
-    await db.notifications.update_one(
-        {"id": notification_id, "userId": current_user.id},
-        {"$set": {"isRead": True}}
-    )
-    return {"message": "Notification marked as read"}
-
-@api_router.post("/notifications/read-all")
-async def mark_all_read(current_user: User = Depends(get_current_user)):
-    await db.notifications.update_many(
-        {"userId": current_user.id},
-        {"$set": {"isRead": True}}
-    )
-    return {"message": "All notifications marked as read"}
-
 # New endpoints for enhanced features
 
 @api_router.get("/users/{userId}/profile")
