@@ -6165,7 +6165,7 @@ async def accept_message_request(
         logger.error(f"Error accepting request: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.delete("/messages/request/decline")
+@api_router.post("/messages/request/decline")
 async def decline_message_request(
     request: MessageRequestBody,
     authorization: str = Header(None)
