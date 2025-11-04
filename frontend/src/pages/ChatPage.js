@@ -119,7 +119,7 @@ const ChatPage = () => {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/messages')}
+              onClick={() => navigate(-1)}
               className="hover:bg-pink-50 p-2 rounded-full transition"
             >
               <ArrowLeft className="w-5 h-5 text-pink-600" />
