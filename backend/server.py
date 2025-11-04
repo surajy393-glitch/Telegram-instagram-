@@ -3971,7 +3971,11 @@ async def add_comment_to_post(post_id: str, text: str = Form(...), parentComment
         )
         await db.notifications.insert_one(notification.dict())
     
-    return {"message": "Comment added", "comment": comment}
+    return {
+        "success": True,
+        "message": "Comment added",
+        "comment": comment
+    }
 
 @api_router.post("/posts/{post_id}/comment/{comment_id}/like")
 async def like_comment(post_id: str, comment_id: str, current_user: User = Depends(get_current_user)):
