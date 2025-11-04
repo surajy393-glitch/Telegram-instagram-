@@ -845,26 +845,21 @@ const FeedPage = ({ user, onLogout }) => {
                   </div>
                 )}
 
-                {/* Post Image - FIXED VERSION */}
-                {post.imageUrl ? (
-                  <div 
-                    className="w-full cursor-pointer"
-                    onClick={() => navigate(`/post/${post.id}`)}
-                  >
-                    <img
-                      src={post.imageUrl.startsWith('data:') || post.imageUrl.startsWith('http') 
-                        ? post.imageUrl 
-                        : `${post.imageUrl}`}
-                      alt="Post"
-                      className="w-full max-h-96 object-cover"
-                      onLoad={() => console.log('✅ Image loaded:', post.imageUrl)}
-                      onError={(e) => {
-                        console.error('❌ Image failed:', post.imageUrl);
-                        console.error('Full URL tried:', e.target.src);
-                      }}
-                    />
-                  </div>
-                ) : null}
+                {/* Post Image */}
+                {(() => {
+                  const mediaUrl = getPostMediaUrl(post);
+                  if (!mediaUrl) return null;
+                  const isVideo = post.mediaType === 'video';
+                  return (
+                    <div className="w-full cursor-pointer" onClick={() => navigate(`/post/${post.id}`)}>
+                      {isVideo ? (
+                        <video src={mediaUrl} controls className="w-full max-h-96 object-contain" />
+                      ) : (
+                        <img src={mediaUrl} alt="Post" className="w-full max-h-96 object-cover" />
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Post Actions */}
                 <div className="px-4 py-3 flex items-center justify-between border-t border-gray-100">
