@@ -123,6 +123,32 @@ const MessagesPage = () => {
         </div>
       </div>
 
+      {/* Tabs: Messages & Requests */}
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="flex border-b border-pink-200">
+          <button
+            onClick={() => setActiveTab('messages')}
+            className={`flex-1 py-3 text-center font-semibold transition-colors ${
+              activeTab === 'messages'
+                ? 'text-pink-600 border-b-2 border-pink-600'
+                : 'text-gray-500 hover:text-pink-500'
+            }`}
+          >
+            Messages
+          </button>
+          <button
+            onClick={() => setActiveTab('requests')}
+            className={`flex-1 py-3 text-center font-semibold transition-colors ${
+              activeTab === 'requests'
+                ? 'text-pink-600 border-b-2 border-pink-600'
+                : 'text-gray-500 hover:text-pink-500'
+            }`}
+          >
+            Requests {requestMessages.length > 0 && `(${requestMessages.length})`}
+          </button>
+        </div>
+      </div>
+
       {/* Conversations List */}
       <div className="max-w-2xl mx-auto px-4 py-4">
         {loading ? (
@@ -134,7 +160,7 @@ const MessagesPage = () => {
           <div className="text-center py-12">
             <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              {searchQuery ? 'No conversations found' : 'No messages yet'}
+              {searchQuery ? 'No conversations found' : activeTab === 'requests' ? 'No requests' : 'No messages yet'}
             </h3>
             <p className="text-gray-500">
               {searchQuery 
