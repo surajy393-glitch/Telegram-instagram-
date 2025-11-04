@@ -6130,7 +6130,7 @@ async def get_unread_count(
 # Message Request Management Endpoints
 @api_router.post("/messages/request/accept")
 async def accept_message_request(
-    request: dict,
+    request: MessageRequestBody,
     authorization: str = Header(None)
 ):
     """Accept a message request"""
@@ -6139,7 +6139,7 @@ async def accept_message_request(
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
-        conversation_id = request.get("conversationId")
+        conversation_id = request.conversationId
         user_id = current_user.id
         
         # Update conversation to mark as accepted
