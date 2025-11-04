@@ -5666,6 +5666,7 @@ async def get_notifications(
                 "type": notif.get("type"),
                 # support both post notifications and story notifications:
                 "postId": notif.get("postId") or notif.get("storyId"),
+                "postImage": notif.get("postImage"),
                 # some old docs used "read" instead of "isRead"
                 "isRead": notif.get("isRead", notif.get("read", False)),
                 "createdAt": created_at_str,
