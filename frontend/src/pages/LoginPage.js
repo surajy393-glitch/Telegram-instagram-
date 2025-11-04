@@ -287,7 +287,7 @@ const LoginPage = ({ onLogin }) => {
       }
 
       try {
-        await axios.post(`${API}/auth/forgot-password`, {
+        await httpClient.post('/auth/forgot-password', {
           email: forgotPasswordEmail.trim()
         });
 
