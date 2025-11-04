@@ -557,7 +557,7 @@ const RegisterPage = ({ onLogin }) => {
 
           // First check if user already exists
           try {
-            const checkResponse = await axios.post(`${API}/auth/telegram-signin`, {
+            const checkResponse = await httpClient.post('/auth/telegram-signin', {
               telegramId: user.id
             });
             
