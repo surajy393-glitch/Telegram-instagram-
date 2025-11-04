@@ -59,7 +59,7 @@ const MessagesPage = () => {
     if (!window.confirm('Delete this conversation?')) return;
     
     try {
-      await httpClient.delete('/messages/request/decline', { data: { conversationId } });
+      await httpClient.post('/messages/request/decline', { conversationId });
       // Remove from local state immediately
       setConversations(prev => prev.filter(c => c.conversationId !== conversationId));
       alert('Request declined');
