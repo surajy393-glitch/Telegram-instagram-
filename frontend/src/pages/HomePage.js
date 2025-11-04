@@ -95,6 +95,7 @@ const HomePage = ({ user, onLogout }) => {
   const [commentingPost, setCommentingPost] = useState(null);
   const [commentText, setCommentText] = useState("");
   const [notificationCount, setNotificationCount] = useState(0);
+  const [messageCount, setMessageCount] = useState(0);
   const [newPost, setNewPost] = useState({ mediaUrl: "", caption: "", mediaType: "image" });
   const [newStory, setNewStory] = useState({ mediaUrl: "", caption: "", mediaType: "image" });
   const [openPostMenu, setOpenPostMenu] = useState(null); // Track which post menu is open
@@ -102,9 +103,13 @@ const HomePage = ({ user, onLogout }) => {
   useEffect(() => {
     fetchFeed();
     fetchNotificationCount();
+    fetchMessageCount();
     
-    // Poll notification count every 30 seconds
-    const interval = setInterval(fetchNotificationCount, 30000);
+    // Poll notification and message count every 30 seconds
+    const interval = setInterval(() => {
+      fetchNotificationCount();
+      fetchMessageCount();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
