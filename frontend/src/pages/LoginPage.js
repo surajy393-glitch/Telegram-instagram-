@@ -67,7 +67,7 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/auth/login`, formData);
+      const response = await httpClient.post('/auth/login', formData);
       const token = response.data.access_token;
       const user = response.data.user;
       
