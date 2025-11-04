@@ -180,7 +180,6 @@ const HomePage = ({ user, onLogout }) => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       await httpClient.post('/posts/create', newPost);
 
       setShowCreatePost(false);
