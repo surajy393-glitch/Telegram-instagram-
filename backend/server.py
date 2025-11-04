@@ -5622,10 +5622,10 @@ async def calculate_compatibility(
 
 # Get unread notification count
 @api_router.get("/notifications/unread-count")
-async def get_unread_notification_count(current_user: dict = Depends(get_current_user)):
+async def get_unread_notification_count(current_user: User = Depends(get_current_user)):
     try:
         count = await db.notifications.count_documents({
-            "userId": current_user["id"],
+            "userId": current_user.id,
             "isRead": False
         })
         return {"count": count}
