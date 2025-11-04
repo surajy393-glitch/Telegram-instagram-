@@ -237,7 +237,7 @@ const FeedPage = ({ user, onLogout }) => {
         formData.append('image', selectedImage);
       }
 
-      const response = await axios.post(`/api/social/posts`, formData, {
+      const response = await httpClient.post('/posts', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
