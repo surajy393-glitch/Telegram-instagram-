@@ -268,26 +268,50 @@ const ChatPage = () => {
               <Smile className="w-5 h-5 text-gray-400" />
             </button>
             
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 px-4 py-2 border border-pink-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
-              disabled={sending}
-            />
-            
-            <button
-              type="submit"
-              disabled={!newMessage.trim() || sending}
-              className={`p-2 rounded-full transition ${
-                newMessage.trim() && !sending
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              <Send className="w-5 h-5" />
-            </button>
+            {/* Conditional Input: Show Accept/Delete for requests, regular input for messages */}
+            {isRequest ? (
+              // Request Actions - Replace input with buttons
+              <div className="flex-1 flex gap-3">
+                <button
+                  onClick={handleDeclineRequest}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
+                >
+                  <X className="w-5 h-5" />
+                  Delete
+                </button>
+                <button
+                  onClick={handleAcceptRequest}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all font-semibold"
+                >
+                  <Check className="w-5 h-5" />
+                  Accept & Chat
+                </button>
+              </div>
+            ) : (
+              // Regular message input
+              <>
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-2 border border-pink-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  disabled={sending}
+                />
+                
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || sending}
+                  className={`p-2 rounded-full transition ${
+                    newMessage.trim() && !sending
+                      ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </>
+            )}
           </form>
         </div>
       </div>
