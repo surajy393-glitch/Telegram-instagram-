@@ -306,7 +306,7 @@ const DatingRegisterPage = ({ onLogin }) => {
     setOtpLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/verify-email-otp`, {
+      const response = await httpClient.post('/auth/verify-email-otp', {
         email: formData.email,
         otp: emailOtp.trim()
       });
