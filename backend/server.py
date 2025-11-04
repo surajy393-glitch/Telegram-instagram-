@@ -6052,8 +6052,8 @@ async def get_conversation_messages(
                 "content": msg.get("content"),
                 "mediaUrl": msg.get("media_url"),
                 "status": msg.get("status", {}),
-                "readAt": msg.get("read_at").isoformat() if msg.get("read_at") else None,
-                "createdAt": msg.get("created_at").isoformat() if msg.get("created_at") else None,
+                "readAt": msg.get("read_at") if msg.get("read_at") else None,
+                "createdAt": msg.get("created_at") if msg.get("created_at") else None,
                 "isMine": msg["sender_id"] == user_id
             })
         
