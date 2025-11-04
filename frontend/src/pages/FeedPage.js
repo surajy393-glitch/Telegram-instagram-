@@ -370,7 +370,7 @@ const FeedPage = ({ user, onLogout }) => {
       formData.append('isAnonymous', false);
       formData.append('image', newStory.mediaFile); // Send the actual file
 
-      const response = await axios.post(`/api/social/stories`, formData, {
+      const response = await httpClient.post('/stories', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
