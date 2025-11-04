@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Crown, MoreVertical, Shield, AlertCircle, EyeOff, Link2, Share2, Zap, Lock, Info } from "lucide-react";
+import { ArrowLeft, Crown, MoreVertical, Shield, AlertCircle, EyeOff, Link2, Share2, Zap, Lock, Info, MessageSquare } from "lucide-react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import axios from "axios";
 import { getToken, httpClient } from "@/utils/authClient";
