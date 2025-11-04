@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, MessageCircle, Send, Plus, LogOut, User as UserIcon, Bookmark, X, MoreVertical, Trash2, Download, Link2, Share2, AlertCircle, Bell, Search, MessageSquare } from "lucide-react";
 import HashtagText from "@/components/HashtagText";
-import axios from "axios";
 import { httpClient } from "@/utils/authClient";
 import { getPostMediaUrl } from '@/utils/media';
 import {
@@ -20,8 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const API = "/api";
 
 // Utility function for relative time (IST-aware)
 const getRelativeTime = (dateString) => {
