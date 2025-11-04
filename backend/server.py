@@ -5638,11 +5638,11 @@ async def get_unread_notification_count(current_user: User = Depends(get_current
 async def get_notifications(
     skip: int = 0,
     limit: int = 50,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     try:
         notifications = await db.notifications.find({
-            "userId": current_user["id"]
+            "userId": current_user.id
         }).sort("createdAt", -1).skip(skip).limit(limit).to_list(length=limit)
         
         # Normalize each notification
