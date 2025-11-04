@@ -698,23 +698,7 @@ const HomePage = ({ user, onLogout }) => {
               <p className="text-gray-600 text-lg">No posts yet. Be the first to share!</p>
             </div>
           ) : (
-            posts.filter(post => {
-              // Always show posts from other users
-              if (post.userId !== user?.id) return true;
-              
-              // For own posts, only show if created within last 1 minute
-              try {
-                const postTime = new Date(post.createdAt);
-                const now = new Date();
-                const diffInMinutes = (now - postTime) / (1000 * 60);
-                
-                // Show only if less than 1 minute old
-                return diffInMinutes < 1;
-              } catch (error) {
-                // If can't parse date, hide own post
-                return false;
-              }
-            }).map((post) => (
+            posts.map((post) => (
               <div key={post.id} className="glass-effect rounded-3xl shadow-lg hover:shadow-xl transition-shadow">
                 {/* Post Header */}
                 <div className="p-4 flex items-center justify-between">
