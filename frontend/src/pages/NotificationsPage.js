@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Heart, MessageCircle, UserPlus } from "lucide-react";
 import { httpClient } from "@/utils/authClient";
 
-const API = "/api";
-
 const getRelativeTime = (dateString) => {
   const utcString = dateString.endsWith('Z') ? dateString : dateString + 'Z';
   const postDate = new Date(utcString);
