@@ -517,7 +517,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleHideLikes = async (postId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/hide-likes`, {}, {
+      await httpClient.post(`/posts/${postId}/hide-likes`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchFeed();
