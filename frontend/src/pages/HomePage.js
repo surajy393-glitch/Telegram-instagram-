@@ -529,7 +529,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleToggleComments = async (postId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/toggle-comments`, {}, {
+      await httpClient.post(`/posts/${postId}/toggle-comments`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchFeed();
