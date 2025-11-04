@@ -213,10 +213,7 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleLike = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await httpClient.post(`/posts/${postId}/like`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await httpClient.post(`/posts/${postId}/like`, {});
       console.log("Like response:", response.data);
       
       // Immediately update the UI without waiting for full fetch
