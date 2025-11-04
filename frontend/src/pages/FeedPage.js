@@ -761,7 +761,7 @@ const FeedPage = ({ user, onLogout }) => {
                               </button>
                               <button onClick={async () => { 
                                 try {
-                                  await axios.post(`/api/users/${post.userId}/unfollow`, {}, {
+                                  await httpClient.post(`/users/${post.userId}/unfollow`, {}, {
                                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                                   });
                                   alert('Unfollowed user');
