@@ -6167,7 +6167,7 @@ async def accept_message_request(
 
 @api_router.delete("/messages/request/decline")
 async def decline_message_request(
-    request: dict,
+    request: MessageRequestBody,
     authorization: str = Header(None)
 ):
     """Decline and delete a message request"""
@@ -6176,7 +6176,7 @@ async def decline_message_request(
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
-        conversation_id = request.get("conversationId")
+        conversation_id = request.conversationId
         
         # Delete the conversation and all its messages
         await db.conversations.delete_one({"_id": conversation_id})
