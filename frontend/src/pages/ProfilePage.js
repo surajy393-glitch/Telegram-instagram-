@@ -885,12 +885,12 @@ const ProfilePage = ({ user, onLogout }) => {
                 
                 <Link to={`/chat/${viewingUser?.id}`} className="flex-1">
                   <Button
-                    data-testid="premium-chat-user-btn"
+                    data-testid="message-user-btn"
                     variant="outline"
-                    className="w-full border-2 border-purple-500 text-purple-600 hover:bg-purple-50 rounded-xl py-3 text-sm"
+                    className="w-full border-2 border-pink-500 text-pink-600 hover:bg-pink-50 rounded-xl py-3 text-sm"
                   >
-                    <Crown className="w-4 h-4 mr-1" />
-                    Chat
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Message
                   </Button>
                 </Link>
               </div>
