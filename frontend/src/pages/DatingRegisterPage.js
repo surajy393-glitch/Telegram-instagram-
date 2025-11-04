@@ -395,7 +395,7 @@ const DatingRegisterPage = ({ onLogin }) => {
     setMobileOtpLoading(true);
     
     try {
-      const response = await axios.post(`${API}/auth/verify-mobile-otp`, {
+      const response = await httpClient.post('/auth/verify-mobile-otp', {
         mobileNumber: formData.mobileNumber,
         otp: mobileOtp.trim()
       });
