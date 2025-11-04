@@ -123,7 +123,7 @@ const PostDetailPage = ({ user }) => {
       }));
 
       // Make API call - for now we'll update the post's comments array
-      const response = await httpClient.post(`/posts/${postId}/comment/${commentId}/like`, {});
+      const response = await httpClient.post(`posts/${postId}/comment/${commentId}/like`, {});
     } catch (error) {
       console.error("Error liking comment:", error);
     }
