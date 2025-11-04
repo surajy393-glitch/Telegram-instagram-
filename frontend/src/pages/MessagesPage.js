@@ -266,19 +266,6 @@ const MessagesPage = () => {
                     </div>
                   </div>
                 )}
-                    >
-                      <Check className="w-4 h-4" />
-                      Accept
-                    </button>
-                    <button
-                      onClick={(e) => handleDeclineRequest(conversation.conversationId, e)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
-                    >
-                      <X className="w-4 h-4" />
-                      Decline
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
           </div>
