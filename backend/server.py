@@ -4023,6 +4023,14 @@ async def delete_comment(post_id: str, comment_id: str, current_user: User = Dep
         {"$set": {"comments": updated_comments}}
     )
     
+    # Delete associated notification
+    await db.notifications.delete_many({
+        "userId": post["userId"],
+        "fromUserId": current_user.id,
+        "type": "comment",
+        "postId": post_id
+    })
+    
     return {"message": "Comment deleted successfully"}
 
 @api_router.post("/posts/{post_id}/comment/{comment_id}/report")
