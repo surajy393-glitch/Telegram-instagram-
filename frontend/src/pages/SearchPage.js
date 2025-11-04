@@ -418,11 +418,11 @@ const SearchPage = ({ user, onLogout }) => {
             className={post.isLiked ? "text-red-500 hover:text-red-600" : "text-gray-600 hover:text-red-500"}
           >
             <Heart className={`w-5 h-5 ${post.isLiked ? "fill-current" : ""}`} />
-            {post.likes}
+            {post.likesCount || post.likes?.length || 0}
           </Button>
           <Button variant="ghost" size="sm" className="text-gray-600 hover:text-pink-600">
             <MessageCircle className="w-5 h-5" />
-            {post.comments}
+            {post.commentsCount || post.comments?.length || 0}
           </Button>
           <Button
             variant="ghost"
