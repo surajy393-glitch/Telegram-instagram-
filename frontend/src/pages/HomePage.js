@@ -624,7 +624,7 @@ const HomePage = ({ user, onLogout }) => {
               </Button>
             </Link>
             <Link to="/messages">
-              <Button variant="ghost" className="hover:bg-pink-50 relative p-2" data-testid="messages-btn">
+              <Button variant="ghost" className="hover:bg-pink-50 relative p-2 flex-shrink-0" data-testid="messages-btn">
                 <MessageSquare className="w-5 h-5 text-pink-600" />
                 {messageCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
@@ -634,7 +634,7 @@ const HomePage = ({ user, onLogout }) => {
               </Button>
             </Link>
             <Link to="/notifications">
-              <Button variant="ghost" className="hover:bg-pink-50 relative p-2" data-testid="notifications-btn">
+              <Button variant="ghost" className="hover:bg-pink-50 relative p-2 flex-shrink-0" data-testid="notifications-btn">
                 <Bell className="w-5 h-5 text-pink-600" />
                 {notificationCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
@@ -644,14 +644,14 @@ const HomePage = ({ user, onLogout }) => {
               </Button>
             </Link>
             <Link to="/profile">
-              <Button variant="ghost" className="hover:bg-pink-50 p-2" data-testid="profile-btn">
+              <Button variant="ghost" className="hover:bg-pink-50 p-2 flex-shrink-0" data-testid="profile-btn">
                 <UserIcon className="w-5 h-5 text-pink-600" />
               </Button>
             </Link>
             <Button
               onClick={onLogout}
               variant="ghost"
-              className="hover:bg-pink-50 p-2"
+              className="hover:bg-pink-50 p-2 flex-shrink-0"
               data-testid="logout-btn"
             >
               <LogOut className="w-5 h-5 text-pink-600" />
