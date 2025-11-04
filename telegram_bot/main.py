@@ -1067,7 +1067,7 @@ def main():
     app.add_handler(CommandHandler("mymatches", cmd_mymatches), group=0)
     
     # Webapp callback handlers
-    app.add_handler(CallbackQueryHandler(handle_close_webapp_msg, pattern="^close_webapp_msg$"), group=0)
+    # app.add_handler(CallbackQueryHandler(handle_close_webapp_msg, pattern="^close_webapp_msg$"), group=0)  # Function removed
 
     # Referral command
     app.add_handler(CommandHandler("ref", cmd_ref), group=0)
