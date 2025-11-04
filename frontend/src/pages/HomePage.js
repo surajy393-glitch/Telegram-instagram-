@@ -342,7 +342,7 @@ const HomePage = ({ user, onLogout }) => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API}/stories/${storyToDelete}`, {
+      await httpClient.delete(`/stories/${storyToDelete}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
