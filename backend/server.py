@@ -5860,6 +5860,275 @@ async def serve_upload(file_type: str, filename: str):
         logger.error(f"Error serving file: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# =============================================================================
+# MESSAGING SYSTEM
+# =============================================================================
+
+class SendMessageRequest(BaseModel):
+    receiverId: str
+    content: str
+    type: str = "text"  # text, image, video, audio, file
+    mediaUrl: Optional[str] = None
+
+class MarkReadRequest(BaseModel):
+    conversationId: str
+
+@api_router.post("/messages/send")
+async def send_message(
+    request: SendMessageRequest,
+    authorization: str = Header(None)
+):
+    """Send a message to another user"""
+    try:
+        # Get current user
+        current_user = await get_current_user_from_token(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        sender_id = current_user.id
+        receiver_id = request.receiverId
+        
+        # Check if receiver exists
+        receiver = await db.users.find_one({"id": receiver_id})
+        if not receiver:
+            raise HTTPException(status_code=404, detail="Receiver not found")
+        
+        # Create conversation ID (sorted to ensure same ID regardless of who starts)
+        participants = sorted([sender_id, receiver_id])
+        conversation_id = f"{participants[0]}_{participants[1]}"
+        
+        # Check if conversation exists, if not create it
+        conversation = await db.conversations.find_one({"_id": conversation_id})
+        
+        if not conversation:
+            # Create new conversation
+            conversation = {
+                "_id": conversation_id,
+                "participants": participants,
+                "participantDetails": {
+                    sender_id: {
+                        "userId": sender_id,
+                        "username": current_user.username,
+                        "fullName": current_user.fullName,
+                        "profileImage": current_user.profileImage
+                    },
+                    receiver_id: {
+                        "userId": receiver_id,
+                        "username": receiver.get("username"),
+                        "fullName": receiver.get("fullName"),
+                        "profileImage": receiver.get("profileImage")
+                    }
+                },
+                "last_message": request.content,
+                "last_message_at": datetime.now(timezone.utc),
+                "unread_count": {sender_id: 0, receiver_id: 0},
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.conversations.insert_one(conversation)
+        
+        # Create message
+        message_id = str(uuid4())
+        message = {
+            "_id": message_id,
+            "conversation_id": conversation_id,
+            "sender_id": sender_id,
+            "receiver_id": receiver_id,
+            "type": request.type,
+            "content": request.content if request.type == "text" else None,
+            "media_url": request.mediaUrl if request.type != "text" else None,
+            "status": {
+                "sent": True,
+                "delivered": True,
+                "read": False
+            },
+            "read_at": None,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.messages.insert_one(message)
+        
+        # Update conversation
+        await db.conversations.update_one(
+            {"_id": conversation_id},
+            {
+                "$set": {
+                    "last_message": request.content if request.type == "text" else f"Sent a {request.type}",
+                    "last_message_at": datetime.now(timezone.utc)
+                },
+                "$inc": {f"unread_count.{receiver_id}": 1}
+            }
+        )
+        
+        return {
+            "success": True,
+            "message": "Message sent successfully",
+            "messageId": message_id,
+            "conversationId": conversation_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sending message: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/messages/conversations")
+async def get_conversations(
+    authorization: str = Header(None)
+):
+    """Get all conversations for current user (inbox)"""
+    try:
+        # Get current user
+        current_user = await get_current_user_from_token(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user.id
+        
+        # Get all conversations where user is a participant
+        conversations = await db.conversations.find(
+            {"participants": user_id}
+        ).sort("last_message_at", -1).to_list(length=None)
+        
+        # Format conversations for frontend
+        formatted_conversations = []
+        for conv in conversations:
+            # Get the other participant
+            other_user_id = conv["participants"][0] if conv["participants"][0] != user_id else conv["participants"][1]
+            other_user_details = conv["participantDetails"].get(other_user_id, {})
+            
+            formatted_conversations.append({
+                "conversationId": conv["_id"],
+                "otherUser": {
+                    "id": other_user_id,
+                    "username": other_user_details.get("username", "Unknown"),
+                    "fullName": other_user_details.get("fullName", "Unknown"),
+                    "profileImage": other_user_details.get("profileImage", "")
+                },
+                "lastMessage": conv.get("last_message", ""),
+                "lastMessageAt": conv.get("last_message_at").isoformat() if conv.get("last_message_at") else None,
+                "unreadCount": conv.get("unread_count", {}).get(user_id, 0)
+            })
+        
+        return {"conversations": formatted_conversations}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting conversations: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/messages/conversation/{other_user_id}")
+async def get_conversation_messages(
+    other_user_id: str,
+    authorization: str = Header(None)
+):
+    """Get all messages in a conversation with a specific user"""
+    try:
+        # Get current user
+        current_user = await get_current_user_from_token(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user.id
+        
+        # Create conversation ID
+        participants = sorted([user_id, other_user_id])
+        conversation_id = f"{participants[0]}_{participants[1]}"
+        
+        # Get messages
+        messages = await db.messages.find(
+            {"conversation_id": conversation_id}
+        ).sort("created_at", 1).to_list(length=None)
+        
+        # Format messages
+        formatted_messages = []
+        for msg in messages:
+            formatted_messages.append({
+                "id": msg["_id"],
+                "senderId": msg["sender_id"],
+                "receiverId": msg["receiver_id"],
+                "type": msg["type"],
+                "content": msg.get("content"),
+                "mediaUrl": msg.get("media_url"),
+                "status": msg.get("status", {}),
+                "readAt": msg.get("read_at").isoformat() if msg.get("read_at") else None,
+                "createdAt": msg.get("created_at").isoformat() if msg.get("created_at") else None,
+                "isMine": msg["sender_id"] == user_id
+            })
+        
+        # Mark messages as read (from other user to current user)
+        await db.messages.update_many(
+            {
+                "conversation_id": conversation_id,
+                "receiver_id": user_id,
+                "status.read": False
+            },
+            {
+                "$set": {
+                    "status.read": True,
+                    "read_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Reset unread count for this user in conversation
+        await db.conversations.update_one(
+            {"_id": conversation_id},
+            {"$set": {f"unread_count.{user_id}": 0}}
+        )
+        
+        # Get other user details
+        other_user = await db.users.find_one({"id": other_user_id})
+        
+        return {
+            "messages": formatted_messages,
+            "otherUser": {
+                "id": other_user_id,
+                "username": other_user.get("username", "Unknown") if other_user else "Unknown",
+                "fullName": other_user.get("fullName", "Unknown") if other_user else "Unknown",
+                "profileImage": other_user.get("profileImage", "") if other_user else ""
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting conversation messages: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/messages/unread-count")
+async def get_unread_count(
+    authorization: str = Header(None)
+):
+    """Get total unread message count for current user"""
+    try:
+        # Get current user
+        current_user = await get_current_user_from_token(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user.id
+        
+        # Get all conversations
+        conversations = await db.conversations.find(
+            {"participants": user_id}
+        ).to_list(length=None)
+        
+        # Sum up unread counts
+        total_unread = sum(
+            conv.get("unread_count", {}).get(user_id, 0)
+            for conv in conversations
+        )
+        
+        return {"count": total_unread}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting unread count: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
