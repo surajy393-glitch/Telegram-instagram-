@@ -213,23 +213,13 @@ const MessagesPage = () => {
                         {conversation.otherUser.fullName}
                       </h3>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-xs text-gray-500">
-                          {formatTimestamp(conversation.lastMessageAt)}
-                        </span>
-                        {activeTab === 'requests' && (
-                          <ChevronDown 
-                            className={`w-4 h-4 text-pink-500 transition-transform ${
-                              expandedRequestId === conversation.conversationId ? 'rotate-180' : ''
-                            }`}
-                          />
-                        )}
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <p className={`text-sm truncate ${conversation.unreadCount > 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
                         {conversation.lastMessage}
                       </p>
-                      {conversation.unreadCount > 0 && activeTab === 'messages' && (
+                      {conversation.unreadCount > 0 && (
                         <span className="ml-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                           {conversation.unreadCount}
                         </span>
@@ -237,36 +227,6 @@ const MessagesPage = () => {
                     </div>
                   </div>
                 </div>
-                
-                {/* Request Actions (only show when expanded in Requests tab) */}
-                {activeTab === 'requests' && expandedRequestId === conversation.conversationId && (
-                  <div className="mt-4 pt-4 border-t border-pink-100 animate-fadeIn">
-                    {/* Message Preview */}
-                    <div className="mb-3 p-3 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg">
-                      <p className="text-sm text-gray-700 italic">
-                        "{conversation.lastMessage}"
-                      </p>
-                    </div>
-                    
-                    {/* Action Buttons - LuvHive Style */}
-                    <div className="flex gap-3">
-                      <button
-                        onClick={(e) => handleDeclineRequest(conversation.conversationId, e)}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold group"
-                      >
-                        <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        Delete
-                      </button>
-                      <button
-                        onClick={(e) => handleAcceptRequest(conversation.conversationId, e)}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all font-semibold group"
-                      >
-                        <Check className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        Accept & Chat
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
           </div>
