@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { httpClient } from '@/utils/authClient';
-import { Heart, MessageCircle, Share2, Send, Image as ImageIcon, Plus, Bell, Search, User, MoreVertical, Bookmark, UserIcon as UserIconLucide, AlertCircle, Trash2, Download } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Send, Image as ImageIcon, Plus, Bell, Search, User, MoreVertical, Bookmark, UserIcon as UserIconLucide, AlertCircle, Trash2, Download, MessageSquare } from 'lucide-react';
 import VerifiedBadge from '@/components/VerifiedBadge';
 
 const API = "/api";
