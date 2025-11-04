@@ -182,12 +182,13 @@ const MessagesPage = () => {
                     if (activeTab === 'messages') {
                       navigate(`/chat/${conversation.otherUser.id}`);
                     } else {
-                      // In requests tab, toggle expand
-                      setExpandedRequestId(
-                        expandedRequestId === conversation.conversationId 
-                          ? null 
-                          : conversation.conversationId
-                      );
+                      // In requests tab, open chat page with request state
+                      navigate(`/chat/${conversation.otherUser.id}`, { 
+                        state: { 
+                          isRequest: true,
+                          conversationId: conversation.conversationId 
+                        } 
+                      });
                     }
                   }}
                 >
