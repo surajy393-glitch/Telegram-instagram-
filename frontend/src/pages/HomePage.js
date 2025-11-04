@@ -504,7 +504,7 @@ const HomePage = ({ user, onLogout }) => {
   const handleArchivePost = async (postId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API}/posts/${postId}/archive`, {}, {
+      await httpClient.post(`/posts/${postId}/archive`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("Post archived successfully!");
