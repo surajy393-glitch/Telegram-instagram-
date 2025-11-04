@@ -96,6 +96,10 @@ SECRET_KEY = os.environ.get("JWT_SECRET", "your-secret-key-change-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
 
+
+class MessageRequestBody(BaseModel):
+    conversationId: str
+
 # Models
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
