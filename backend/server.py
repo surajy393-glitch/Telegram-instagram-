@@ -6016,7 +6016,7 @@ async def get_conversations(
                     "profileImage": other_user_details.get("profileImage", "")
                 },
                 "lastMessage": conv.get("last_message", ""),
-                "lastMessageAt": conv.get("last_message_at") if conv.get("last_message_at") else None,
+                "lastMessageAt": serialize_datetime(conv.get("last_message_at")),
                 "unreadCount": conv.get("unread_count", {}).get(user_id, 0)
             })
         
