@@ -3044,6 +3044,10 @@ async def cleanup_account_data(identifier: str):
                 {"$pull": {"following": user_id}}
             )
             
+            # Delete all notifications to and from this user
+            await db.notifications.delete_many({"userId": user_id})  # Notifications TO this user
+            await db.notifications.delete_many({"fromUserId": user_id})  # Notifications FROM this user
+            
             # Delete the user account
             user_deleted = await db.users.delete_one({"id": user_id})
             
