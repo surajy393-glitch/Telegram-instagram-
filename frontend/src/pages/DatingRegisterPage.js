@@ -574,7 +574,7 @@ const DatingRegisterPage = ({ onLogin }) => {
         formDataToSend.append("profilePhoto", formData.profilePhoto);
       }
 
-      const response = await axios.post(`${API}/auth/register-enhanced`, formDataToSend, {
+      const response = await httpClient.post('/auth/register-enhanced', formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data"
         }
