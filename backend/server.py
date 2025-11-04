@@ -5700,10 +5700,10 @@ async def mark_notification_read(
 
 # Mark all notifications as read
 @api_router.put("/notifications/read-all")
-async def mark_all_notifications_read(current_user: dict = Depends(get_current_user)):
+async def mark_all_notifications_read(current_user: User = Depends(get_current_user)):
     try:
         await db.notifications.update_many(
-            {"userId": current_user["id"], "isRead": False},
+            {"userId": current_user.id, "isRead": False},
             {"$set": {"isRead": True}}
         )
         
