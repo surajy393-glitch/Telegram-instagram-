@@ -775,7 +775,7 @@ const FeedPage = ({ user, onLogout }) => {
                               </button>
                               <button onClick={async () => { 
                                 try {
-                                  await axios.post(`/api/users/${post.userId}/mute`, {}, {
+                                  await httpClient.post(`/users/${post.userId}/mute`, {}, {
                                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                                   });
                                   alert('User muted. You won\'t see their posts anymore.');
