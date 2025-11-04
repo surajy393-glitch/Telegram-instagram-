@@ -85,10 +85,12 @@ const ChatPage = () => {
 
   const groupMessagesByDate = (messages) => {
     const groups = {};
+    const istOffset = 5.5 * 60 * 60 * 1000; // IST offset
     
     messages.forEach(msg => {
       const date = new Date(msg.createdAt);
-      const dateKey = date.toDateString();
+      const istDate = new Date(date.getTime() + istOffset);
+      const dateKey = istDate.toDateString();
       
       if (!groups[dateKey]) {
         groups[dateKey] = [];
@@ -101,11 +103,13 @@ const ChatPage = () => {
 
   const getDateLabel = (dateString) => {
     const date = new Date(dateString);
+    const istOffset = 5.5 * 60 * 60 * 1000;
     const today = new Date();
-    const yesterday = new Date(today);
+    const istToday = new Date(today.getTime() + istOffset);
+    const yesterday = new Date(istToday);
     yesterday.setDate(yesterday.getDate() - 1);
     
-    if (date.toDateString() === today.toDateString()) {
+    if (date.toDateString() === istToday.toDateString()) {
       return 'Today';
     } else if (date.toDateString() === yesterday.toDateString()) {
       return 'Yesterday';
