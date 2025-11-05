@@ -199,46 +199,45 @@ export class WebRTCCall {
 
   async connectWebSocket() {
     return new Promise((resolve, reject) => {
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsHost = window.location.host;
-      const wsUrl = `${wsProtocol}//${wsHost}/api/ws/signaling/${this.localUserId}`;
+      // Use global WebSocket manager to reuse connections
+      this.websocketMessageHandler = async (message) => {
+        await this.handleSignalingMessage(message);
+      };
       
-      console.log('🔌 WebSocket URL:', wsUrl);
+      this.websocket = wsManager.getConnection(this.localUserId, this.websocketMessageHandler);
       
       // Connection timeout (5 seconds)
       const timeout = setTimeout(() => {
         if (this.websocket && this.websocket.readyState !== WebSocket.OPEN) {
           console.error('❌ WebSocket connection timeout');
-          this.websocket.close();
           reject(new Error('WebSocket connection timeout'));
+        } else {
+          clearTimeout(timeout);
+          console.log('✅ WebSocket connected successfully');
+          this.isWebSocketReady = true;
+          resolve();
         }
       }, 5000);
       
-      this.websocket = new WebSocket(wsUrl);
-      
-      this.websocket.onopen = () => {
+      // If already open, resolve immediately
+      if (this.websocket.readyState === WebSocket.OPEN) {
         clearTimeout(timeout);
-        console.log('✅ WebSocket connected successfully');
+        console.log('✅ WebSocket already connected');
         this.isWebSocketReady = true;
         resolve();
-      };
+      }
       
-      this.websocket.onmessage = async (event) => {
-        const message = JSON.parse(event.data);
-        await this.handleSignalingMessage(message);
-      };
-      
-      this.websocket.onerror = (error) => {
-        clearTimeout(timeout);
-        console.error('❌ WebSocket error:', error);
-        reject(new Error('WebSocket connection failed'));
-      };
-      
-      this.websocket.onclose = (event) => {
-        clearTimeout(timeout);
-        console.log('WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
-        this.isWebSocketReady = false;
-      };
+      // Listen for open event if connecting
+      if (this.websocket.readyState === WebSocket.CONNECTING) {
+        const onOpen = () => {
+          clearTimeout(timeout);
+          console.log('✅ WebSocket connected successfully');
+          this.isWebSocketReady = true;
+          this.websocket.removeEventListener('open', onOpen);
+          resolve();
+        };
+        this.websocket.addEventListener('open', onOpen);
+      }
     });
   }
 
