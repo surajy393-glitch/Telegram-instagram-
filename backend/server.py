@@ -6059,10 +6059,24 @@ async def get_conversation_messages(
         participants = sorted([user_id, other_user_id])
         conversation_id = f"{participants[0]}_{participants[1]}"
         
-        # Get messages
-        messages = await db.messages.find(
-            {"conversation_id": conversation_id}
-        ).sort("created_at", 1).to_list(length=None)
+        # Get messages - exclude messages deleted for this user or deleted for everyone
+        messages = await db.messages.find({
+            "conversation_id": conversation_id,
+            "$and": [
+                {
+                    "$or": [
+                        {f"deletedBy.{user_id}": {"$exists": False}},
+                        {f"deletedBy.{user_id}": None}
+                    ]
+                },
+                {
+                    "$or": [
+                        {"deletedForEveryone": {"$exists": False}},
+                        {"deletedForEveryone": False}
+                    ]
+                }
+            ]
+        }).sort("created_at", 1).to_list(length=None)
         
         # Format messages
         formatted_messages = []
