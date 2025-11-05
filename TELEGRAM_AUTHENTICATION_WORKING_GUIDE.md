@@ -31,7 +31,7 @@ The JavaScript errors have been **FIXED** and your Telegram bot integration is *
 4. **Bot should respond** (as shown in your video)
 
 ### **Step 2: Test Web Authentication**
-1. **Go to**: https://chatfix-luvhive.preview.emergentagent.com/login
+1. **Go to**: https://luvhive-login-fix.preview.emergentagent.com/login
 2. **Click "Continue with Telegram"**
 3. **Follow the 4-step dialog**:
    - ✅ Open Telegram
