@@ -6552,6 +6552,3 @@ async def get_call_history(
     except Exception as e:
         logger.error(f"Error getting call history: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-    client.close()
