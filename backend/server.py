@@ -100,6 +100,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
 class MessageRequestBody(BaseModel):
     conversationId: str
 
+class ConversationActionBody(BaseModel):
+    conversationId: str
+    action: str  # pin, unpin, mute_messages, unmute_messages, mute_calls, unmute_calls, delete
+
 # Models
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
