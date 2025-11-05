@@ -185,27 +185,83 @@ export class WebRTCCall {
     try {
       const { type, data, fromUserId, callType } = message;
       
-      if (fromUserId !== this.remoteUserId) return;
+      console.log('📨 Received signal:', type, 'from:', fromUserId);
+      
+      // Allow messages from any user (don't restrict to remoteUserId for incoming calls)
       
       switch (type) {
         case 'offer':
-          await this.handleOffer(data.offer, callType);
+          // This is an incoming call!
+          console.log('📞 Incoming call from:', fromUserId, 'Type:', callType);
+          
+          // Notify parent component about incoming call
+          if (this.onIncomingCall) {
+            this.onIncomingCall({
+              fromUserId,
+              callType,
+              offer: data.offer
+            });
+          }
+          
+          // Store offer for later (when user accepts)
+          this.pendingOffer = { offer: data.offer, callType, fromUserId };
           break;
           
         case 'answer':
+          if (fromUserId !== this.remoteUserId) return;
           await this.handleAnswer(data.answer);
           break;
           
         case 'ice-candidate':
+          if (fromUserId !== this.remoteUserId) return;
           await this.handleIceCandidate(data.candidate);
           break;
           
         case 'call-end':
+          if (fromUserId !== this.remoteUserId) return;
           this.endCall();
           break;
       }
     } catch (error) {
       console.error('❌ Error handling signaling message:', error);
+    }
+  }
+
+  async acceptIncomingCall() {
+    // Accept the incoming call
+    if (!this.pendingOffer) {
+      console.error('No pending offer to accept');
+      return;
+    }
+
+    const { offer, callType, fromUserId } = this.pendingOffer;
+    this.remoteUserId = fromUserId;
+    this.callType = callType;
+    
+    // Get user media first
+    const constraints = {
+      audio: true,
+      video: callType === 'video' ? {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user'
+      } : false
+    };
+    
+    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+    console.log('✅ Got local media stream for incoming call');
+    
+    // Now handle the offer
+    await this.handleOffer(offer, callType);
+    
+    return this.localStream;
+  }
+
+  rejectIncomingCall() {
+    // Reject the incoming call
+    if (this.pendingOffer) {
+      this.sendSignal('call-end', {});
+      this.pendingOffer = null;
     }
   }
 
