@@ -124,12 +124,20 @@ const ChatPage = () => {
       const call = new WebRTCCall(currentUser.id, userId, type);
       setCurrentCall(call);
       
+      // Handle incoming calls
+      call.onIncomingCall = (incomingCallData) => {
+        console.log('📞 Incoming call notification received');
+        setIncomingCall(incomingCallData);
+        setShowIncomingCallModal(true);
+      };
+      
       // Initialize and get local stream
       const stream = await call.initialize();
       setLocalStream(stream);
       
       // Handle remote stream
       call.onRemoteStream = (stream) => {
+        console.log('📺 Remote stream received');
         setRemoteStream(stream);
       };
       
@@ -144,7 +152,7 @@ const ChatPage = () => {
         endCall();
       };
       
-      // Start the call
+      // Start the call (send offer)
       await call.startCall();
       
     } catch (error) {
@@ -152,6 +160,35 @@ const ChatPage = () => {
       alert('Failed to start call. Please check your camera/microphone permissions.');
       endCall();
     }
+  };
+
+  const acceptIncomingCall = async () => {
+    try {
+      setShowIncomingCallModal(false);
+      setIsCallActive(true);
+      setCallType(incomingCall.callType);
+      
+      if (currentCall) {
+        // Accept the call
+        const stream = await currentCall.acceptIncomingCall();
+        setLocalStream(stream);
+      }
+      
+      setIncomingCall(null);
+    } catch (error) {
+      console.error('Error accepting call:', error);
+      alert('Failed to accept call');
+      endCall();
+    }
+  };
+
+  const rejectIncomingCall = () => {
+    setShowIncomingCallModal(false);
+    if (currentCall) {
+      currentCall.rejectIncomingCall();
+    }
+    setIncomingCall(null);
+    endCall();
   };
 
   const endCall = () => {
