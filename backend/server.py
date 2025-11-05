@@ -323,6 +323,75 @@ class ZegoTokenRequest(BaseModel):
     userId: str
     roomId: str
 
+# ZegoCloud Token04 Generation Helper Functions
+def __make_nonce():
+    return random.getrandbits(31)
+
+def __make_random_iv():
+    str_chars = '0123456789abcdefghijklmnopqrstuvwxyz'
+    iv = ""
+    for i in range(16):
+        index = int(random.random() * 16)
+        iv += str_chars[index]
+    return iv
+
+def __aes_pkcs5_padding(cipher_text, block_size):
+    padding_size = len(cipher_text) if (len(cipher_text) == len(
+        cipher_text.encode('utf-8'))) else len(cipher_text.encode('utf-8'))
+    padding = block_size - padding_size % block_size
+    if padding < 0:
+        return None
+    padding_text = chr(padding) * padding
+    return cipher_text + padding_text
+
+def __aes_encrypt(plain_text, key, iv):
+    cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
+    content_padding = __aes_pkcs5_padding(plain_text, 16)
+    encrypt_bytes = cipher.encrypt(content_padding.encode('utf-8'))
+    return encrypt_bytes
+
+def generate_zegocloud_token04(app_id, user_id, secret, effective_time_in_seconds, payload):
+    """Generate ZegoCloud Token04 for authentication"""
+    if type(app_id) != int or app_id == 0:
+        raise ValueError("appID invalid")
+    if type(user_id) != str or user_id == "":
+        raise ValueError("userID invalid")
+    if type(secret) != str or len(secret) != 32:
+        raise ValueError("secret must be a 32 byte string")
+    if type(effective_time_in_seconds) != int or effective_time_in_seconds <= 0:
+        raise ValueError("effective_time_in_seconds invalid")
+    
+    create_time = int(time.time())
+    expire_time = create_time + effective_time_in_seconds
+    nonce = __make_nonce()
+
+    _token = {"app_id": app_id, "user_id": user_id, "nonce": nonce,
+              "ctime": create_time, "expire": expire_time, "payload": payload}
+    plain_text = json.dumps(_token, separators=(',', ':'), ensure_ascii=False)
+
+    iv = __make_random_iv()
+    encrypt_buf = __aes_encrypt(plain_text, secret, iv)
+
+    result_size = len(encrypt_buf) + 28
+    result = bytearray(result_size)
+
+    big_endian_expire_time = struct.pack("!q", expire_time)
+    result[0: 0 + len(big_endian_expire_time)] = big_endian_expire_time[:]
+
+    big_endian_iv_size = struct.pack("!h", len(iv))
+    result[8: 8 + len(big_endian_iv_size)] = big_endian_iv_size[:]
+
+    buffer = bytearray(iv.encode('utf-8'))
+    result[10: 10 + len(buffer)] = buffer[:]
+
+    big_endian_buf_size = struct.pack("!h", len(encrypt_buf))
+    result[26: 26 + len(big_endian_buf_size)] = big_endian_buf_size[:]
+
+    result[28: len(result)] = encrypt_buf[:]
+
+    token = "04" + binascii.b2a_base64(result, newline=False).decode()
+    return token
+
 # Helper functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
