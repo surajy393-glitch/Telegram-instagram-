@@ -120,37 +120,42 @@ export class ZegoCloudCall {
   }
 
   /**
-   * Get user media (camera/microphone)
+   * Get user media using ZegoCloud createStream (camera/microphone)
    */
   async getUserMedia() {
     try {
-      const constraints = {
-        audio: true,
-        video: this.isVideoEnabled ? {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 30 }
-        } : false
+      if (!this.zg) {
+        throw new Error('ZegoCloud engine not initialized');
+      }
+
+      // Use ZegoCloud's createStream method
+      const config = {
+        camera: {
+          audio: true,
+          video: this.isVideoEnabled ? {
+            width: 1280,
+            height: 720,
+            frameRate: 30
+          } : false
+        }
       };
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = await this.zg.createStream(config);
       this.localStream = stream;
       
-      console.log('User media acquired successfully');
+      console.log('ZegoCloud stream created successfully');
       return stream;
     } catch (error) {
-      console.error('Failed to get user media:', error);
+      console.error('Failed to create ZegoCloud stream:', error);
       
       // Handle specific permission errors
-      if (error.name === 'NotAllowedError') {
+      if (error.msg && error.msg.includes('permission')) {
         throw new Error('Camera/microphone permission denied');
-      } else if (error.name === 'NotFoundError') {
+      } else if (error.msg && error.msg.includes('not found')) {
         throw new Error('Camera/microphone not found');
-      } else if (error.name === 'NotReadableError') {
-        throw new Error('Camera/microphone already in use');
       }
       
-      throw new Error(`Media access failed: ${error.message}`);
+      throw new Error(`Stream creation failed: ${error.msg || error.message}`);
     }
   }
 
