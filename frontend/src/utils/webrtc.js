@@ -312,29 +312,53 @@ export class WebRTCCall {
   }
 
   endCall() {
-    // Send end call signal
-    this.sendSignal('call-end', {});
+    console.log('🔚 Ending call...');
     
-    // Stop all tracks
-    if (this.localStream) {
-      this.localStream.getTracks().forEach(track => track.stop());
+    try {
+      // Send end call signal only if WebSocket is open
+      if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+        this.sendSignal('call-end', {});
+        console.log('📤 Sent call-end signal');
+      }
+      
+      // Stop all local stream tracks
+      if (this.localStream) {
+        this.localStream.getTracks().forEach(track => {
+          track.stop();
+          console.log('⏹️ Stopped track:', track.kind);
+        });
+        this.localStream = null;
+      }
+      
+      // Close peer connection
+      if (this.peerConnection) {
+        this.peerConnection.close();
+        this.peerConnection = null;
+        console.log('🔌 Peer connection closed');
+      }
+      
+      // Close WebSocket
+      if (this.websocket) {
+        if (this.websocket.readyState === WebSocket.OPEN || 
+            this.websocket.readyState === WebSocket.CONNECTING) {
+          this.websocket.close();
+        }
+        this.websocket = null;
+        console.log('🔌 WebSocket closed');
+      }
+      
+      // Reset flags
+      this.isWebSocketReady = false;
+      this.remoteStream = null;
+      
+      // Call end callback
+      if (this.onCallEnd) {
+        this.onCallEnd();
+      }
+      
+      console.log('✅ Call ended successfully');
+    } catch (error) {
+      console.error('❌ Error during cleanup:', error);
     }
-    
-    // Close peer connection
-    if (this.peerConnection) {
-      this.peerConnection.close();
-    }
-    
-    // Close websocket
-    if (this.websocket) {
-      this.websocket.close();
-    }
-    
-    // Call end callback
-    if (this.onCallEnd) {
-      this.onCallEnd();
-    }
-    
-    console.log('Call ended');
   }
 }
