@@ -121,12 +121,17 @@ const ChatPage = () => {
       setCallType(type);
       setIsCallActive(true);
       
+      console.log('🎥 startCall - currentUser:', currentUser);
+      console.log('🎥 startCall - currentUser.id:', currentUser?.id);
+      
       // Make sure a user is logged in before starting a call.
       if (!currentUser || !currentUser.id) {
+        console.error('❌ No valid currentUser or currentUser.id');
         throw new Error('Current user ID is not available. Please sign in again.');
       }
       
       // Create ZegoCloud call instance - falls back to guest ID if needed
+      console.log('🎥 Creating ZegoCloudCall with userId:', currentUser.id, 'remoteUserId:', userId);
       const call = new ZegoCloudCall(currentUser.id, userId, type);
       setCurrentCall(call);
       
