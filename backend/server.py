@@ -5997,6 +5997,12 @@ async def get_conversations(
             # Check if this is a request for current user
             is_request = conv.get("isRequest", {}).get(user_id, False)
             
+            # Check pin and mute status for current user
+            is_pinned = user_id in conv.get("pinnedBy", [])
+            muted_by_user = conv.get("mutedBy", {}).get(user_id, {})
+            messages_muted = muted_by_user.get("messages", False)
+            calls_muted = muted_by_user.get("calls", False)
+            
             formatted_conversations.append({
                 "conversationId": conv["_id"],
                 "otherUser": {
@@ -6008,8 +6014,14 @@ async def get_conversations(
                 "lastMessage": conv.get("last_message", ""),
                 "lastMessageAt": serialize_datetime(conv.get("last_message_at")),
                 "unreadCount": conv.get("unread_count", {}).get(user_id, 0),
-                "isRequest": is_request  # Add request status
+                "isRequest": is_request,  # Add request status
+                "isPinned": is_pinned,
+                "messagesMuted": messages_muted,
+                "callsMuted": calls_muted
             })
+        
+        # Sort conversations: pinned first, then by last_message_at
+        formatted_conversations.sort(key=lambda x: (not x["isPinned"], x["lastMessageAt"] or ""), reverse=True)
         
         return {"conversations": formatted_conversations}
         
