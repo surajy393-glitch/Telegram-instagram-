@@ -41,6 +41,7 @@ export class WebRTCCall {
     this.onError = null;
     this.onIncomingCall = null; // Callback for incoming call notification
     this.isWebSocketReady = false;
+    this.iceCandidateQueue = []; // Queue for ICE candidates received before remote description
   }
 
   async initialize() {
