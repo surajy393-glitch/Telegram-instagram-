@@ -325,6 +325,16 @@ const ChatPage = () => {
       </div>
 
       {/* Call Modal */}
+      {/* Incoming Call Modal */}
+      <IncomingCallModal
+        isOpen={showIncomingCallModal}
+        callType={incomingCall?.callType || 'audio'}
+        callerUser={otherUser}
+        onAccept={acceptIncomingCall}
+        onReject={rejectIncomingCall}
+      />
+
+      {/* Call Modal */}
       <CallModal
         isOpen={isCallActive}
         callType={callType}
