@@ -17,6 +17,8 @@ const MessagesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('messages'); // 'messages' or 'requests'
   const [expandedRequestId, setExpandedRequestId] = useState(null); // Track expanded request
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState(null);
 
   useEffect(() => {
     fetchConversations();
