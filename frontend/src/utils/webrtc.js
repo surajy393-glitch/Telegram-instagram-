@@ -320,6 +320,9 @@ export class WebRTCCall {
     try {
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
       console.log('✅ Set remote description from answer');
+      
+      // Process any queued ICE candidates now that remote description is set
+      await this.processQueuedIceCandidates();
     } catch (error) {
       console.error('❌ Error handling answer:', error);
     }
