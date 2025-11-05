@@ -39,6 +39,8 @@ export class WebRTCCall {
     this.onRemoteStream = null;
     this.onCallEnd = null;
     this.onError = null;
+    this.onIncomingCall = null; // Callback for incoming call notification
+    this.isWebSocketReady = false;
   }
 
   async initialize() {
