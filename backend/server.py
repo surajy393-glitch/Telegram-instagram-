@@ -6481,10 +6481,10 @@ async def websocket_signaling(websocket: WebSocket, user_id: str):
             await signaling_manager.send_signal(target_user_id, message)
             
     except WebSocketDisconnect:
-        signaling_manager.disconnect(user_id)
+        signaling_manager.disconnect(user_id, websocket)
     except Exception as e:
         logger.error(f"WebSocket error for user {user_id}: {e}")
-        signaling_manager.disconnect(user_id)
+        signaling_manager.disconnect(user_id, websocket)
 
 
 # Call history model
