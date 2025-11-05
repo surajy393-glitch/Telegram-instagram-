@@ -112,6 +112,69 @@ const ChatPage = () => {
     }
   };
 
+  // Call functions
+  const startCall = async (type) => {
+    try {
+      setCallType(type);
+      setIsCallActive(true);
+      
+      const call = new WebRTCCall(currentUser.id, userId, type);
+      setCurrentCall(call);
+      
+      // Initialize and get local stream
+      const stream = await call.initialize();
+      setLocalStream(stream);
+      
+      // Handle remote stream
+      call.onRemoteStream = (stream) => {
+        setRemoteStream(stream);
+      };
+      
+      // Handle call end
+      call.onCallEnd = () => {
+        endCall();
+      };
+      
+      // Handle errors
+      call.onError = (error) => {
+        alert(error);
+        endCall();
+      };
+      
+      // Start the call
+      await call.startCall();
+      
+    } catch (error) {
+      console.error('Error starting call:', error);
+      alert('Failed to start call. Please check your camera/microphone permissions.');
+      endCall();
+    }
+  };
+
+  const endCall = () => {
+    if (currentCall) {
+      currentCall.endCall();
+    }
+    setIsCallActive(false);
+    setCurrentCall(null);
+    setLocalStream(null);
+    setRemoteStream(null);
+  };
+
+  const toggleAudio = () => {
+    if (currentCall) {
+      return currentCall.toggleAudio();
+    }
+    return false;
+  };
+
+  const toggleVideo = () => {
+    if (currentCall) {
+      return currentCall.toggleVideo();
+    }
+    return false;
+  };
+
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
     
