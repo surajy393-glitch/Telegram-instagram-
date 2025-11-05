@@ -27,6 +27,118 @@ const ICE_SERVERS = {
   ]
 };
 
+// Global WebSocket connection manager to prevent multiple connections
+class WebSocketManager {
+  constructor() {
+    this.connections = new Map(); // userId -> { ws, refCount, messageHandlers }
+  }
+
+  getConnection(userId, messageHandler) {
+    if (this.connections.has(userId)) {
+      // Reuse existing connection
+      const conn = this.connections.get(userId);
+      conn.refCount++;
+      conn.messageHandlers.add(messageHandler);
+      console.log(`♻️ Reusing WebSocket connection for user ${userId} (refCount: ${conn.refCount})`);
+      return conn.ws;
+    }
+
+    // Create new connection
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.host;
+    const wsUrl = `${wsProtocol}//${wsHost}/api/ws/signaling/${userId}`;
+    
+    console.log('🔌 Creating new WebSocket connection:', wsUrl);
+    const ws = new WebSocket(wsUrl);
+    
+    const connData = {
+      ws,
+      refCount: 1,
+      messageHandlers: new Set([messageHandler]),
+      reconnectAttempts: 0,
+      reconnectTimer: null
+    };
+    
+    this.connections.set(userId, connData);
+    
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      // Broadcast to all handlers
+      connData.messageHandlers.forEach(handler => {
+        try {
+          handler(message);
+        } catch (error) {
+          console.error('Error in message handler:', error);
+        }
+      });
+    };
+    
+    ws.onclose = (event) => {
+      console.log(`WebSocket disconnected. Code: ${event.code}, Reason: ${event.reason || 'none'}`);
+      this.handleDisconnection(userId);
+    };
+    
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+    
+    return ws;
+  }
+
+  handleDisconnection(userId) {
+    const conn = this.connections.get(userId);
+    if (!conn) return;
+
+    // Attempt reconnection with exponential backoff
+    if (conn.reconnectAttempts < 5) {
+      const delay = Math.min(1000 * Math.pow(2, conn.reconnectAttempts), 30000);
+      console.log(`🔄 Reconnecting WebSocket in ${delay}ms (attempt ${conn.reconnectAttempts + 1}/5)`);
+      
+      conn.reconnectTimer = setTimeout(() => {
+        console.log('Signaling disconnected, reconnecting...');
+        conn.reconnectAttempts++;
+        
+        // Store handlers before recreating connection
+        const handlers = Array.from(conn.messageHandlers);
+        this.connections.delete(userId);
+        
+        // Recreate connection for each handler
+        handlers.forEach(handler => {
+          this.getConnection(userId, handler);
+        });
+      }, delay);
+    } else {
+      console.error('❌ Max reconnection attempts reached');
+      this.connections.delete(userId);
+    }
+  }
+
+  releaseConnection(userId, messageHandler) {
+    const conn = this.connections.get(userId);
+    if (!conn) return;
+
+    conn.messageHandlers.delete(messageHandler);
+    conn.refCount--;
+    
+    console.log(`📉 Released WebSocket connection for user ${userId} (refCount: ${conn.refCount})`);
+
+    // Only close if no more references
+    if (conn.refCount <= 0) {
+      console.log(`🔌 Closing WebSocket connection for user ${userId}`);
+      if (conn.reconnectTimer) {
+        clearTimeout(conn.reconnectTimer);
+      }
+      if (conn.ws && conn.ws.readyState === WebSocket.OPEN) {
+        conn.ws.close();
+      }
+      this.connections.delete(userId);
+    }
+  }
+}
+
+// Global singleton instance
+const wsManager = new WebSocketManager();
+
 export class WebRTCCall {
   constructor(localUserId, remoteUserId, callType = 'audio') {
     this.localUserId = localUserId;
