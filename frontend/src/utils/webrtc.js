@@ -244,12 +244,18 @@ export class WebRTCCall {
 
   sendSignal(type, data) {
     if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+      console.log('📤 Sending signal:', type, 'to user:', this.remoteUserId);
       this.websocket.send(JSON.stringify({
         type,
         targetUserId: this.remoteUserId,
         callType: this.callType,
         data
       }));
+    } else {
+      console.error('❌ Cannot send signal - WebSocket not open. State:', this.websocket?.readyState);
+      if (this.onError) {
+        this.onError('WebSocket not connected');
+      }
     }
   }
 
