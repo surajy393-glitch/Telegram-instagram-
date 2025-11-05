@@ -260,18 +260,30 @@ export class ZegoCloudCall {
    */
   async publishStream() {
     try {
-      if (!this.zg || !this.localStream) {
-        throw new Error('Engine or local stream not available');
+      if (!this.zg) {
+        throw new Error('ZegoCloud engine not available');
       }
+      
+      if (!this.localStream) {
+        throw new Error('Local stream not available');
+      }
+
+      // Validate stream has tracks
+      const tracks = this.localStream.getTracks();
+      if (!tracks || tracks.length === 0) {
+        throw new Error('Local stream has no media tracks');
+      }
+
+      console.log('Publishing stream with tracks:', tracks.map(t => `${t.kind}(${t.label})`));
 
       const streamId = `${this.localUserId}_stream`;
       
       await this.zg.startPublishingStream(streamId, this.localStream);
       this.isPublishing = true;
       
-      console.log(`Publishing stream: ${streamId}`);
+      console.log(`✅ Publishing stream: ${streamId}`);
     } catch (error) {
-      console.error('Failed to publish stream:', error);
+      console.error('❌ Failed to publish stream:', error);
       throw error;
     }
   }
