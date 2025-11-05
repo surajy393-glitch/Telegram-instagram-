@@ -233,13 +233,14 @@ export class ZegoCloudCall {
 
       console.log('Joining room with token type:', typeof token, 'starts with 04:', token.startsWith('04'));
 
-      // Correct loginRoom signature: loginRoom(roomID, user, config)
-      const user = { userID: this.localUserId, userName: this.localUserId };
-      const config = { userUpdate: true, token: token };
+      // CORRECT loginRoom signature: loginRoom(roomID, token, userInfo, config)
+      // Token MUST be 2nd parameter as STRING, not inside config!
+      const userInfo = { userID: this.localUserId, userName: this.localUserId };
+      const config = { userUpdate: true };
 
-      console.log('Calling loginRoom with:', { roomId: this.roomId, user, config: { ...config, token: 'REDACTED' } });
+      console.log('Calling loginRoom with:', { roomId: this.roomId, userInfo, config });
 
-      const result = await this.zg.loginRoom(this.roomId, user, config);
+      const result = await this.zg.loginRoom(this.roomId, token, userInfo, config);
 
       console.log('loginRoom result:', result);
 
