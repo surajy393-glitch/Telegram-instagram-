@@ -27,11 +27,9 @@ export class ZegoCloudCall {
     // Read AppID from the environment or fall back to a default.
     const envAppId = parseInt(process.env.REACT_APP_ZEGO_APP_ID, 10);
     this.appId = Number.isInteger(envAppId) ? envAppId : 2106710509;
-
-    // Use the coolzcloud.com domain by default.
-    // Allow an override via REACT_APP_ZEGO_SERVER_URL if needed.
-    const defaultServer = `wss://webliveroom${this.appId}-api.coolzcloud.com/ws`;
-    this.server = process.env.REACT_APP_ZEGO_SERVER_URL || defaultServer;
+    
+    // Read AppSign from environment (required for SDK initialization)
+    this.appSign = process.env.REACT_APP_ZEGO_APP_SIGN || '';
     
     // State management
     this.zg = null;
