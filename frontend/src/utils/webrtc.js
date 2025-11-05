@@ -43,7 +43,7 @@ export class WebRTCCall {
 
   async initialize() {
     try {
-      // STEP 1: Get user media FIRST (camera/microphone) - independent of signaling
+      // STEP 1: Get camera/microphone access FIRST
       const constraints = {
         audio: true,
         video: this.callType === 'video' ? {
@@ -57,17 +57,55 @@ export class WebRTCCall {
       this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
       console.log('✅ Got local media stream');
       
-      // STEP 2: Connect WebSocket for signaling (non-blocking, runs in background)
+      // STEP 2: Connect WebSocket for signaling (with timeout)
+      console.log('🔌 Connecting to WebSocket signaling server...');
+      await this.connectWebSocket();
+      
+      return this.localStream;
+      
+    } catch (error) {
+      console.error('❌ Error initializing WebRTC:', error);
+      
+      // Specific error messages
+      if (error.name === 'NotAllowedError') {
+        if (this.onError) this.onError('Camera/microphone permission denied');
+      } else if (error.name === 'NotFoundError') {
+        if (this.onError) this.onError('Camera/microphone not found');
+      } else if (error.name === 'NotReadableError') {
+        if (this.onError) this.onError('Camera/microphone already in use');
+      } else if (error.message === 'WebSocket connection timeout') {
+        if (this.onError) this.onError('Connection timeout - Please try again');
+      } else {
+        if (this.onError) this.onError('Failed to start call. Please check permissions.');
+      }
+      throw error;
+    }
+  }
+
+  async connectWebSocket() {
+    return new Promise((resolve, reject) => {
       const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsHost = window.location.host;
       const wsUrl = `${wsProtocol}//${wsHost}/ws/signaling/${this.localUserId}`;
       
-      console.log('🔌 Connecting to WebSocket:', wsUrl);
+      console.log('🔌 WebSocket URL:', wsUrl);
+      
+      // Connection timeout (5 seconds)
+      const timeout = setTimeout(() => {
+        if (this.websocket && this.websocket.readyState !== WebSocket.OPEN) {
+          console.error('❌ WebSocket connection timeout');
+          this.websocket.close();
+          reject(new Error('WebSocket connection timeout'));
+        }
+      }, 5000);
       
       this.websocket = new WebSocket(wsUrl);
       
       this.websocket.onopen = () => {
+        clearTimeout(timeout);
         console.log('✅ WebSocket connected successfully');
+        this.isWebSocketReady = true;
+        resolve();
       };
       
       this.websocket.onmessage = async (event) => {
@@ -76,22 +114,17 @@ export class WebRTCCall {
       };
       
       this.websocket.onerror = (error) => {
-        console.error('❌ WebSocket connection error:', error);
-        console.warn('⚠️ Signaling may not work, but local video should be visible');
+        clearTimeout(timeout);
+        console.error('❌ WebSocket error:', error);
+        reject(new Error('WebSocket connection failed'));
       };
       
       this.websocket.onclose = (event) => {
+        clearTimeout(timeout);
         console.log('WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
+        this.isWebSocketReady = false;
       };
-      
-      // Return local stream immediately (don't wait for WebSocket)
-      return this.localStream;
-      
-    } catch (error) {
-      console.error('❌ Error initializing WebRTC:', error);
-      if (this.onError) this.onError('Failed to access camera/microphone. Please check permissions.');
-      throw error;
-    }
+    });
   }
 
   async startCall() {
