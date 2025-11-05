@@ -75,6 +75,66 @@ const MessagesPage = () => {
     }
   };
 
+  const handleConversationAction = async (conversationId, action) => {
+    try {
+      // Optimistic update
+      setConversations(prev => prev.map(conv => {
+        if (conv.conversationId !== conversationId) return conv;
+        
+        switch (action) {
+          case 'pin':
+          case 'unpin':
+            return { ...conv, isPinned: action === 'pin' };
+          case 'mute_messages':
+          case 'unmute_messages':
+            return { ...conv, messagesMuted: action === 'mute_messages' };
+          case 'mute_calls':
+          case 'unmute_calls':
+            return { ...conv, callsMuted: action === 'mute_calls' };
+          default:
+            return conv;
+        }
+      }));
+
+      // Make API call
+      const response = await httpClient.post('/messages/conversation/action', {
+        conversationId,
+        action
+      });
+
+      // If delete action, remove from list
+      if (action === 'delete') {
+        setConversations(prev => prev.filter(c => c.conversationId !== conversationId));
+      }
+
+      // Re-fetch to get latest state and proper sorting
+      await fetchConversations();
+    } catch (error) {
+      console.error('Error performing conversation action:', error);
+      // Revert optimistic update on error
+      await fetchConversations();
+      alert('Failed to perform action');
+    }
+  };
+
+  const handlePin = (conversationId, isPinned) => {
+    handleConversationAction(conversationId, isPinned ? 'unpin' : 'pin');
+  };
+
+  const handleDelete = (conversationId) => {
+    if (window.confirm('Are you sure you want to delete this conversation?')) {
+      handleConversationAction(conversationId, 'delete');
+    }
+  };
+
+  const handleMuteMessages = (conversationId, messagesMuted) => {
+    handleConversationAction(conversationId, messagesMuted ? 'unmute_messages' : 'mute_messages');
+  };
+
+  const handleMuteCalls = (conversationId, callsMuted) => {
+    handleConversationAction(conversationId, callsMuted ? 'unmute_calls' : 'mute_calls');
+  };
+
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
     
