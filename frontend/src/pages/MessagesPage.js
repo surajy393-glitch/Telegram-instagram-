@@ -350,6 +350,17 @@ const MessagesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Chat Dialog */}
+      <DeleteChatDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setSelectedConversation(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        otherUserName={selectedConversation?.otherUser?.fullName || ''}
+      />
     </div>
   );
 };
