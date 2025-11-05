@@ -73,7 +73,7 @@ TELEGRAM_BOT_TOKEN="8494034049:AAEb5jiuYLUMmkjsIURx6RqhHJ4mj3bOI10"
 
 ### **Current Status**: Ready for Testing
 
-1. **Go to**: `https://luvhive-chat.preview.emergentagent.com/login`
+1. **Go to**: `https://chatfix-luvhive.preview.emergentagent.com/login`
 2. **Click**: "Continue with Telegram" 
 3. **Expected**: Telegram Login Widget opens with your bot (@Loveekisssbot)
 4. **Authorize**: The LuvHive app through Telegram
