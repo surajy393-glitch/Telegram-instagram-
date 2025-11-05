@@ -260,11 +260,41 @@ const ChatPage = () => {
                   <h2 className="font-semibold text-gray-900">{otherUser.fullName}</h2>
                   <p className="text-xs text-gray-500">@{otherUser.username}</p>
                 </div>
+                
+                {/* Call Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => startCall('audio')}
+                    className="p-2 hover:bg-pink-50 rounded-full transition"
+                    title="Voice Call"
+                  >
+                    <Phone className="w-5 h-5 text-pink-600" />
+                  </button>
+                  <button
+                    onClick={() => startCall('video')}
+                    className="p-2 hover:bg-pink-50 rounded-full transition"
+                    title="Video Call"
+                  >
+                    <Video className="w-5 h-5 text-pink-600" />
+                  </button>
+                </div>
               </>
             )}
           </div>
         </div>
       </div>
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={isCallActive}
+        callType={callType}
+        localStream={localStream}
+        remoteStream={remoteStream}
+        onEndCall={endCall}
+        onToggleAudio={toggleAudio}
+        onToggleVideo={toggleVideo}
+        otherUser={otherUser}
+      />
 
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto px-4 py-4 max-w-2xl mx-auto w-full">
