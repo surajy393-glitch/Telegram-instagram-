@@ -6199,6 +6199,90 @@ async def decline_message_request(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.post("/messages/conversation/action")
+async def conversation_action(
+    body: ConversationActionBody,
+    authorization: str = Header(None)
+):
+    """
+    Handle conversation actions: pin, unpin, mute_messages, unmute_messages, mute_calls, unmute_calls, delete
+    """
+    try:
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user.id
+        conversation_id = body.conversationId
+        action = body.action
+        
+        # Verify conversation exists and user is a participant
+        conversation = await db.conversations.find_one({"_id": conversation_id})
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        if user_id not in conversation.get("participants", []):
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Handle different actions
+        if action == "pin":
+            await db.conversations.update_one(
+                {"_id": conversation_id},
+                {"$addToSet": {f"pinnedBy": user_id}}
+            )
+            return {"success": True, "message": "Conversation pinned", "isPinned": True}
+            
+        elif action == "unpin":
+            await db.conversations.update_one(
+                {"_id": conversation_id},
+                {"$pull": {f"pinnedBy": user_id}}
+            )
+            return {"success": True, "message": "Conversation unpinned", "isPinned": False}
+            
+        elif action == "mute_messages":
+            await db.conversations.update_one(
+                {"_id": conversation_id},
+                {"$set": {f"mutedBy.{user_id}.messages": True}}
+            )
+            return {"success": True, "message": "Messages muted", "messagesMuted": True}
+            
+        elif action == "unmute_messages":
+            await db.conversations.update_one(
+                {"_id": conversation_id},
+                {"$set": {f"mutedBy.{user_id}.messages": False}}
+            )
+            return {"success": True, "message": "Messages unmuted", "messagesMuted": False}
+            
+        elif action == "mute_calls":
+            await db.conversations.update_one(
+                {"_id": conversation_id},
+                {"$set": {f"mutedBy.{user_id}.calls": True}}
+            )
+            return {"success": True, "message": "Calls muted", "callsMuted": True}
+            
+        elif action == "unmute_calls":
+            await db.conversations.update_one(
+                {"_id": conversation_id},
+                {"$set": {f"mutedBy.{user_id}.calls": False}}
+            )
+            return {"success": True, "message": "Calls unmuted", "callsMuted": False}
+            
+        elif action == "delete":
+            # Delete the conversation and all its messages
+            await db.conversations.delete_one({"_id": conversation_id})
+            await db.messages.delete_many({"conversation_id": conversation_id})
+            return {"success": True, "message": "Conversation deleted"}
+            
+        else:
+            raise HTTPException(status_code=400, detail="Invalid action")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error performing conversation action: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
