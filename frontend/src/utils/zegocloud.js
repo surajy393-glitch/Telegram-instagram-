@@ -203,18 +203,17 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud engine not initialized');
       }
 
-      const result = await this.zg.loginRoom(
-        this.roomId,
-        token,
-        { userID: this.localUserId, userName: this.localUserId },
-        { userUpdate: true }
-      );
+      // Correct loginRoom signature: loginRoom(roomID, user, config)
+      const user = { userID: this.localUserId, userName: this.localUserId };
+      const config = { userUpdate: true, token: token };
 
-      if (result === true) {
+      const result = await this.zg.loginRoom(this.roomId, user, config);
+
+      if (result === true || result.errorCode === 0) {
         this.isInRoom = true;
         console.log(`Joined room: ${this.roomId}`);
       } else {
-        throw new Error(`Failed to join room: ${result}`);
+        throw new Error(`Failed to join room: ${result.errorCode || result}`);
       }
     } catch (error) {
       console.error('Room join failed:', error);
