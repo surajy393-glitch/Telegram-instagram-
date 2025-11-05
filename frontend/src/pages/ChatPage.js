@@ -194,28 +194,6 @@ const ChatPage = () => {
         </div>
       </div>
 
-      {/* Call Modal */}
-      {/* Incoming Call Modal */}
-      <IncomingCallModal
-        isOpen={showIncomingCallModal}
-        callType={incomingCall?.callType || 'audio'}
-        callerUser={otherUser}
-        onAccept={acceptIncomingCall}
-        onReject={rejectIncomingCall}
-      />
-
-      {/* Call Modal */}
-      <CallModal
-        isOpen={isCallActive}
-        callType={callType}
-        localStream={localStream}
-        remoteStream={remoteStream}
-        onEndCall={endCall}
-        onToggleAudio={toggleAudio}
-        onToggleVideo={toggleVideo}
-        otherUser={otherUser}
-      />
-
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto px-4 py-4 max-w-2xl mx-auto w-full">
         {loading ? (
