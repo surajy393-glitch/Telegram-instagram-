@@ -2,9 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { httpClient, getUser } from '../utils/authClient';
 import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X } from 'lucide-react';
-import { WebRTCCall } from '../utils/webrtc';
-import CallModal from '../components/CallModal';
-import IncomingCallModal from '../components/IncomingCallModal';
 
 const ChatPage = () => {
   const { userId } = useParams();
