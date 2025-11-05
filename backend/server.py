@@ -315,6 +315,10 @@ class ChatMessage(BaseModel):
     message: str
     createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class ZegoTokenRequest(BaseModel):
+    userId: str
+    roomId: str
+
 # Helper functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
