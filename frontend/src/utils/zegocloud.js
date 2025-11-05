@@ -79,15 +79,15 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud App ID not configured');
       }
 
-      // Create ZegoCloud engine instance for WEB SDK
-      // Web SDK signature: createEngine(appID, serverConfig)
-      // appID must be a number, serverConfig is optional
-      this.zg = ZegoExpressEngine.createEngine(parseInt(this.appId), {});
+      // Create ZegoCloud engine instance using constructor (as per official docs)
+      // Constructor signature: new ZegoExpressEngine(appID, server)
+      this.zg = new ZegoExpressEngine(this.appId, this.server);
       
       // Set up event listeners
       this.setupEventListeners();
       
       console.log('ZegoCloud engine initialized successfully');
+      console.log('Using AppID:', this.appId, 'Server:', this.server);
       return true;
     } catch (error) {
       console.error('Failed to initialize ZegoCloud engine:', error);
