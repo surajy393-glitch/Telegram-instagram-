@@ -103,6 +103,7 @@ class MessageRequestBody(BaseModel):
 class ConversationActionBody(BaseModel):
     conversationId: str
     action: str  # pin, unpin, mute_messages, unmute_messages, mute_calls, unmute_calls, delete
+    deleteForBoth: Optional[bool] = False  # For delete action: delete for both users or just me
 
 # Models
 class User(BaseModel):
