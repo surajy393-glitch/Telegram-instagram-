@@ -6454,7 +6454,7 @@ async def generate_zego_token(
     request: ZegoTokenRequest,
     authorization: str = Header(None)
 ):
-    """Generate ZegoCloud token for video calling"""
+    """Generate ZegoCloud Token04 for video calling"""
     try:
         # Authenticate user
         current_user = await get_current_user(authorization)
@@ -6471,35 +6471,29 @@ async def generate_zego_token(
         # Token generation parameters
         user_id = request.userId
         room_id = request.roomId
-        timestamp = int(time.time())
-        nonce = timestamp  # Using timestamp as nonce for simplicity
-        ttl = 3600  # 1 hour TTL
+        effective_time_in_seconds = 3600  # 1 hour TTL
         
-        # Create payload for token
-        payload = {
-            "app_id": int(app_id),
-            "user_id": user_id,
+        # Create payload with room_id and privileges
+        payload_data = {
             "room_id": room_id,
-            "timestamp": timestamp,
-            "nonce": nonce,
-            "ttl": ttl
+            "privilege": {
+                1: 1,  # PrivilegeKeyLogin: PrivilegeEnable
+                2: 1   # PrivilegeKeyPublish: PrivilegeEnable
+            },
+            "stream_id_list": []
         }
+        payload = json.dumps(payload_data)
         
-        # Convert payload to JSON string
-        payload_str = json.dumps(payload, separators=(',', ':'))
+        # Generate ZegoCloud Token04 using official algorithm
+        token = generate_zegocloud_token04(
+            int(app_id),
+            user_id,
+            server_secret,
+            effective_time_in_seconds,
+            payload
+        )
         
-        # Generate HMAC-SHA256 signature
-        signature = hmac.new(
-            server_secret.encode('utf-8'),
-            payload_str.encode('utf-8'),
-            hashlib.sha256
-        ).digest()
-        
-        # Combine payload and signature, then base64 encode
-        token_data = payload_str.encode('utf-8') + signature
-        token = base64.b64encode(token_data).decode('utf-8')
-        
-        logger.info(f"Generated ZegoCloud token for user {user_id} in room {room_id}")
+        logger.info(f"Generated ZegoCloud Token04 for user {user_id} in room {room_id}")
         
         return {
             "success": True,
@@ -6507,8 +6501,8 @@ async def generate_zego_token(
             "appId": int(app_id),
             "userId": user_id,
             "roomId": room_id,
-            "ttl": ttl,
-            "expiresAt": timestamp + ttl
+            "ttl": effective_time_in_seconds,
+            "expiresAt": int(time.time()) + effective_time_in_seconds
         }
         
     except HTTPException:
