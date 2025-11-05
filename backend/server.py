@@ -6281,10 +6281,42 @@ async def conversation_action(
             return {"success": True, "message": "Calls unmuted", "callsMuted": False}
             
         elif action == "delete":
-            # Delete the conversation and all its messages
-            await db.conversations.delete_one({"_id": conversation_id})
-            await db.messages.delete_many({"conversation_id": conversation_id})
-            return {"success": True, "message": "Conversation deleted"}
+            # Telegram-style delete: delete for me or delete for both
+            if body.deleteForBoth:
+                # Delete for both: Mark conversation as deleted for everyone
+                await db.conversations.update_one(
+                    {"_id": conversation_id},
+                    {
+                        "$set": {
+                            f"deletedBy.{user_id}": datetime.now(timezone.utc),
+                            "deletedForEveryone": True,
+                            "deletedForEveryoneAt": datetime.now(timezone.utc)
+                        }
+                    }
+                )
+                # Mark all messages as deleted for everyone
+                await db.messages.update_many(
+                    {"conversation_id": conversation_id},
+                    {
+                        "$set": {
+                            "deletedForEveryone": True,
+                            "deletedForEveryoneAt": datetime.now(timezone.utc)
+                        }
+                    }
+                )
+                return {"success": True, "message": "Conversation deleted for everyone"}
+            else:
+                # Delete for me only: Soft delete
+                await db.conversations.update_one(
+                    {"_id": conversation_id},
+                    {"$set": {f"deletedBy.{user_id}": datetime.now(timezone.utc)}}
+                )
+                # Mark all messages as deleted for this user only
+                await db.messages.update_many(
+                    {"conversation_id": conversation_id},
+                    {"$set": {f"deletedBy.{user_id}": datetime.now(timezone.utc)}}
+                )
+                return {"success": True, "message": "Conversation deleted for you"}
             
         else:
             raise HTTPException(status_code=400, detail="Invalid action")
