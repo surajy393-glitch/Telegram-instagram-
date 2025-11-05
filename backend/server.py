@@ -6405,27 +6405,51 @@ async def shutdown_db_client():
 # In-memory storage for active WebSocket connections
 class SignalingManager:
     def __init__(self):
-        self.active_connections: dict[str, WebSocket] = {}
+        self.active_connections: dict[str, list[WebSocket]] = {}  # Support multiple connections per user
     
     async def connect(self, user_id: str, websocket: WebSocket):
         await websocket.accept()
-        self.active_connections[user_id] = websocket
-        logger.info(f"WebSocket connected for user: {user_id}")
+        
+        # Initialize list if user doesn't exist
+        if user_id not in self.active_connections:
+            self.active_connections[user_id] = []
+        
+        # Append new connection (support multiple)
+        self.active_connections[user_id].append(websocket)
+        logger.info(f"WebSocket connected for user: {user_id} (Total: {len(self.active_connections[user_id])})")
     
-    def disconnect(self, user_id: str):
+    def disconnect(self, user_id: str, websocket: WebSocket):
         if user_id in self.active_connections:
-            del self.active_connections[user_id]
-            logger.info(f"WebSocket disconnected for user: {user_id}")
+            try:
+                self.active_connections[user_id].remove(websocket)
+                logger.info(f"WebSocket disconnected for user: {user_id} (Remaining: {len(self.active_connections[user_id])})")
+                
+                # Remove user entry if no connections left
+                if not self.active_connections[user_id]:
+                    del self.active_connections[user_id]
+            except ValueError:
+                logger.warning(f"WebSocket not found in active connections for user: {user_id}")
     
     async def send_signal(self, user_id: str, message: dict):
         if user_id in self.active_connections:
-            try:
-                await self.active_connections[user_id].send_json(message)
-                return True
-            except Exception as e:
-                logger.error(f"Error sending signal to {user_id}: {e}")
-                self.disconnect(user_id)
-                return False
+            sent_count = 0
+            dead_connections = []
+            
+            # Broadcast to ALL connections for this user
+            for ws in self.active_connections[user_id]:
+                try:
+                    await ws.send_json(message)
+                    sent_count += 1
+                except Exception as e:
+                    logger.error(f"Error sending signal to {user_id}: {e}")
+                    dead_connections.append(ws)
+            
+            # Clean up dead connections
+            for ws in dead_connections:
+                self.disconnect(user_id, ws)
+            
+            logger.info(f"Signal sent to {user_id}: {sent_count} connection(s)")
+            return sent_count > 0
         return False
 
 signaling_manager = SignalingManager()
