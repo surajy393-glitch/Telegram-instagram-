@@ -1,12 +1,29 @@
-// WebRTC configuration with Google STUN servers
+// WebRTC configuration with Google STUN servers + OpenRelay TURN servers
 const ICE_SERVERS = {
   iceServers: [
-    // Google Public STUN servers (FREE)
+    // Google Public STUN servers (FREE) - for NAT traversal
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
     { urls: 'stun:stun3.l.google.com:19302' },
     { urls: 'stun:stun4.l.google.com:19302' },
+    
+    // OpenRelay TURN servers (FREE) - for same-device/same-network testing
+    { 
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    },
+    { 
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    },
+    { 
+      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    }
   ]
 };
 
