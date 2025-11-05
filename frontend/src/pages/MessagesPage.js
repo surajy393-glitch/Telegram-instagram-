@@ -8,6 +8,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '../components/ui/context-menu';
+import DeleteChatDialog from '../components/DeleteChatDialog';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
