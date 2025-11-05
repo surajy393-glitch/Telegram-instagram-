@@ -6376,6 +6376,75 @@ async def conversation_action(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.post("/zego/token")
+async def generate_zego_token(
+    request: ZegoTokenRequest,
+    authorization: str = Header(None)
+):
+    """Generate ZegoCloud token for video calling"""
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Get ZegoCloud credentials from environment
+        app_id = os.getenv("ZEGO_APP_ID")
+        server_secret = os.getenv("ZEGO_SERVER_SECRET")
+        
+        if not app_id or not server_secret:
+            raise HTTPException(status_code=500, detail="ZegoCloud credentials not configured")
+        
+        # Token generation parameters
+        user_id = request.userId
+        room_id = request.roomId
+        timestamp = int(time.time())
+        nonce = timestamp  # Using timestamp as nonce for simplicity
+        ttl = 3600  # 1 hour TTL
+        
+        # Create payload for token
+        payload = {
+            "app_id": int(app_id),
+            "user_id": user_id,
+            "room_id": room_id,
+            "timestamp": timestamp,
+            "nonce": nonce,
+            "ttl": ttl
+        }
+        
+        # Convert payload to JSON string
+        payload_str = json.dumps(payload, separators=(',', ':'))
+        
+        # Generate HMAC-SHA256 signature
+        signature = hmac.new(
+            server_secret.encode('utf-8'),
+            payload_str.encode('utf-8'),
+            hashlib.sha256
+        ).digest()
+        
+        # Combine payload and signature, then base64 encode
+        token_data = payload_str.encode('utf-8') + signature
+        token = base64.b64encode(token_data).decode('utf-8')
+        
+        logger.info(f"Generated ZegoCloud token for user {user_id} in room {room_id}")
+        
+        return {
+            "success": True,
+            "token": token,
+            "appId": int(app_id),
+            "userId": user_id,
+            "roomId": room_id,
+            "ttl": ttl,
+            "expiresAt": timestamp + ttl
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating ZegoCloud token: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate token")
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
