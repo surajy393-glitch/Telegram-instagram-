@@ -79,13 +79,15 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud App ID not configured');
       }
 
-      // Create ZegoCloud engine instance using createEngine factory method
-      const profile = {
-        appID: this.appId,
-        server: this.server
-      };
-      
-      this.zg = ZegoExpressEngine.createEngine(profile);
+      // Create ZegoCloud engine instance
+      // Using empty string for appSign since we're using Token04 authentication
+      // Token04 is passed during loginRoom, not during engine initialization
+      this.zg = ZegoExpressEngine.createEngine(
+        this.appId,        // appID
+        '',                // appSign (empty when using Token04)
+        true,              // isTestEnv
+        0                  // scenario (0 = default)
+      );
       
       // Set up event listeners
       this.setupEventListeners();
