@@ -9,11 +9,16 @@ import { httpClient } from './authClient';
  */
 export class ZegoCloudCall {
   constructor(localUserId, remoteUserId, callType = 'video') {
+    // Log the received userId for debugging
+    console.log('🔍 ZegoCloudCall constructor - received localUserId:', localUserId, 'type:', typeof localUserId);
+    
     // Fallback to a random guest ID if no valid user ID is provided.
     if (typeof localUserId !== 'string' || localUserId.trim() === '') {
+      console.warn('⚠️ Empty or invalid localUserId received, generating guest ID');
       localUserId = `guest_${Math.random().toString(36).slice(2, 11)}`;
     }
     this.localUserId = localUserId;
+    console.log('✅ Using localUserId:', this.localUserId);
     this.remoteUserId = remoteUserId;
     this.callType = callType; // 'video' or 'audio'
     this.roomId = this.generateRoomId(localUserId, remoteUserId);
