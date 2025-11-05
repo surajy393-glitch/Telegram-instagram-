@@ -54,18 +54,34 @@ export class ZegoCloudCall {
    */
   async fetchToken() {
     try {
+      console.log('Fetching ZegoCloud token for:', { userId: this.localUserId, roomId: this.roomId });
+      
       const response = await httpClient.post('/zego/token', {
         userId: this.localUserId,
         roomId: this.roomId
       });
       
+      console.log('Token response:', response.data);
+      
       if (response.data && response.data.token) {
-        return response.data.token;
+        const token = response.data.token;
+        
+        // Validate token is a string
+        if (typeof token !== 'string') {
+          throw new Error(`Token is not a string, received: ${typeof token}`);
+        }
+        
+        if (!token.startsWith('04')) {
+          throw new Error('Invalid Token04 format - should start with "04"');
+        }
+        
+        console.log('✅ Valid Token04 received:', token.substring(0, 20) + '...');
+        return token;
       }
       
       throw new Error('Invalid token response from server');
     } catch (error) {
-      console.error('Failed to fetch ZegoCloud token:', error);
+      console.error('❌ Failed to fetch ZegoCloud token:', error);
       throw new Error(`Token fetch failed: ${error.message}`);
     }
   }
