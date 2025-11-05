@@ -324,7 +324,7 @@ const MessagesPage = () => {
                     <span>{conversation.isPinned ? 'Unpin' : 'Pin'}</span>
                   </ContextMenuItem>
                   <ContextMenuItem
-                    onClick={() => handleDelete(conversation.conversationId)}
+                    onClick={() => handleDelete(conversation)}
                     className="flex items-center gap-2 text-white hover:bg-gray-700 cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
