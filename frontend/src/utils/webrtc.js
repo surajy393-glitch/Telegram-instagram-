@@ -51,26 +51,29 @@ export class WebRTCCall {
       console.log('🔌 WebSocket URL:', wsUrl);
       console.log('🔌 Protocol:', wsProtocol, 'Host:', wsHost);
       
-      // Connect to signaling server
-      this.websocket = new WebSocket(wsUrl);
-      
-      this.websocket.onopen = () => {
-        console.log('✅ WebSocket connected');
-      };
-      
-      this.websocket.onmessage = async (event) => {
-        const message = JSON.parse(event.data);
-        await this.handleSignalingMessage(message);
-      };
-      
-      this.websocket.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-        if (this.onError) this.onError('WebSocket connection failed');
-      };
-      
-      this.websocket.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
+      // Create WebSocket and wait for it to open
+      await new Promise((resolve, reject) => {
+        this.websocket = new WebSocket(wsUrl);
+        
+        this.websocket.onopen = () => {
+          console.log('✅ WebSocket connected successfully');
+          resolve();
+        };
+        
+        this.websocket.onmessage = async (event) => {
+          const message = JSON.parse(event.data);
+          await this.handleSignalingMessage(message);
+        };
+        
+        this.websocket.onerror = (error) => {
+          console.error('❌ WebSocket connection error:', error);
+          reject(new Error('WebSocket connection failed'));
+        };
+        
+        this.websocket.onclose = (event) => {
+          console.log('WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
+        };
+      });
       
       // Get user media (camera/microphone)
       const constraints = {
