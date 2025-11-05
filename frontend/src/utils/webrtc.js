@@ -301,6 +301,9 @@ export class WebRTCCall {
       
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
       
+      // Process any queued ICE candidates now that remote description is set
+      await this.processQueuedIceCandidates();
+      
       // Create and send answer
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
