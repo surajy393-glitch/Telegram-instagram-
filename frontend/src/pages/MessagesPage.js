@@ -238,62 +238,103 @@ const MessagesPage = () => {
         ) : (
           <div className="space-y-2">
             {filteredConversations.map((conversation) => (
-              <div
-                key={conversation.conversationId}
-                className="block bg-white rounded-lg p-4 border border-pink-100"
-              >
-                <div 
-                  className="flex items-center gap-3 cursor-pointer hover:bg-pink-50 -m-4 p-4 rounded-lg transition"
-                  onClick={() => {
-                    if (activeTab === 'messages') {
-                      navigate(`/chat/${conversation.otherUser.id}`);
-                    } else {
-                      // In requests tab, open chat page with request state
-                      navigate(`/chat/${conversation.otherUser.id}`, { 
-                        state: { 
-                          isRequest: true,
-                          conversationId: conversation.conversationId 
-                        } 
-                      });
-                    }
-                  }}
-                >
-                  {/* Profile Image */}
-                  <img
-                    src={
-                      conversation.otherUser.profileImage
-                        ? conversation.otherUser.profileImage.startsWith('http') ||
-                          conversation.otherUser.profileImage.startsWith('data:')
-                          ? conversation.otherUser.profileImage
-                          : conversation.otherUser.profileImage
-                        : 'https://via.placeholder.com/48'
-                    }
-                    alt={conversation.otherUser.username}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
+              <ContextMenu key={conversation.conversationId}>
+                <ContextMenuTrigger asChild>
+                  <div
+                    className="block bg-white rounded-lg p-4 border border-pink-100"
+                  >
+                    <div 
+                      className="flex items-center gap-3 cursor-pointer hover:bg-pink-50 -m-4 p-4 rounded-lg transition"
+                      onClick={() => {
+                        if (activeTab === 'messages') {
+                          navigate(`/chat/${conversation.otherUser.id}`);
+                        } else {
+                          // In requests tab, open chat page with request state
+                          navigate(`/chat/${conversation.otherUser.id}`, { 
+                            state: { 
+                              isRequest: true,
+                              conversationId: conversation.conversationId 
+                            } 
+                          });
+                        }
+                      }}
+                    >
+                      {/* Profile Image */}
+                      <img
+                        src={
+                          conversation.otherUser.profileImage
+                            ? conversation.otherUser.profileImage.startsWith('http') ||
+                              conversation.otherUser.profileImage.startsWith('data:')
+                              ? conversation.otherUser.profileImage
+                              : conversation.otherUser.profileImage
+                            : 'https://via.placeholder.com/48'
+                        }
+                        alt={conversation.otherUser.username}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
 
-                  {/* Message Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-gray-900 truncate">
-                        {conversation.otherUser.fullName}
-                      </h3>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Message Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-900 truncate">
+                              {conversation.otherUser.fullName}
+                            </h3>
+                            {conversation.isPinned && (
+                              <Pin className="w-4 h-4 text-pink-500 flex-shrink-0" fill="currentColor" />
+                            )}
+                            {conversation.messagesMuted && (
+                              <BellOff className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <p className={`text-sm truncate ${conversation.unreadCount > 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                            {conversation.lastMessage}
+                          </p>
+                          {conversation.unreadCount > 0 && (
+                            <span className="ml-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                              {conversation.unreadCount}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <p className={`text-sm truncate ${conversation.unreadCount > 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                        {conversation.lastMessage}
-                      </p>
-                      {conversation.unreadCount > 0 && (
-                        <span className="ml-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
-                          {conversation.unreadCount}
-                        </span>
-                      )}
-                    </div>
                   </div>
-                </div>
-              </div>
+                </ContextMenuTrigger>
+                <ContextMenuContent className="w-48 bg-gray-800 border-gray-700">
+                  <ContextMenuItem
+                    onClick={() => handlePin(conversation.conversationId, conversation.isPinned)}
+                    className="flex items-center gap-2 text-white hover:bg-gray-700 cursor-pointer"
+                  >
+                    <Pin className="w-4 h-4" />
+                    <span>{conversation.isPinned ? 'Unpin' : 'Pin'}</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => handleDelete(conversation.conversationId)}
+                    className="flex items-center gap-2 text-white hover:bg-gray-700 cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => handleMuteMessages(conversation.conversationId, conversation.messagesMuted)}
+                    className="flex items-center gap-2 text-white hover:bg-gray-700 cursor-pointer"
+                  >
+                    <BellOff className="w-4 h-4" />
+                    <span>{conversation.messagesMuted ? 'Unmute messages' : 'Mute messages'}</span>
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => handleMuteCalls(conversation.conversationId, conversation.callsMuted)}
+                    className="flex items-center gap-2 text-white hover:bg-gray-700 cursor-pointer"
+                  >
+                    <PhoneOff className="w-4 h-4" />
+                    <span>{conversation.callsMuted ? 'Unmute calls' : 'Mute calls'}</span>
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </div>
         )}
