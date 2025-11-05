@@ -6430,7 +6430,7 @@ class SignalingManager:
 
 signaling_manager = SignalingManager()
 
-@app.websocket("/ws/signaling/{user_id}")
+@app.websocket("/api/ws/signaling/{user_id}")
 async def websocket_signaling(websocket: WebSocket, user_id: str):
     """WebSocket endpoint for WebRTC signaling"""
     await signaling_manager.connect(user_id, websocket)
