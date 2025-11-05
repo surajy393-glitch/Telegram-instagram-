@@ -6394,7 +6394,12 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-
+    """Close MongoDB client connection on shutdown"""
+    try:
+        client.close()
+        logger.info("MongoDB client closed successfully")
+    except Exception as e:
+        logger.error(f"Error closing MongoDB client: {e}")
 
 # ==================== WebRTC Signaling Server ====================
 # In-memory storage for active WebSocket connections
