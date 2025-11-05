@@ -226,20 +226,31 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud engine not initialized');
       }
 
+      // Validate token
+      if (!token || typeof token !== 'string') {
+        throw new Error(`Invalid token: expected string, got ${typeof token}. Value: ${token}`);
+      }
+
+      console.log('Joining room with token type:', typeof token, 'starts with 04:', token.startsWith('04'));
+
       // Correct loginRoom signature: loginRoom(roomID, user, config)
       const user = { userID: this.localUserId, userName: this.localUserId };
       const config = { userUpdate: true, token: token };
 
+      console.log('Calling loginRoom with:', { roomId: this.roomId, user, config: { ...config, token: 'REDACTED' } });
+
       const result = await this.zg.loginRoom(this.roomId, user, config);
 
-      if (result === true || result.errorCode === 0) {
+      console.log('loginRoom result:', result);
+
+      if (result === true || (result && result.errorCode === 0)) {
         this.isInRoom = true;
-        console.log(`Joined room: ${this.roomId}`);
+        console.log(`✅ Joined room successfully: ${this.roomId}`);
       } else {
-        throw new Error(`Failed to join room: ${result.errorCode || result}`);
+        throw new Error(`Failed to join room: ${result.errorCode || JSON.stringify(result)}`);
       }
     } catch (error) {
-      console.error('Room join failed:', error);
+      console.error('❌ Room join failed:', error);
       throw error;
     }
   }
