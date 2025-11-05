@@ -75,13 +75,22 @@ export class ZegoCloudCall {
       console.log('Token response:', response.data);
       
       if (response.data && response.data.token) {
-        const token = response.data.token;
+        let token = response.data.token;
         
-        // Validate token is a string
+        // The API should return a simple string. However, defensive
+        // programming is important: if the backend inadvertently wraps the
+        // token in an object (e.g. { token: '04...' }), extract the string.
         if (typeof token !== 'string') {
-          throw new Error(`Token is not a string, received: ${typeof token}`);
+          // If a nested `token` field exists, use it. Otherwise report an
+          // explicit error so that developers can correct the API response.
+          if (token && typeof token.token === 'string') {
+            token = token.token;
+          } else {
+            throw new Error(`Token is not a string, received: ${typeof token}`);
+          }
         }
         
+        // Ensure the token starts with the expected "04" prefix (Token04)
         if (!token.startsWith('04')) {
           throw new Error('Invalid Token04 format - should start with "04"');
         }
