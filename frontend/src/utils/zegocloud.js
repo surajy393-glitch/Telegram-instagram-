@@ -9,25 +9,24 @@ import { httpClient } from './authClient';
  */
 export class ZegoCloudCall {
   constructor(localUserId, remoteUserId, callType = 'video') {
+    // Fallback to a random guest ID if no valid user ID is provided.
+    if (typeof localUserId !== 'string' || localUserId.trim() === '') {
+      localUserId = `guest_${Math.random().toString(36).slice(2, 11)}`;
+    }
     this.localUserId = localUserId;
     this.remoteUserId = remoteUserId;
     this.callType = callType; // 'video' or 'audio'
     this.roomId = this.generateRoomId(localUserId, remoteUserId);
     
     // ZegoCloud configuration
-    // Attempt to read the application ID from the environment. If the
-    // variable is undefined or does not parse to a number, fall back to a
-    // hard-coded default. Passing NaN into the Zego SDK causes cryptic
-    // runtime errors (for example "t.substring is not a function" in
-    // renewLocalToken), so explicitly guard against NaN here. Replace
-    // 2106710509 with your own AppID from the Zego Console when deploying.
+    // Read AppID from the environment or fall back to a default.
     const envAppId = parseInt(process.env.REACT_APP_ZEGO_APP_ID, 10);
     this.appId = Number.isInteger(envAppId) ? envAppId : 2106710509;
 
-    // Construct the websocket server URL using the resolved appId. Using a
-    // malformed appId (e.g. NaN) would result in an invalid URL and failed
-    // connections.
-    this.server = `wss://webliveroom${this.appId}-api.zego.im/ws`;
+    // Use the coolzcloud.com domain by default.
+    // Allow an override via REACT_APP_ZEGO_SERVER_URL if needed.
+    const defaultServer = `wss://webliveroom${this.appId}-api.coolzcloud.com/ws`;
+    this.server = process.env.REACT_APP_ZEGO_SERVER_URL || defaultServer;
     
     // State management
     this.zg = null;
