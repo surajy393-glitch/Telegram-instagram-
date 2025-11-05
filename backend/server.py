@@ -6394,4 +6394,128 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+
+
+# ==================== WebRTC Signaling Server ====================
+# In-memory storage for active WebSocket connections
+class SignalingManager:
+    def __init__(self):
+        self.active_connections: dict[str, WebSocket] = {}
+    
+    async def connect(self, user_id: str, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections[user_id] = websocket
+        logger.info(f"WebSocket connected for user: {user_id}")
+    
+    def disconnect(self, user_id: str):
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
+            logger.info(f"WebSocket disconnected for user: {user_id}")
+    
+    async def send_signal(self, user_id: str, message: dict):
+        if user_id in self.active_connections:
+            try:
+                await self.active_connections[user_id].send_json(message)
+                return True
+            except Exception as e:
+                logger.error(f"Error sending signal to {user_id}: {e}")
+                self.disconnect(user_id)
+                return False
+        return False
+
+signaling_manager = SignalingManager()
+
+@app.websocket("/ws/signaling/{user_id}")
+async def websocket_signaling(websocket: WebSocket, user_id: str):
+    """WebSocket endpoint for WebRTC signaling"""
+    await signaling_manager.connect(user_id, websocket)
+    try:
+        while True:
+            # Receive message from client
+            data = await websocket.receive_json()
+            
+            # Route signal to target user
+            signal_type = data.get("type")
+            target_user_id = data.get("targetUserId")
+            
+            if not target_user_id:
+                continue
+            
+            # Forward the signal to target user
+            message = {
+                "type": signal_type,
+                "fromUserId": user_id,
+                "data": data.get("data"),
+                "callType": data.get("callType")  # 'audio' or 'video'
+            }
+            
+            await signaling_manager.send_signal(target_user_id, message)
+            
+    except WebSocketDisconnect:
+        signaling_manager.disconnect(user_id)
+    except Exception as e:
+        logger.error(f"WebSocket error for user {user_id}: {e}")
+        signaling_manager.disconnect(user_id)
+
+
+# Call history model
+class CallLog(BaseModel):
+    callId: str
+    callerId: str
+    receiverId: str
+    callType: str  # 'audio' or 'video'
+    status: str  # 'completed', 'missed', 'declined'
+    duration: Optional[int] = 0  # in seconds
+    startedAt: datetime
+    endedAt: Optional[datetime] = None
+
+@api_router.post("/calls/log")
+async def log_call(
+    call_log: CallLog,
+    authorization: str = Header(None)
+):
+    """Log a call for history"""
+    try:
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Save call log to database
+        call_data = call_log.dict()
+        call_data["createdAt"] = datetime.now(timezone.utc)
+        
+        await db.call_logs.insert_one(call_data)
+        
+        return {"success": True, "message": "Call logged successfully"}
+        
+    except Exception as e:
+        logger.error(f"Error logging call: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/calls/history/{user_id}")
+async def get_call_history(
+    user_id: str,
+    authorization: str = Header(None)
+):
+    """Get call history with a specific user"""
+    try:
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Get calls between current user and specified user
+        calls = await db.call_logs.find({
+            "$or": [
+                {"callerId": current_user.id, "receiverId": user_id},
+                {"callerId": user_id, "receiverId": current_user.id}
+            ]
+        }).sort("startedAt", -1).limit(50).to_list(length=50)
+        
+        return {"calls": calls}
+        
+    except Exception as e:
+        logger.error(f"Error getting call history: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
     client.close()
