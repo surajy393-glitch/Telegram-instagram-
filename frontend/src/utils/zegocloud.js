@@ -116,19 +116,34 @@ export class ZegoCloudCall {
       if (!this.appId) {
         throw new Error('ZegoCloud App ID not configured');
       }
+      
+      if (!this.appSign) {
+        throw new Error('ZegoCloud App Sign not configured');
+      }
 
-      // Create ZegoCloud engine instance using constructor (as per official docs)
-      // Constructor signature: new ZegoExpressEngine(appID, server)
-      this.zg = new ZegoExpressEngine(this.appId, this.server);
+      console.log('🔧 Initializing ZegoCloud engine...');
+      console.log('   AppID:', this.appId);
+      console.log('   AppSign:', this.appSign ? 'Present (hidden)' : 'Missing');
+      
+      // Create ZegoCloud engine using createEngine static method
+      // Signature: createEngine(appID, appSign, isTestEnv, scenario, eventHandler)
+      this.zg = ZegoExpressEngine.createEngine(
+        this.appId,                    // appID (number)
+        this.appSign,                  // appSign (string) - required for authentication
+        false,                         // isTestEnv (false = production environment)
+        ZegoScenario.General,          // scenario enum for video calling
+        null                           // eventHandler (will be set up separately)
+      );
       
       // Set up event listeners
       this.setupEventListeners();
       
-      console.log('ZegoCloud engine initialized successfully');
-      console.log('Using AppID:', this.appId, 'Server:', this.server);
+      console.log('✅ ZegoCloud engine initialized successfully');
+      console.log('   AppID:', this.appId);
+      console.log('   Scenario: General (video calling optimized)');
       return true;
     } catch (error) {
-      console.error('Failed to initialize ZegoCloud engine:', error);
+      console.error('❌ Failed to initialize ZegoCloud engine:', error);
       this.handleError('Engine initialization failed', error);
       return false;
     }
