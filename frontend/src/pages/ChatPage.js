@@ -29,6 +29,7 @@ const ChatPage = () => {
   const [callType, setCallType] = useState('audio'); // 'audio' or 'video'
   const [incomingCall, setIncomingCall] = useState(null); // Store incoming call info
   const [showIncomingCallModal, setShowIncomingCallModal] = useState(false);
+  const signalingConnectionRef = useRef(null); // Persistent WebSocket for incoming calls
 
   useEffect(() => {
     fetchMessages();
@@ -37,6 +38,55 @@ const ChatPage = () => {
     const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [userId]);
+
+  // Persistent WebSocket for incoming call notifications
+  useEffect(() => {
+    if (!currentUser?.id) return;
+
+    console.log('🔌 Setting up persistent signaling connection...');
+    
+    const connectSignaling = async () => {
+      try {
+        const signalingCall = new WebRTCCall(currentUser.id, userId, 'audio');
+        signalingConnectionRef.current = signalingCall;
+        
+        // Connect WebSocket only (don't get media yet)
+        await signalingCall.connectWebSocket();
+        console.log('✅ Persistent signaling connected - Ready to receive calls');
+        
+        // Listen for incoming calls
+        signalingCall.onIncomingCall = (incomingCallData) => {
+          console.log('📞 INCOMING CALL from:', incomingCallData.fromUserId);
+          setIncomingCall(incomingCallData);
+          setShowIncomingCallModal(true);
+          setCallType(incomingCallData.callType);
+          setCurrentCall(signalingCall); // Reuse this connection
+        };
+        
+        // Handle connection close
+        signalingCall.onCallEnd = () => {
+          console.log('⚠️ Signaling disconnected, reconnecting...');
+          // Reconnect after 3 seconds
+          setTimeout(connectSignaling, 3000);
+        };
+        
+      } catch (error) {
+        console.error('❌ Failed to connect signaling:', error);
+        // Retry after 3 seconds
+        setTimeout(connectSignaling, 3000);
+      }
+    };
+    
+    connectSignaling();
+    
+    // Cleanup only on unmount
+    return () => {
+      if (signalingConnectionRef.current?.websocket) {
+        signalingConnectionRef.current.websocket.close();
+        console.log('🔌 Persistent signaling disconnected');
+      }
+    };
+  }, [currentUser?.id, userId]);
 
   useEffect(() => {
     // Only scroll if new messages were added
