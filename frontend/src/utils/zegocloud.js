@@ -102,21 +102,28 @@ export class ZegoCloudCall {
   setupEventListeners() {
     if (!this.zg) return;
 
-    // User management events
-    this.zg.on('roomUserUpdate', this.handleUserAdd, this.handleUserDelete);
+    // Stream management events (official API)
+    this.zg.on('roomStreamUpdate', (roomID, updateType, streamList) => {
+      console.log('roomStreamUpdate:', roomID, updateType, streamList);
+      if (updateType === 'ADD') {
+        this.handleStreamAdd(roomID, streamList);
+      } else if (updateType === 'DELETE') {
+        this.handleStreamDelete(roomID, streamList);
+      }
+    });
     
-    // Stream management events
-    this.zg.on('roomStreamUpdate', this.handleStreamAdd, this.handleStreamDelete);
+    // User management events (official API)
+    this.zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+      console.log('roomUserUpdate:', roomID, updateType, userList);
+      if (updateType === 'ADD') {
+        this.handleUserAdd(roomID, userList);
+      } else if (updateType === 'DELETE') {
+        this.handleUserDelete(roomID, userList);
+      }
+    });
     
     // Room state events
     this.zg.on('roomStateUpdate', this.handleRoomStateUpdate);
-    
-    // Error handling
-    this.zg.on('roomStateChanged', (roomId, state, errorCode, extendedData) => {
-      if (errorCode !== 0) {
-        this.handleError(`Room state error: ${errorCode}`, { roomId, state, extendedData });
-      }
-    });
   }
 
   /**
