@@ -78,7 +78,7 @@ const MessagesPage = () => {
     }
   };
 
-  const handleConversationAction = async (conversationId, action) => {
+  const handleConversationAction = async (conversationId, action, deleteForBoth = false) => {
     try {
       // Optimistic update
       setConversations(prev => prev.map(conv => {
@@ -102,7 +102,8 @@ const MessagesPage = () => {
       // Make API call
       const response = await httpClient.post('/messages/conversation/action', {
         conversationId,
-        action
+        action,
+        deleteForBoth
       });
 
       // If delete action, remove from list
@@ -124,10 +125,17 @@ const MessagesPage = () => {
     handleConversationAction(conversationId, isPinned ? 'unpin' : 'pin');
   };
 
-  const handleDelete = (conversationId) => {
-    if (window.confirm('Are you sure you want to delete this conversation?')) {
-      handleConversationAction(conversationId, 'delete');
+  const handleDelete = (conversation) => {
+    setSelectedConversation(conversation);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = (deleteForBoth) => {
+    if (selectedConversation) {
+      handleConversationAction(selectedConversation.conversationId, 'delete', deleteForBoth);
     }
+    setDeleteDialogOpen(false);
+    setSelectedConversation(null);
   };
 
   const handleMuteMessages = (conversationId, messagesMuted) => {
