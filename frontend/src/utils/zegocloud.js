@@ -16,7 +16,7 @@ export class ZegoCloudCall {
     
     // ZegoCloud configuration
     this.appId = parseInt(process.env.REACT_APP_ZEGO_APP_ID);
-    this.server = 'wss://webliveroom-api.zego.im/ws';
+    this.server = `wss://webliveroom${this.appId}-api.zego.im/ws`;
     
     // State management
     this.zg = null;
