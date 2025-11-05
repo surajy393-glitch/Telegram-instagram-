@@ -17,16 +17,6 @@ const ChatPage = () => {
   const messagesEndRef = useRef(null);
   const prevMessageCount = useRef(0);
   const currentUser = getUser();
-  
-  // Call state
-  const [isCallActive, setIsCallActive] = useState(false);
-  const [currentCall, setCurrentCall] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const [remoteStream, setRemoteStream] = useState(null);
-  const [callType, setCallType] = useState('audio'); // 'audio' or 'video'
-  const [incomingCall, setIncomingCall] = useState(null); // Store incoming call info
-  const [showIncomingCallModal, setShowIncomingCallModal] = useState(false);
-  const signalingConnectionRef = useRef(null); // Persistent WebSocket for incoming calls
 
   useEffect(() => {
     fetchMessages();
