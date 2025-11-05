@@ -5984,9 +5984,18 @@ async def get_conversations(
         user_id = current_user.id
         
         # Get all conversations where user is a participant
-        conversations = await db.conversations.find(
-            {"participants": user_id}
-        ).sort("last_message_at", -1).to_list(length=None)
+        # Exclude conversations deleted by this user or deleted for everyone
+        conversations = await db.conversations.find({
+            "participants": user_id,
+            "$or": [
+                {f"deletedBy.{user_id}": {"$exists": False}},
+                {f"deletedBy.{user_id}": None}
+            ],
+            "$or": [
+                {"deletedForEveryone": {"$exists": False}},
+                {"deletedForEveryone": False}
+            ]
+        }).sort("last_message_at", -1).to_list(length=None)
         
         # Format conversations for frontend
         formatted_conversations = []
