@@ -324,11 +324,40 @@ export class WebRTCCall {
 
   async handleIceCandidate(candidate) {
     try {
+      // Check if remote description is set before adding ICE candidate
+      if (!this.peerConnection) {
+        console.log('⏳ Queuing ICE candidate - peer connection not ready');
+        this.iceCandidateQueue.push(candidate);
+        return;
+      }
+      
+      if (!this.peerConnection.remoteDescription) {
+        console.log('⏳ Queuing ICE candidate - remote description not set');
+        this.iceCandidateQueue.push(candidate);
+        return;
+      }
+      
       await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       console.log('✅ Added ICE candidate');
     } catch (error) {
       console.error('❌ Error adding ICE candidate:', error);
     }
+  }
+  
+  async processQueuedIceCandidates() {
+    // Process all queued ICE candidates after remote description is set
+    console.log(`📦 Processing ${this.iceCandidateQueue.length} queued ICE candidates`);
+    
+    for (const candidate of this.iceCandidateQueue) {
+      try {
+        await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        console.log('✅ Added queued ICE candidate');
+      } catch (error) {
+        console.error('❌ Error adding queued ICE candidate:', error);
+      }
+    }
+    
+    this.iceCandidateQueue = [];
   }
 
   sendSignal(type, data) {
