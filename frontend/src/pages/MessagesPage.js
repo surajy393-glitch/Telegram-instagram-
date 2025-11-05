@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { httpClient } from '../utils/authClient';
-import { ArrowLeft, MessageCircle, Search, Check, X, ChevronDown } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Search, Check, X, ChevronDown, Pin, Trash2, BellOff, PhoneOff } from 'lucide-react';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '../components/ui/context-menu';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
