@@ -258,7 +258,12 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud engine not initialized');
       }
 
-      const remoteStream = await this.zg.startPlayingStream(streamId);
+      // startPlayingStream with video element or callback
+      const remoteStream = await this.zg.startPlayingStream(streamId, {
+        video: true,
+        audio: true
+      });
+      
       this.remoteStream = remoteStream;
       
       console.log(`Subscribed to stream: ${streamId}`);
