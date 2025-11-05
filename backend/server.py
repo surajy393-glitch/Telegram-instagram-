@@ -24,6 +24,10 @@ import hmac
 import hashlib
 import time
 import json
+import random
+import struct
+import binascii
+from Crypto.Cipher import AES
 from urllib.parse import parse_qsl
 import psycopg2
 from psycopg2.extras import RealDictCursor
