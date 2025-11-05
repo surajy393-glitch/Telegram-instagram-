@@ -5945,7 +5945,7 @@ async def send_message(
         
         await db.messages.insert_one(message)
         
-        # Update conversation
+        # Update conversation and clear any deletion flags (resurrection scenario)
         await db.conversations.update_one(
             {"_id": conversation_id},
             {
@@ -5953,7 +5953,26 @@ async def send_message(
                     "last_message": request.content if request.type == "text" else f"Sent a {request.type}",
                     "last_message_at": datetime.now(timezone.utc)
                 },
-                "$inc": {f"unread_count.{receiver_id}": 1}
+                "$inc": {f"unread_count.{receiver_id}": 1},
+                "$unset": {
+                    "deletedForEveryone": "",
+                    "deletedForEveryoneAt": "",
+                    f"deletedBy.{sender_id}": "",
+                    f"deletedBy.{receiver_id}": ""
+                }
+            }
+        )
+        
+        # Clear deletion flags from all messages in this conversation (resurrection)
+        await db.messages.update_many(
+            {"conversation_id": conversation_id},
+            {
+                "$unset": {
+                    "deletedForEveryone": "",
+                    "deletedForEveryoneAt": "",
+                    f"deletedBy.{sender_id}": "",
+                    f"deletedBy.{receiver_id}": ""
+                }
             }
         )
         
