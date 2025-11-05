@@ -542,14 +542,12 @@ export class WebRTCCall {
         console.log('🔌 Peer connection closed');
       }
       
-      // Close WebSocket
-      if (this.websocket) {
-        if (this.websocket.readyState === WebSocket.OPEN || 
-            this.websocket.readyState === WebSocket.CONNECTING) {
-          this.websocket.close();
-        }
+      // Release WebSocket connection from manager (don't close directly)
+      if (this.websocket && this.websocketMessageHandler) {
+        wsManager.releaseConnection(this.localUserId, this.websocketMessageHandler);
         this.websocket = null;
-        console.log('🔌 WebSocket closed');
+        this.websocketMessageHandler = null;
+        console.log('🔌 WebSocket connection released');
       }
       
       // Reset flags
