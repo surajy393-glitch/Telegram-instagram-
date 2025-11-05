@@ -6446,7 +6446,7 @@ async def generate_zego_token(
 
 
 # Include the router in the main app
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router)
 
 # Import and include social features router
 from social_features import social_router
