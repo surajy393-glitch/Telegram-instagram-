@@ -47,11 +47,19 @@ export function setToken(token) {
 export function getUser() {
   const telegramUserId = getTelegramUserId();
   const key = `tg_${telegramUserId}_user`;
+  console.log('🔍 getUser - telegramUserId:', telegramUserId, 'key:', key);
   const stored = localStorage.getItem(key);
-  if (!stored) return null;
+  console.log('🔍 getUser - stored data found:', !!stored);
+  if (!stored) {
+    console.warn('⚠️ No user data found in localStorage for key:', key);
+    return null;
+  }
   try {
-    return JSON.parse(stored);
+    const user = JSON.parse(stored);
+    console.log('✅ getUser - parsed user:', {id: user.id, username: user.username});
+    return user;
   } catch (e) {
+    console.error('❌ getUser - JSON parse error:', e);
     return null;
   }
 }
