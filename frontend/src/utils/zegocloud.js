@@ -79,8 +79,13 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud App ID not configured');
       }
 
-      // Create ZegoCloud engine instance
-      this.zg = new ZegoExpressEngine(this.appId, this.server);
+      // Create ZegoCloud engine instance using createEngine factory method
+      const profile = {
+        appID: this.appId,
+        server: this.server
+      };
+      
+      this.zg = ZegoExpressEngine.createEngine(profile);
       
       // Set up event listeners
       this.setupEventListeners();
