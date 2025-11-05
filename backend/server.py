@@ -6495,8 +6495,8 @@ class CallLog(BaseModel):
     callType: str  # 'audio' or 'video'
     status: str  # 'completed', 'missed', 'declined'
     duration: Optional[int] = 0  # in seconds
-    startedAt: datetime
-    endedAt: Optional[datetime] = None
+    startedAt: str  # ISO string from frontend
+    endedAt: Optional[str] = None  # ISO string from frontend
 
 @api_router.post("/calls/log")
 async def log_call(
