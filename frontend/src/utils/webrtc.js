@@ -86,7 +86,7 @@ export class WebRTCCall {
     return new Promise((resolve, reject) => {
       const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsHost = window.location.host;
-      const wsUrl = `${wsProtocol}//${wsHost}/ws/signaling/${this.localUserId}`;
+      const wsUrl = `${wsProtocol}//${wsHost}/api/ws/signaling/${this.localUserId}`;
       
       console.log('🔌 WebSocket URL:', wsUrl);
       
