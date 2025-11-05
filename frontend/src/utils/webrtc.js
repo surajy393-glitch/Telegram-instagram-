@@ -48,6 +48,9 @@ export class WebRTCCall {
       const wsHost = window.location.host;
       const wsUrl = `${wsProtocol}//${wsHost}/ws/signaling/${this.localUserId}`;
       
+      console.log('🔌 WebSocket URL:', wsUrl);
+      console.log('🔌 Protocol:', wsProtocol, 'Host:', wsHost);
+      
       // Connect to signaling server
       this.websocket = new WebSocket(wsUrl);
       
