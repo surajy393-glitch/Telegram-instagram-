@@ -219,9 +219,18 @@ const ChatPage = () => {
       setCallType(incomingCall.callType);
       
       if (currentCall) {
-        // Accept the call
+        // Set remote user ID from incoming call
+        currentCall.remoteUserId = incomingCall.fromUserId;
+        
+        // Accept the call and get media
         const stream = await currentCall.acceptIncomingCall();
         setLocalStream(stream);
+        
+        // Handle remote stream
+        currentCall.onRemoteStream = (stream) => {
+          console.log('📺 Remote stream received');
+          setRemoteStream(stream);
+        };
       }
       
       setIncomingCall(null);
@@ -238,15 +247,36 @@ const ChatPage = () => {
       currentCall.rejectIncomingCall();
     }
     setIncomingCall(null);
-    endCall();
   };
 
-  const endCall = () => {
-    if (currentCall) {
+  const endCall = async () => {
+    // Log call history before ending
+    if (currentCall && isCallActive) {
+      try {
+        await httpClient.post('/calls/log', {
+          callId: `call-${Date.now()}`,
+          callerId: currentUser.id,
+          receiverId: userId,
+          callType: callType,
+          status: 'completed',
+          duration: 0,
+          startedAt: new Date().toISOString()
+        });
+        console.log('📝 Call logged to history');
+        
+        // Refresh messages to show call log
+        await fetchMessages();
+      } catch (error) {
+        console.error('Failed to log call:', error);
+      }
+    }
+    
+    if (currentCall && currentCall !== signalingConnectionRef.current) {
       currentCall.endCall();
     }
+    
     setIsCallActive(false);
-    setCurrentCall(null);
+    setCurrentCall(signalingConnectionRef.current); // Restore persistent connection
     setLocalStream(null);
     setRemoteStream(null);
   };
