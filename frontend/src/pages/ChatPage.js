@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { httpClient, getUser } from '../utils/authClient';
-import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X } from 'lucide-react';
+import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X, Phone, Video } from 'lucide-react';
+import { ZegoCloudCall } from '../utils/zegocloud';
+import CallModal from '../components/CallModal';
+import IncomingCallModal from '../components/IncomingCallModal';
 
 const ChatPage = () => {
   const { userId } = useParams();
@@ -18,12 +21,35 @@ const ChatPage = () => {
   const prevMessageCount = useRef(0);
   const currentUser = getUser();
 
+  // Call state management
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [currentCall, setCurrentCall] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [callType, setCallType] = useState('video');
+  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [callHistory, setCallHistory] = useState([]);
+
   useEffect(() => {
     fetchMessages();
+    fetchCallHistory();
     
     // Poll for new messages every 3 seconds
-    const interval = setInterval(fetchMessages, 3000);
-    return () => clearInterval(interval);
+    const messageInterval = setInterval(fetchMessages, 3000);
+    
+    // Poll for incoming calls every 2 seconds
+    const callInterval = setInterval(checkForIncomingCalls, 2000);
+    
+    return () => {
+      clearInterval(messageInterval);
+      clearInterval(callInterval);
+      // Cleanup call if active
+      if (currentCall) {
+        currentCall.endCall();
+      }
+    };
   }, [userId]);
 
   useEffect(() => {
@@ -54,6 +80,152 @@ const ChatPage = () => {
       console.error('Error fetching messages:', error);
       setLoading(false);
     }
+  };
+
+  const fetchCallHistory = async () => {
+    try {
+      const response = await httpClient.get(`/calls/history/${userId}`);
+      setCallHistory(response.data.calls || []);
+    } catch (error) {
+      console.error('Error fetching call history:', error);
+    }
+  };
+
+  const checkForIncomingCalls = async () => {
+    // Mock incoming call check - in real implementation this would check for actual incoming calls
+    // For demo purposes, we'll skip this to avoid constant notifications
+    // In production, this would check a real-time notification system
+  };
+
+  const logCall = async (callData) => {
+    try {
+      await httpClient.post('/calls/log', {
+        callerId: currentUser.id,
+        receiverId: userId,
+        callType: callData.callType,
+        status: callData.status,
+        duration: callData.duration || 0,
+        startedAt: callData.startedAt,
+        endedAt: callData.endedAt
+      });
+      
+      // Refresh call history
+      await fetchCallHistory();
+    } catch (error) {
+      console.error('Error logging call:', error);
+    }
+  };
+
+  const startCall = async (type = 'video') => {
+    try {
+      setCallType(type);
+      setIsCallActive(true);
+      
+      // Create ZegoCloud call instance
+      const call = new ZegoCloudCall(currentUser.id, userId, type);
+      setCurrentCall(call);
+      
+      // Set up call callbacks
+      call.setCallbacks({
+        onRemoteStream: (stream, userId) => {
+          console.log('Remote stream received:', stream);
+          setRemoteStream(stream);
+        },
+        onCallEnd: () => {
+          handleCallEnd();
+        },
+        onError: (message, error) => {
+          console.error('Call error:', message, error);
+          alert(`Call error: ${message}`);
+          handleCallEnd();
+        },
+        onIncomingCall: (user) => {
+          console.log('Incoming call from:', user);
+        }
+      });
+      
+      // Start the call
+      const callStartTime = new Date().toISOString();
+      const success = await call.startCall();
+      
+      if (success) {
+        setLocalStream(call.localStream);
+        setIsVideoEnabled(type === 'video');
+        setIsAudioEnabled(true);
+        
+        // Log call start
+        await logCall({
+          callType: type,
+          status: 'started',
+          startedAt: callStartTime
+        });
+      } else {
+        throw new Error('Failed to start call');
+      }
+    } catch (error) {
+      console.error('Error starting call:', error);
+      alert('Failed to start call. Please check your camera/microphone permissions.');
+      handleCallEnd();
+    }
+  };
+
+  const handleCallEnd = async () => {
+    try {
+      const callEndTime = new Date().toISOString();
+      
+      if (currentCall) {
+        const callState = currentCall.getCallState();
+        await currentCall.endCall();
+        
+        // Log call end
+        await logCall({
+          callType: callState.callType,
+          status: 'completed',
+          duration: Math.floor((new Date() - new Date()) / 1000), // Calculate actual duration
+          startedAt: new Date().toISOString(), // Should be actual start time
+          endedAt: callEndTime
+        });
+      }
+      
+      // Reset call state
+      setIsCallActive(false);
+      setCurrentCall(null);
+      setLocalStream(null);
+      setRemoteStream(null);
+      setIsAudioEnabled(true);
+      setIsVideoEnabled(true);
+    } catch (error) {
+      console.error('Error ending call:', error);
+    }
+  };
+
+  const toggleAudio = async () => {
+    if (currentCall) {
+      const enabled = await currentCall.toggleAudio();
+      setIsAudioEnabled(enabled);
+      return enabled;
+    }
+    return isAudioEnabled;
+  };
+
+  const toggleVideo = async () => {
+    if (currentCall) {
+      const enabled = await currentCall.toggleVideo();
+      setIsVideoEnabled(enabled);
+      return enabled;
+    }
+    return isVideoEnabled;
+  };
+
+  const handleAcceptIncomingCall = async () => {
+    if (incomingCall) {
+      await startCall(incomingCall.callType);
+      setIncomingCall(null);
+    }
+  };
+
+  const handleRejectIncomingCall = () => {
+    setIncomingCall(null);
   };
 
   const handleAcceptRequest = async () => {
@@ -188,6 +360,39 @@ const ChatPage = () => {
                   <h2 className="font-semibold text-gray-900">{otherUser.fullName}</h2>
                   <p className="text-xs text-gray-500">@{otherUser.username}</p>
                 </div>
+                
+                {/* Call Buttons */}
+                {!isRequest && (
+                  <div className="flex items-center gap-2">
+                    {/* Audio Call Button */}
+                    <button
+                      onClick={() => startCall('audio')}
+                      disabled={isCallActive}
+                      className={`p-2 rounded-full transition ${
+                        isCallActive 
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'hover:bg-pink-50 text-pink-600 hover:text-pink-700'
+                      }`}
+                      title="Voice Call"
+                    >
+                      <Phone className="w-5 h-5" />
+                    </button>
+                    
+                    {/* Video Call Button */}
+                    <button
+                      onClick={() => startCall('video')}
+                      disabled={isCallActive}
+                      className={`p-2 rounded-full transition ${
+                        isCallActive 
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'hover:bg-pink-50 text-pink-600 hover:text-pink-700'
+                      }`}
+                      title="Video Call"
+                    >
+                      <Video className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -315,6 +520,29 @@ const ChatPage = () => {
           </form>
         </div>
       </div>
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={isCallActive}
+        callType={callType}
+        localStream={localStream}
+        remoteStream={remoteStream}
+        onEndCall={handleCallEnd}
+        onToggleAudio={toggleAudio}
+        onToggleVideo={toggleVideo}
+        otherUser={otherUser}
+        isAudioEnabled={isAudioEnabled}
+        isVideoEnabled={isVideoEnabled}
+      />
+
+      {/* Incoming Call Modal */}
+      <IncomingCallModal
+        isOpen={!!incomingCall}
+        callType={incomingCall?.callType}
+        callerUser={incomingCall?.callerUser}
+        onAccept={handleAcceptIncomingCall}
+        onReject={handleRejectIncomingCall}
+      />
     </div>
   );
 };
