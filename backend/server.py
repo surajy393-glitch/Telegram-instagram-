@@ -6511,6 +6511,13 @@ async def log_call(
         
         # Save call log to database
         call_data = call_log.dict()
+        
+        # Parse ISO string dates to datetime objects for MongoDB
+        if isinstance(call_data.get("startedAt"), str):
+            call_data["startedAt"] = datetime.fromisoformat(call_data["startedAt"].replace('Z', '+00:00'))
+        if call_data.get("endedAt") and isinstance(call_data["endedAt"], str):
+            call_data["endedAt"] = datetime.fromisoformat(call_data["endedAt"].replace('Z', '+00:00'))
+            
         call_data["createdAt"] = datetime.now(timezone.utc)
         
         await db.call_logs.insert_one(call_data)
