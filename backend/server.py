@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Depends, Header, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Depends, Header, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
+from sse_starlette.sse import EventSourceResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
