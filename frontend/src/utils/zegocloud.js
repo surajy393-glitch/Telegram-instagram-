@@ -24,8 +24,22 @@ export class ZegoCloudCall {
     this.roomId = this.generateRoomId(localUserId, remoteUserId);
     
     // ZegoCloud configuration - TOKEN-ONLY MODE
-    const envAppId = parseInt(process.env.REACT_APP_ZEGO_APP_ID, 10);
-    this.appId = Number.isInteger(envAppId) ? envAppId : 2106710509;
+    // CRITICAL: Ensure appID is a NUMBER (not string) for SDK v3.11.0
+    const envAppId = process.env.REACT_APP_ZEGO_APP_ID;
+    let parsedAppId;
+    
+    if (typeof envAppId === 'string') {
+      parsedAppId = parseInt(envAppId, 10);
+    } else if (typeof envAppId === 'number') {
+      parsedAppId = envAppId;
+    } else {
+      parsedAppId = 2106710509; // Fallback default
+    }
+    
+    // Final validation: ensure it's a valid positive integer
+    this.appId = (Number.isInteger(parsedAppId) && parsedAppId > 0) ? parsedAppId : 2106710509;
+    
+    console.log('🔧 ZegoCloud appID configured:', this.appId, '(type:', typeof this.appId, ')');
     
     // State management
     this.zg = null;
