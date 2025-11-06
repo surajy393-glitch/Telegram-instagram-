@@ -379,25 +379,28 @@ const ChatPage = () => {
         console.error('⚠️ Failed to send call ended signal:', signalError);
       }
       
+      // Log call - even if it failed or currentCall is null
+      const actualDuration = callStartTime 
+        ? Math.floor((callEndTime - callStartTime) / 1000) 
+        : 0;
+      
+      const callStatus = currentCall && actualDuration > 0 ? 'completed' : 'missed';
+      
+      await logCall({
+        callType: callType,  // Use state variable instead of callState
+        status: callStatus,
+        duration: actualDuration,
+        startedAt: callStartTime ? callStartTime.toISOString() : new Date().toISOString(),
+        endedAt: callEndTime.toISOString()
+      });
+      
+      // Refresh call history to show the new call
+      await fetchCallHistory();
+      
+      // Cleanup call if it exists
       if (currentCall) {
-        const callState = currentCall.getCallState();
         await currentCall.endCall();
-        
-        // Calculate actual call duration
-        const actualDuration = callStartTime 
-          ? Math.floor((callEndTime - callStartTime) / 1000) 
-          : 0;
-        
-        // Log call end with accurate duration
-        await logCall({
-          callType: callState.callType,
-          status: 'completed',
-          duration: actualDuration,
-          startedAt: callStartTime ? callStartTime.toISOString() : new Date().toISOString(),
-          endedAt: callEndTime.toISOString()
-        });
-        
-        // Refresh call history to show the new call
+      }
         await fetchCallHistory();
       }
       
