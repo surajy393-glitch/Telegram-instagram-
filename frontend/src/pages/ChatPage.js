@@ -286,20 +286,38 @@ const ChatPage = () => {
 
   const handleCallEnd = async () => {
     try {
-      const callEndTime = new Date().toISOString();
+      const callEndTime = new Date();
+      
+      // Send call ended signal via WebSocket
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'call_ended',
+          targetUserId: userId,
+          fromUserId: currentUser?.id
+        }));
+        console.log('📤 Sent call ended signal');
+      }
       
       if (currentCall) {
         const callState = currentCall.getCallState();
         await currentCall.endCall();
         
-        // Log call end
+        // Calculate actual call duration
+        const actualDuration = callStartTime 
+          ? Math.floor((callEndTime - callStartTime) / 1000) 
+          : 0;
+        
+        // Log call end with accurate duration
         await logCall({
           callType: callState.callType,
           status: 'completed',
-          duration: Math.floor((new Date() - new Date()) / 1000), // Calculate actual duration
-          startedAt: new Date().toISOString(), // Should be actual start time
-          endedAt: callEndTime
+          duration: actualDuration,
+          startedAt: callStartTime ? callStartTime.toISOString() : new Date().toISOString(),
+          endedAt: callEndTime.toISOString()
         });
+        
+        // Refresh call history to show the new call
+        await fetchCallHistory();
       }
       
       // Reset call state
@@ -309,6 +327,7 @@ const ChatPage = () => {
       setRemoteStream(null);
       setIsAudioEnabled(true);
       setIsVideoEnabled(true);
+      setCallStartTime(null);
     } catch (error) {
       console.error('Error ending call:', error);
     }
