@@ -56,7 +56,8 @@ function destroyGlobalEngine() {
   if (activeCallsCount === 0 && zegoEngineInstance) {
     console.log('🗑️ Destroying global ZegoCloud engine...');
     try {
-      ZegoExpressEngine.destroyEngine(); // STATIC METHOD
+      // Use INSTANCE method, not static method for Web SDK v3.11.0
+      zegoEngineInstance.destroyEngine();
       zegoEngineInstance = null;
       console.log('✅ Global ZegoCloud engine destroyed');
     } catch (error) {
