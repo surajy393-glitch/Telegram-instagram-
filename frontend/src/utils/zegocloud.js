@@ -273,31 +273,37 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud engine not initialized');
       }
 
-      // Use ZegoCloud's createStream method
+      // Enhanced video quality configuration for better streaming
       const config = {
         camera: {
           audio: true,
           video: this.isVideoEnabled ? {
-            width: 1280,
-            height: 720,
-            frameRate: 30
+            width: { ideal: 1280, max: 1920 },
+            height: { ideal: 720, max: 1080 },
+            frameRate: { ideal: 30, max: 60 },
+            facingMode: 'user'
           } : false
         }
       };
 
+      console.log('Creating ZegoCloud stream with config:', config);
       const stream = await this.zg.createStream(config);
       this.localStream = stream;
       
-      console.log('ZegoCloud stream created successfully');
+      console.log('✅ ZegoCloud stream created successfully');
+      console.log('   Video tracks:', stream.getVideoTracks().length);
+      console.log('   Audio tracks:', stream.getAudioTracks().length);
       return stream;
     } catch (error) {
-      console.error('Failed to create ZegoCloud stream:', error);
+      console.error('❌ Failed to create ZegoCloud stream:', error);
       
-      // Handle specific permission errors
+      // Handle specific permission errors with user-friendly messages
       if (error.msg && error.msg.includes('permission')) {
-        throw new Error('Camera/microphone permission denied');
+        throw new Error('Camera/microphone permission denied. Please allow access in browser settings.');
       } else if (error.msg && error.msg.includes('not found')) {
-        throw new Error('Camera/microphone not found');
+        throw new Error('Camera/microphone not found. Please connect a device and try again.');
+      } else if (error.code === 1103061) {
+        throw new Error('Camera/microphone device error. Please check your device connections.');
       }
       
       throw new Error(`Stream creation failed: ${error.msg || error.message}`);
