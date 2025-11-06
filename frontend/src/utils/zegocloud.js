@@ -734,7 +734,8 @@ export function destroyZegoEngine() {
   if (zegoEngineInstance) {
     console.log('🚨 Emergency engine destroy called');
     try {
-      ZegoExpressEngine.destroyEngine();
+      // Use INSTANCE method for Web SDK v3.11.0
+      zegoEngineInstance.destroyEngine();
       zegoEngineInstance = null;
       activeCallsCount = 0;
       console.log('✅ Engine destroyed successfully');
