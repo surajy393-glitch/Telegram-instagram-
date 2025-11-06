@@ -31,6 +31,91 @@ const ChatPage = () => {
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [incomingCall, setIncomingCall] = useState(null);
   const [callHistory, setCallHistory] = useState([]);
+  const [callStartTime, setCallStartTime] = useState(null);
+  
+  // WebSocket reference for call signaling
+  const wsRef = useRef(null);
+
+  // WebSocket Signaling Connection
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    
+    // Get backend URL and convert to WebSocket
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || '/api';
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.host;
+    const wsUrl = `${wsProtocol}//${wsHost}${backendUrl}/ws/signaling/${currentUser.id}`;
+    
+    console.log('🔌 Connecting to WebSocket signaling:', wsUrl);
+    
+    try {
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+      
+      ws.onopen = () => {
+        console.log('✅ WebSocket signaling connected');
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const signal = JSON.parse(event.data);
+          console.log('📨 Received signaling message:', signal);
+          
+          // Handle incoming call signal
+          if (signal.type === 'incoming_call') {
+            console.log('📞 Incoming call from:', signal.fromUserId);
+            setIncomingCall({
+              callType: signal.callType || 'video',
+              callerUser: {
+                id: signal.fromUserId,
+                fullName: signal.data?.callerName || 'Unknown User',
+                username: signal.data?.callerUsername || 'unknown',
+                profileImage: signal.data?.callerImage
+              }
+            });
+          }
+          
+          // Handle call ended signal
+          if (signal.type === 'call_ended') {
+            console.log('📵 Call ended signal received');
+            handleCallEnd();
+          }
+          
+          // Handle call accepted signal
+          if (signal.type === 'call_accepted') {
+            console.log('✅ Call accepted by remote user');
+          }
+          
+          // Handle call rejected signal
+          if (signal.type === 'call_rejected') {
+            console.log('❌ Call rejected by remote user');
+            handleCallEnd();
+          }
+          
+        } catch (error) {
+          console.error('❌ WebSocket message parse error:', error);
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('❌ WebSocket signaling error:', error);
+      };
+      
+      ws.onclose = () => {
+        console.log('🔌 WebSocket signaling disconnected');
+      };
+      
+    } catch (error) {
+      console.error('❌ Failed to create WebSocket connection:', error);
+    }
+    
+    return () => {
+      if (wsRef.current) {
+        console.log('🔌 Closing WebSocket signaling');
+        wsRef.current.close();
+      }
+    };
+  }, [currentUser?.id]);
 
   useEffect(() => {
     fetchMessages();
