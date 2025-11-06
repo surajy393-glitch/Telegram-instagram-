@@ -341,6 +341,9 @@ export class ZegoCloudCall {
   /**
    * Join ZegoCloud room - CORRECTED TOKEN SYNTAX
    */
+  /**
+   * Join ZegoCloud room - CORRECTED FOR SDK v3.11.0
+   */
   async joinRoom(token) {
     try {
       if (!this.zg) {
@@ -354,14 +357,30 @@ export class ZegoCloudCall {
 
       console.log('Joining room with token type:', typeof token, 'starts with 04:', token.startsWith('04'));
 
-      // CORRECT loginRoom syntax for token-based authentication
-      const result = await this.zg.loginRoom(this.roomId, {
-        token: token,  // Token for authentication
-        user: {
-          userID: this.localUserId,
-          userName: this.localUserId
-        }
+      // CORRECT loginRoom syntax for SDK v3.11.0: 3 separate parameters
+      // loginRoom(roomID: string, token: string, user: object, config?: object)
+      const user = {
+        userID: String(this.localUserId),
+        userName: String(this.localUserId)
+      };
+
+      const config = {
+        userUpdate: true
+      };
+
+      console.log('loginRoom parameters:', {
+        roomId: this.roomId,
+        tokenType: typeof token,
+        user: user,
+        config: config
       });
+
+      const result = await this.zg.loginRoom(
+        this.roomId,  // 1st param: roomID as string
+        token,        // 2nd param: token as string (NOT in object!)
+        user,         // 3rd param: user object
+        config        // 4th param: config object (optional)
+      );
 
       console.log('loginRoom result:', result);
 
