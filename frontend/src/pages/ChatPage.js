@@ -389,14 +389,24 @@ const ChatPage = () => {
     try {
       const callEndTime = new Date();
       
-      // Send call ended signal via WebSocket
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          type: 'call_ended',
-          targetUserId: userId,
-          fromUserId: currentUser?.id
-        }));
-        console.log('📤 Sent call ended signal');
+      // Send call ended signal (WebSocket or HTTP fallback)
+      try {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: 'call_ended',
+            targetUserId: userId,
+            fromUserId: currentUser?.id
+          }));
+          console.log('📤 Sent call ended signal via WebSocket');
+        } else {
+          await httpClient.post('/calls/signal', {
+            targetUserId: userId,
+            type: 'call_ended'
+          });
+          console.log('📤 Sent call ended signal via HTTP');
+        }
+      } catch (signalError) {
+        console.error('⚠️ Failed to send call ended signal:', signalError);
       }
       
       if (currentCall) {
