@@ -353,13 +353,35 @@ const ChatPage = () => {
 
   const handleAcceptIncomingCall = async () => {
     if (incomingCall) {
+      // Send call accepted signal
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'call_accepted',
+          targetUserId: incomingCall.callerUser.id,
+          fromUserId: currentUser?.id
+        }));
+        console.log('📤 Sent call accepted signal');
+      }
+      
       await startCall(incomingCall.callType);
       setIncomingCall(null);
     }
   };
 
   const handleRejectIncomingCall = () => {
-    setIncomingCall(null);
+    if (incomingCall) {
+      // Send call rejected signal
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'call_rejected',
+          targetUserId: incomingCall.callerUser.id,
+          fromUserId: currentUser?.id
+        }));
+        console.log('📤 Sent call rejected signal');
+      }
+      
+      setIncomingCall(null);
+    }
   };
 
   const handleAcceptRequest = async () => {
