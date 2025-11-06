@@ -683,6 +683,34 @@ export class ZegoCloudCall {
   handleRoomStateUpdate(roomId, state, errorCode, extendedData) {
     console.log('Room state update:', { roomId, state, errorCode, extendedData });
     
+    // Handle disconnection with auto-reconnection
+    if (state === 'DISCONNECTED' && errorCode !== 0 && this.isInRoom) {
+      console.warn('⚠️ Connection lost, attempting reconnection...');
+      
+      // Attempt reconnection after 2 seconds
+      setTimeout(async () => {
+        if (this.isInRoom) {
+          try {
+            console.log('🔄 Reconnecting to room...');
+            const token = await this.fetchToken();
+            await this.joinRoom(token);
+            
+            // Re-publish stream if we were publishing
+            if (this.isPublishing && this.localStream) {
+              const streamId = `${this.localUserId}_stream`;
+              await this.zg.startPublishingStream(streamId, this.localStream);
+              console.log('✅ Re-published stream after reconnection');
+            }
+            
+            console.log('✅ Reconnection successful');
+          } catch (error) {
+            console.error('❌ Reconnection failed:', error);
+            this.handleError('Reconnection failed', error);
+          }
+        }
+      }, 2000);
+    }
+    
     if (errorCode !== 0) {
       this.handleError(`Room state error: ${errorCode}`, { roomId, state, extendedData });
     }
