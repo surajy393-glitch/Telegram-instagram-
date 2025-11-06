@@ -454,14 +454,25 @@ const ChatPage = () => {
 
   const handleAcceptIncomingCall = async () => {
     if (incomingCall) {
-      // Send call accepted signal
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          type: 'call_accepted',
-          targetUserId: incomingCall.callerUser.id,
-          fromUserId: currentUser?.id
-        }));
-        console.log('📤 Sent call accepted signal');
+      // Send call accepted signal (WebSocket or HTTP fallback)
+      try {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: 'call_accepted',
+            targetUserId: incomingCall.callerUser.id,
+            fromUserId: currentUser?.id
+          }));
+          console.log('📤 Sent call accepted signal via WebSocket');
+        } else {
+          await httpClient.post('/calls/signal', {
+            targetUserId: incomingCall.callerUser.id,
+            type: 'call_accepted',
+            callType: incomingCall.callType
+          });
+          console.log('📤 Sent call accepted signal via HTTP');
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to send accept signal:', error);
       }
       
       await startCall(incomingCall.callType);
@@ -469,16 +480,27 @@ const ChatPage = () => {
     }
   };
 
-  const handleRejectIncomingCall = () => {
+  const handleRejectIncomingCall = async () => {
     if (incomingCall) {
-      // Send call rejected signal
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          type: 'call_rejected',
-          targetUserId: incomingCall.callerUser.id,
-          fromUserId: currentUser?.id
-        }));
-        console.log('📤 Sent call rejected signal');
+      // Send call rejected signal (WebSocket or HTTP fallback)
+      try {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: 'call_rejected',
+            targetUserId: incomingCall.callerUser.id,
+            fromUserId: currentUser?.id
+          }));
+          console.log('📤 Sent call rejected signal via WebSocket');
+        } else {
+          await httpClient.post('/calls/signal', {
+            targetUserId: incomingCall.callerUser.id,
+            type: 'call_rejected',
+            callType: incomingCall.callType
+          });
+          console.log('📤 Sent call rejected signal via HTTP');
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to send reject signal:', error);
       }
       
       setIncomingCall(null);
