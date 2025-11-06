@@ -339,12 +339,8 @@ const ChatPage = () => {
         setIsVideoEnabled(type === 'video');
         setIsAudioEnabled(true);
         
-        // Log call start
-        await logCall({
-          callType: type,
-          status: 'started',
-          startedAt: callStartTime
-        });
+        // Don't log 'started' status - only log when call ends
+        console.log('✅ Call started successfully');
       } else {
         throw new Error('Failed to start call');
       }
