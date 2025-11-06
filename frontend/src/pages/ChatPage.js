@@ -638,7 +638,11 @@ const ChatPage = () => {
                         : 'bg-white border border-pink-100 text-gray-900'
                     }`}
                   >
-                    <p className="text-sm break-words">{message.content}</p>
+                    <p className="text-sm break-words">
+                      {message.content && typeof message.content === 'string' 
+                        ? message.content 
+                        : '[Empty message]'}
+                    </p>
                     <div className={`flex items-center justify-end gap-1 mt-1`}>
                       <span
                         className={`text-xs ${
