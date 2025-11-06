@@ -5,6 +5,7 @@ import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X, Phone, Video } fr
 import { ZegoCloudCall } from '../utils/zegocloud';
 import CallModal from '../components/CallModal';
 import IncomingCallModal from '../components/IncomingCallModal';
+import { requestMediaPermissions, hasValidPermissionCache } from '../utils/permissions';
 
 const ChatPage = () => {
   const { userId } = useParams();
@@ -32,9 +33,11 @@ const ChatPage = () => {
   const [incomingCall, setIncomingCall] = useState(null);
   const [callHistory, setCallHistory] = useState([]);
   const [callStartTime, setCallStartTime] = useState(null);
+  const [permissionsGranted, setPermissionsGranted] = useState(false);
   
   // WebSocket reference for call signaling
   const wsRef = useRef(null);
+  const permissionRequested = useRef(false);
 
   // WebSocket Signaling Connection
   useEffect(() => {
