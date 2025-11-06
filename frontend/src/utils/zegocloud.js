@@ -621,18 +621,34 @@ export class ZegoCloudCall {
   /**
    * Event handler: Stream removed
    */
-  handleStreamDelete(roomId, updateStreamList) {
-    console.log('Streams removed:', updateStreamList);
+  async handleStreamDelete(roomId, updateStreamList) {
+    console.log('📤 Streams removed:', updateStreamList);
     
     // Handle remote stream removal
-    updateStreamList.forEach(stream => {
+    for (const stream of updateStreamList) {
       if (stream.user.userID === this.remoteUserId) {
-        if (this.remoteStream) {
-          this.remoteStream.getTracks().forEach(track => track.stop());
-          this.remoteStream = null;
+        try {
+          // Stop playing stream using SDK method FIRST
+          if (this.zg && stream.streamID) {
+            console.log(`Stopping remote stream via SDK: ${stream.streamID}`);
+            await this.zg.stopPlayingStream(stream.streamID);
+          }
+          
+          // Then stop MediaStreamTracks
+          if (this.remoteStream) {
+            this.remoteStream.getTracks().forEach(track => {
+              console.log(`Stopping remote ${track.kind} track`);
+              track.stop();
+            });
+            this.remoteStream = null;
+          }
+          
+          this.remoteStreamId = null;
+        } catch (error) {
+          console.error('Error handling stream delete:', error);
         }
       }
-    });
+    }
   }
 
   /**
