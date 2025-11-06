@@ -151,34 +151,50 @@ export class ZegoCloudCall {
       
       console.log('Token response:', response.data);
       
-      if (response.data && response.data.token) {
-        let token = response.data.token;
-        
-        // The API should return a simple string. However, defensive
-        // programming is important: if the backend inadvertently wraps the
-        // token in an object (e.g. { token: '04...' }), extract the string.
-        if (typeof token !== 'string') {
-          // If a nested `token` field exists, use it. Otherwise report an
-          // explicit error so that developers can correct the API response.
-          if (token && typeof token.token === 'string') {
-            token = token.token;
-          } else {
-            throw new Error(`Token is not a string, received: ${typeof token}`);
-          }
-        }
-        
-        // Ensure the token starts with the expected "04" prefix (Token04)
-        if (!token.startsWith('04')) {
-          throw new Error('Invalid Token04 format - should start with "04"');
-        }
-        
-        console.log('✅ Valid Token04 received:', token.substring(0, 20) + '...');
-        return token;
+      // Check if response has token field
+      if (!response.data || !response.data.token) {
+        throw new Error(`Invalid token response structure: ${JSON.stringify(response.data)}`);
       }
       
-      throw new Error('Invalid token response from server');
+      let token = response.data.token;
+      
+      // Explicit null/undefined check FIRST
+      if (token === null || token === undefined) {
+        throw new Error('Token is null or undefined in response');
+      }
+      
+      // Then check if it's a string
+      if (typeof token !== 'string') {
+        // Handle nested token object (defensive programming)
+        if (token && typeof token.token === 'string') {
+          token = token.token;
+        } else {
+          throw new Error(`Token is not a string, received type: ${typeof token}, value: ${JSON.stringify(token)}`);
+        }
+      }
+      
+      // Ensure token is not empty
+      if (token.trim() === '') {
+        throw new Error('Token is an empty string');
+      }
+      
+      // Validate Token04 format
+      if (!token.startsWith('04')) {
+        throw new Error(`Invalid Token04 format - should start with "04", received: ${token.substring(0, 10)}...`);
+      }
+      
+      console.log('✅ Valid Token04 received:', token.substring(0, 20) + '...');
+      return token;
+      
     } catch (error) {
       console.error('❌ Failed to fetch ZegoCloud token:', error);
+      
+      // Enhanced error logging for backend responses
+      if (error.response) {
+        console.error('Backend error response:', error.response.data);
+        throw new Error(`Token fetch failed: ${error.response.data.detail || error.message}`);
+      }
+      
       throw new Error(`Token fetch failed: ${error.message}`);
     }
   }
