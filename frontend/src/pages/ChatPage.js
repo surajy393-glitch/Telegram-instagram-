@@ -120,6 +120,36 @@ const ChatPage = () => {
     };
   }, [currentUser?.id]);
 
+  // Pre-request camera/microphone permissions on page load
+  useEffect(() => {
+    if (permissionRequested.current) return;
+    
+    // Request permissions after a short delay to let page render
+    const timer = setTimeout(async () => {
+      permissionRequested.current = true;
+      
+      // Check if we already have valid cached permissions
+      if (hasValidPermissionCache()) {
+        console.log('✅ Using cached media permissions');
+        setPermissionsGranted(true);
+        return;
+      }
+      
+      console.log('🎥 Pre-requesting camera/microphone permissions...');
+      const result = await requestMediaPermissions();
+      
+      if (result.success) {
+        console.log('✅ Media permissions pre-granted');
+        setPermissionsGranted(true);
+      } else {
+        console.warn('⚠️ Permission request failed:', result.message);
+        setPermissionsGranted(false);
+      }
+    }, 1000); // Wait 1 second after page load
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     fetchMessages();
     fetchCallHistory();
