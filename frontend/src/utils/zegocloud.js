@@ -708,6 +708,23 @@ export function createZegoCall(localUserId, remoteUserId, callType = 'video') {
 }
 
 /**
+ * Destroy global ZegoCloud engine (for emergency cleanup)
+ */
+export function destroyZegoEngine() {
+  if (zegoEngineInstance) {
+    console.log('🚨 Emergency engine destroy called');
+    try {
+      ZegoExpressEngine.destroyEngine();
+      zegoEngineInstance = null;
+      activeCallsCount = 0;
+      console.log('✅ Engine destroyed successfully');
+    } catch (error) {
+      console.error('❌ Error destroying engine:', error);
+    }
+  }
+}
+
+/**
  * Check if ZegoCloud is supported in current browser
  */
 export function isZegoCloudSupported() {
