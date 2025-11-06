@@ -6600,16 +6600,20 @@ signaling_manager = SignalingManager()
 async def websocket_signaling(websocket: WebSocket, user_id: str):
     """WebSocket endpoint for WebRTC signaling"""
     await signaling_manager.connect(user_id, websocket)
+    logger.info(f"🔌 WebSocket signaling connected for user: {user_id}")
+    
     try:
         while True:
             # Receive message from client
             data = await websocket.receive_json()
+            logger.info(f"📨 Received signal from {user_id}: {data}")
             
             # Route signal to target user
             signal_type = data.get("type")
             target_user_id = data.get("targetUserId")
             
             if not target_user_id:
+                logger.warning(f"⚠️ No targetUserId in signal from {user_id}: {data}")
                 continue
             
             # Forward the signal to target user
@@ -6620,12 +6624,15 @@ async def websocket_signaling(websocket: WebSocket, user_id: str):
                 "callType": data.get("callType")  # 'audio' or 'video'
             }
             
+            logger.info(f"📤 Forwarding {signal_type} signal from {user_id} to {target_user_id}")
             await signaling_manager.send_signal(target_user_id, message)
+            logger.info(f"✅ Signal sent successfully")
             
     except WebSocketDisconnect:
+        logger.info(f"🔌 WebSocket disconnected for user: {user_id}")
         signaling_manager.disconnect(user_id, websocket)
     except Exception as e:
-        logger.error(f"WebSocket error for user {user_id}: {e}")
+        logger.error(f"❌ WebSocket error for user {user_id}: {e}")
         signaling_manager.disconnect(user_id, websocket)
 
 
