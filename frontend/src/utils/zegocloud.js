@@ -533,35 +533,48 @@ export class ZegoCloudCall {
    */
   async cleanup() {
     try {
+      console.log('🧹 Starting cleanup...');
+      
+      // Stop remote stream using SDK method FIRST (before stopping tracks)
+      if (this.remoteStreamId && this.zg) {
+        try {
+          console.log(`Stopping remote stream: ${this.remoteStreamId}`);
+          await this.zg.stopPlayingStream(this.remoteStreamId);
+          this.remoteStreamId = null;
+        } catch (error) {
+          console.warn('Error stopping remote stream:', error);
+        }
+      }
+      
       // Stop local stream tracks
       if (this.localStream) {
         this.localStream.getTracks().forEach(track => {
+          console.log(`Stopping local ${track.kind} track`);
           track.stop();
         });
         this.localStream = null;
       }
       
-      // Stop remote stream
+      // Stop remote stream tracks (if still exist)
       if (this.remoteStream) {
         this.remoteStream.getTracks().forEach(track => {
+          console.log(`Stopping remote ${track.kind} track`);
           track.stop();
         });
         this.remoteStream = null;
       }
       
-      // Destroy ZegoCloud engine
-      if (this.zg) {
-        this.zg.destroyEngine();
-        this.zg = null;
-      }
+      // Destroy global engine using singleton pattern
+      destroyGlobalEngine();
+      this.zg = null;
       
       // Reset state
       this.isInRoom = false;
       this.isPublishing = false;
       
-      console.log('Cleanup completed');
+      console.log('✅ Cleanup completed');
     } catch (error) {
-      console.error('Cleanup error:', error);
+      console.error('❌ Cleanup error:', error);
     }
   }
 
