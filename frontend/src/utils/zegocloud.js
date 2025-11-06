@@ -1,6 +1,6 @@
 // frontend/src/utils/zegocloud.js
 
-import ZegoExpressEngine from 'zego-express-engine-webrtc';
+import { ZegoExpressEngine } from 'zego-express-engine-webrtc';
 import { httpClient } from './authClient';
 
 /**
