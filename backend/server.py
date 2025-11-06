@@ -6692,6 +6692,49 @@ async def websocket_signaling(websocket: WebSocket, user_id: str):
         signaling_manager.disconnect(user_id, websocket)
 
 
+# HTTP endpoint for sending call signals (fallback when WebSocket unavailable)
+class CallSignal(BaseModel):
+    targetUserId: str
+    type: str  # 'incoming_call', 'call_accepted', 'call_rejected', 'call_ended'
+    callType: Optional[str] = 'video'
+    data: Optional[dict] = {}
+
+@api_router.post("/calls/signal")
+async def send_call_signal(
+    signal: CallSignal,
+    authorization: str = Header(None)
+):
+    """HTTP endpoint to send call signals (alternative to WebSocket)"""
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Construct message
+        message = {
+            "type": signal.type,
+            "fromUserId": current_user['id'],
+            "callType": signal.callType,
+            "data": signal.data
+        }
+        
+        logger.info(f"📤 HTTP Signal: {signal.type} from {current_user['id']} to {signal.targetUserId}")
+        
+        # Send via SignalingManager (works for both WebSocket and SSE)
+        sent = await signaling_manager.send_signal(signal.targetUserId, message)
+        
+        return {
+            "success": sent,
+            "message": f"Signal sent to {signal.targetUserId}" if sent else "Target user not connected"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sending call signal: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send signal")
+
+
 # Call history model
 class CallLog(BaseModel):
     callId: str
