@@ -617,52 +617,53 @@ const ChatPage = () => {
             
             {/* Messages by Date */}
             {Object.keys(messageGroups).map((dateKey) => (
-            <div key={dateKey}>
-              {/* Date Separator */}
-              <div className="flex justify-center my-4">
-                <span className="bg-white px-3 py-1 rounded-full text-xs text-gray-500 border border-pink-100">
-                  {getDateLabel(dateKey)}
-                </span>
-              </div>
-              
-              {/* Messages */}
-              {messageGroups[dateKey].map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex flex-col mb-4 ${message.isMine ? 'items-end' : 'items-start'}`}
-                >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                      message.isMine
-                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white'
-                        : 'bg-white border border-pink-100 text-gray-900'
-                    }`}
-                  >
-                    <p className="text-sm break-words">
-                      {message.content && typeof message.content === 'string' 
-                        ? message.content 
-                        : '[Empty message]'}
-                    </p>
-                    <div className={`flex items-center justify-end gap-1 mt-1`}>
-                      <span
-                        className={`text-xs ${
-                          message.isMine ? 'text-pink-100' : 'text-gray-400'
-                        }`}
-                      >
-                        {formatTimestamp(message.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* Instagram-style "Seen" status */}
-                  {message.isMine && message.status?.read && message.readAt && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      Seen {formatTimestamp(message.readAt)}
-                    </div>
-                  )}
+              <div key={dateKey}>
+                {/* Date Separator */}
+                <div className="flex justify-center my-4">
+                  <span className="bg-white px-3 py-1 rounded-full text-xs text-gray-500 border border-pink-100">
+                    {getDateLabel(dateKey)}
+                  </span>
                 </div>
-              ))}
-            </div>
-          ))
+                
+                {/* Messages */}
+                {messageGroups[dateKey].map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex flex-col mb-4 ${message.isMine ? 'items-end' : 'items-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                        message.isMine
+                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white'
+                          : 'bg-white border border-pink-100 text-gray-900'
+                      }`}
+                    >
+                      <p className="text-sm break-words">
+                        {message.content && typeof message.content === 'string' 
+                          ? message.content 
+                          : '[Empty message]'}
+                      </p>
+                      <div className={`flex items-center justify-end gap-1 mt-1`}>
+                        <span
+                          className={`text-xs ${
+                            message.isMine ? 'text-pink-100' : 'text-gray-400'
+                          }`}
+                        >
+                          {formatTimestamp(message.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Instagram-style "Seen" status */}
+                    {message.isMine && message.status?.read && message.readAt && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Seen {formatTimestamp(message.readAt)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
