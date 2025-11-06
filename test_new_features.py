@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 load_dotenv('/app/frontend/.env')
 
 # Get backend URL from frontend env
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://video-dating-app-5.preview.emergentagent.com')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dating-app-dev-5.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class NewFeatureTester:

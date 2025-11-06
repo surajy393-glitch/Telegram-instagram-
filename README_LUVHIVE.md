@@ -107,7 +107,7 @@ JWT_SECRET="luvhive-secret-key-change-in-production-2024"
 
 Frontend (`.env`):
 ```env
-REACT_APP_BACKEND_URL=https://video-dating-app-5.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://dating-app-dev-5.preview.emergentagent.com
 WDS_SOCKET_PORT=443
 ```
 
@@ -125,7 +125,7 @@ sudo supervisorctl restart frontend
 sudo supervisorctl restart all
 ```
 
-Access the app at: `https://video-dating-app-5.preview.emergentagent.com`
+Access the app at: `https://dating-app-dev-5.preview.emergentagent.com`
 
 ## 🤖 Telegram Bot Integration
 
@@ -373,4 +373,4 @@ This project is created for your Telegram bot integration.
 
 **Made with ❤️ for LuvHive Social**
 
-🌐 **Live URL:** https://video-dating-app-5.preview.emergentagent.com
+🌐 **Live URL:** https://dating-app-dev-5.preview.emergentagent.com

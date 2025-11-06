@@ -394,7 +394,7 @@ The bot runs these automated jobs:
 ## 🤝 Integration with Web App (LuvHive)
 
 Your Telegram bot can integrate with your web app at:
-`https://video-dating-app-5.preview.emergentagent.com`
+`https://dating-app-dev-5.preview.emergentagent.com`
 
 ### Integration Points:
 1. **User Linking:** Link Telegram account to web app

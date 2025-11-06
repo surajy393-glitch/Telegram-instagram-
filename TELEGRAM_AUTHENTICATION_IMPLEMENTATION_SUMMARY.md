@@ -73,7 +73,7 @@ TELEGRAM_BOT_TOKEN="8494034049:AAEb5jiuYLUMmkjsIURx6RqhHJ4mj3bOI10"
 
 ### **Current Status**: Ready for Testing
 
-1. **Go to**: `https://video-dating-app-5.preview.emergentagent.com/login`
+1. **Go to**: `https://dating-app-dev-5.preview.emergentagent.com/login`
 2. **Click**: "Continue with Telegram" 
 3. **Expected**: Telegram Login Widget opens with your bot (@Loveekisssbot)
 4. **Authorize**: The LuvHive app through Telegram
