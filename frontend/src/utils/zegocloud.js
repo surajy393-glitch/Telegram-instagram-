@@ -200,7 +200,7 @@ export class ZegoCloudCall {
   }
 
   /**
-   * Initialize ZegoCloud engine - SDK v3.11.0 compatible
+   * Initialize ZegoCloud engine - SDK v3.11.0 compatible (SINGLETON PATTERN)
    */
   async initializeEngine() {
     try {
@@ -208,31 +208,18 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud App ID not configured');
       }
 
-      // Ensure appID is a NUMBER (critical for SDK v3.11.0)
-      const appIdNumber = Number(this.appId);
-      if (!Number.isInteger(appIdNumber) || appIdNumber <= 0) {
-        throw new Error(`Invalid appID: must be a positive integer, got ${this.appId} (type: ${typeof this.appId})`);
-      }
-
-      // Ensure server is a STRING (critical for SDK v3.11.0)
-      const serverString = String('wss://webliveroom-api.zego.im/ws');
-
-      console.log('🔧 Initializing ZegoCloud engine...');
-      console.log('   AppID:', appIdNumber, '(type:', typeof appIdNumber, ')');
-      console.log('   Server:', serverString, '(type:', typeof serverString, ')');
+      console.log('🔧 Initializing ZegoCloud engine (singleton mode)...');
       console.log('   Mode: Token-only authentication');
       console.log('   SDK Version: 3.11.0');
       
-      // Create engine instance for SDK v3.11.0
-      // CRITICAL: appID MUST be NUMBER, server MUST be STRING
-      this.zg = new ZegoExpressEngine(appIdNumber, serverString);
+      // Use singleton pattern - reuse existing engine or create new one
+      this.zg = await initializeGlobalEngine(this.appId);
       
-      // Set up event listeners after engine creation
+      // Set up event listeners for this call instance
       this.setupEventListeners();
       
-      console.log('✅ ZegoCloud engine initialized successfully');
-      console.log('   AppID:', appIdNumber);
-      console.log('   WebSocket Server:', serverString);
+      console.log('✅ ZegoCloud engine ready');
+      console.log('   Active calls:', activeCallsCount);
       return true;
     } catch (error) {
       console.error('❌ Failed to initialize ZegoCloud engine:', error);
