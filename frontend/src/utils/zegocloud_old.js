@@ -23,9 +23,13 @@ export class ZegoCloudCall {
     this.callType = callType; // 'video' or 'audio'
     this.roomId = this.generateRoomId(localUserId, remoteUserId);
     
-    // ZegoCloud configuration - TOKEN-ONLY MODE
+    // ZegoCloud configuration
+    // Read AppID from the environment or fall back to a default.
     const envAppId = parseInt(process.env.REACT_APP_ZEGO_APP_ID, 10);
     this.appId = Number.isInteger(envAppId) ? envAppId : 2106710509;
+    
+    // Read AppSign from environment (required for SDK initialization)
+    this.appSign = process.env.REACT_APP_ZEGO_APP_SIGN || '';
     
     // State management
     this.zg = null;
@@ -105,58 +109,74 @@ export class ZegoCloudCall {
   }
 
   /**
-   * Initialize ZegoCloud engine - CORRECTED SYNTAX FOR WEB SDK v3.21.0+
+   * Initialize ZegoCloud engine
    */
   async initializeEngine() {
     try {
       if (!this.appId) {
         throw new Error('ZegoCloud App ID not configured');
       }
+      
+      if (!this.appSign) {
+        throw new Error('ZegoCloud App Sign not configured');
+      }
 
       console.log('🔧 Initializing ZegoCloud engine...');
       console.log('   AppID:', this.appId);
-      console.log('   Mode: Token-only authentication');
+      console.log('   AppSign:', this.appSign ? 'Present (hidden)' : 'Missing');
       
-      // CORRECT createEngine syntax for Web SDK v3.21.0+
-      // Use profile object instead of deprecated 5-parameter syntax
-      this.zg = ZegoExpressEngine.createEngine({
-        appID: this.appId,                    // appID (number)
-        scenario: ZegoScenario.Communication, // Use Communication for video calls
-        eventHandler: {
-          // Stream management events
-          onRoomStreamUpdate: (roomID, updateType, streamList) => {
-            console.log('roomStreamUpdate:', roomID, updateType, streamList);
-            if (updateType === 'ADD') {
-              this.handleStreamAdd(roomID, streamList);
-            } else if (updateType === 'DELETE') {
-              this.handleStreamDelete(roomID, streamList);
-            }
-          },
-          
-          // User management events
-          onRoomUserUpdate: (roomID, updateType, userList) => {
-            console.log('roomUserUpdate:', roomID, updateType, userList);
-            if (updateType === 'ADD') {
-              this.handleUserAdd(roomID, userList);
-            } else if (updateType === 'DELETE') {
-              this.handleUserDelete(roomID, userList);
-            }
-          },
-          
-          // Room state events
-          onRoomStateUpdate: this.handleRoomStateUpdate
-        }
-      });
+      // Create ZegoCloud engine using createEngine static method
+      // Signature: createEngine(appID, appSign, isTestEnv, scenario, eventHandler)
+      this.zg = ZegoExpressEngine.createEngine(
+        this.appId,                    // appID (number)
+        this.appSign,                  // appSign (string) - required for authentication
+        false,                         // isTestEnv (false = production environment)
+        ZegoScenario.General,          // scenario enum for video calling
+        null                           // eventHandler (will be set up separately)
+      );
+      
+      // Set up event listeners
+      this.setupEventListeners();
       
       console.log('✅ ZegoCloud engine initialized successfully');
       console.log('   AppID:', this.appId);
-      console.log('   Scenario: Communication (video calling optimized)');
+      console.log('   Scenario: General (video calling optimized)');
       return true;
     } catch (error) {
       console.error('❌ Failed to initialize ZegoCloud engine:', error);
       this.handleError('Engine initialization failed', error);
       return false;
     }
+  }
+
+  /**
+   * Set up ZegoCloud event listeners
+   */
+  setupEventListeners() {
+    if (!this.zg) return;
+
+    // Stream management events (official API)
+    this.zg.on('roomStreamUpdate', (roomID, updateType, streamList) => {
+      console.log('roomStreamUpdate:', roomID, updateType, streamList);
+      if (updateType === 'ADD') {
+        this.handleStreamAdd(roomID, streamList);
+      } else if (updateType === 'DELETE') {
+        this.handleStreamDelete(roomID, streamList);
+      }
+    });
+    
+    // User management events (official API)
+    this.zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+      console.log('roomUserUpdate:', roomID, updateType, userList);
+      if (updateType === 'ADD') {
+        this.handleUserAdd(roomID, userList);
+      } else if (updateType === 'DELETE') {
+        this.handleUserDelete(roomID, userList);
+      }
+    });
+    
+    // Room state events
+    this.zg.on('roomStateUpdate', this.handleRoomStateUpdate);
   }
 
   /**
@@ -235,7 +255,7 @@ export class ZegoCloudCall {
   }
 
   /**
-   * Join ZegoCloud room - CORRECTED TOKEN SYNTAX
+   * Join ZegoCloud room
    */
   async joinRoom(token) {
     try {
@@ -250,14 +270,17 @@ export class ZegoCloudCall {
 
       console.log('Joining room with token type:', typeof token, 'starts with 04:', token.startsWith('04'));
 
-      // CORRECT loginRoom syntax for token-based authentication
-      const result = await this.zg.loginRoom(this.roomId, {
-        token: token,  // Token for authentication
-        user: {
-          userID: this.localUserId,
-          userName: this.localUserId
-        }
-      });
+      // CORRECT loginRoom signature: loginRoom(roomID, userInfo, config)
+      // Token MUST be in config object, not as separate parameter!
+      const userInfo = { userID: this.localUserId, userName: this.localUserId };
+      const config = { 
+        userUpdate: true,
+        token: token  // Token in config as per official docs
+      };
+
+      console.log('Calling loginRoom with:', { roomId: this.roomId, userInfo, config: {...config, token: 'REDACTED'} });
+
+      const result = await this.zg.loginRoom(this.roomId, userInfo, config);
 
       console.log('loginRoom result:', result);
 
