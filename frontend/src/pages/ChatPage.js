@@ -300,23 +300,40 @@ const ChatPage = () => {
         throw new Error('Current user ID is not available. Please sign in again.');
       }
       
-      // Send incoming call signal via WebSocket BEFORE initializing ZegoCloud
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        const callSignal = {
-          type: 'incoming_call',
-          targetUserId: userId,
-          fromUserId: currentUser.id,
-          callType: type,
-          data: {
-            callerName: currentUser.fullName || currentUser.username,
-            callerUsername: currentUser.username,
-            callerImage: currentUser.profileImage
-          }
-        };
-        wsRef.current.send(JSON.stringify(callSignal));
-        console.log('📤 Sent incoming call signal to:', userId);
-      } else {
-        console.warn('⚠️ WebSocket not connected - notification may not be sent');
+      // Send incoming call signal via WebSocket OR HTTP POST
+      try {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          const callSignal = {
+            type: 'incoming_call',
+            targetUserId: userId,
+            fromUserId: currentUser.id,
+            callType: type,
+            data: {
+              callerName: currentUser.fullName || currentUser.username,
+              callerUsername: currentUser.username,
+              callerImage: currentUser.profileImage
+            }
+          };
+          wsRef.current.send(JSON.stringify(callSignal));
+          console.log('📤 Sent incoming call signal via WebSocket to:', userId);
+        } else {
+          // Fallback to HTTP POST if WebSocket not available
+          console.log('📤 Sending incoming call signal via HTTP POST to:', userId);
+          await httpClient.post('/calls/signal', {
+            targetUserId: userId,
+            type: 'incoming_call',
+            callType: type,
+            data: {
+              callerName: currentUser.fullName || currentUser.username,
+              callerUsername: currentUser.username,
+              callerImage: currentUser.profileImage
+            }
+          });
+          console.log('✅ Signal sent successfully via HTTP');
+        }
+      } catch (signalError) {
+        console.error('⚠️ Failed to send call signal:', signalError);
+        // Continue with call even if signal fails
       }
       
       // Create ZegoCloud call instance - falls back to guest ID if needed
