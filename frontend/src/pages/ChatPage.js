@@ -205,6 +205,7 @@ const ChatPage = () => {
     try {
       setCallType(type);
       setIsCallActive(true);
+      setCallStartTime(new Date()); // Track actual call start time
       
       console.log('🎥 startCall - currentUser:', currentUser);
       console.log('🎥 startCall - currentUser.id:', currentUser?.id);
@@ -213,6 +214,25 @@ const ChatPage = () => {
       if (!currentUser || !currentUser.id) {
         console.error('❌ No valid currentUser or currentUser.id');
         throw new Error('Current user ID is not available. Please sign in again.');
+      }
+      
+      // Send incoming call signal via WebSocket BEFORE initializing ZegoCloud
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        const callSignal = {
+          type: 'incoming_call',
+          targetUserId: userId,
+          fromUserId: currentUser.id,
+          callType: type,
+          data: {
+            callerName: currentUser.fullName || currentUser.username,
+            callerUsername: currentUser.username,
+            callerImage: currentUser.profileImage
+          }
+        };
+        wsRef.current.send(JSON.stringify(callSignal));
+        console.log('📤 Sent incoming call signal to:', userId);
+      } else {
+        console.warn('⚠️ WebSocket not connected - notification may not be sent');
       }
       
       // Create ZegoCloud call instance - falls back to guest ID if needed
