@@ -6545,10 +6545,11 @@ async def shutdown_db_client():
         logger.error(f"Error closing MongoDB client: {e}")
 
 # ==================== WebRTC Signaling Server ====================
-# In-memory storage for active WebSocket connections
+# In-memory storage for active WebSocket connections and SSE queues
 class SignalingManager:
     def __init__(self):
         self.active_connections: dict[str, list[WebSocket]] = {}  # Support multiple connections per user
+        self.sse_queues: dict[str, list] = {}  # SSE event queues for each user
     
     async def connect(self, user_id: str, websocket: WebSocket):
         await websocket.accept()
@@ -6574,6 +6575,9 @@ class SignalingManager:
                 logger.warning(f"WebSocket not found in active connections for user: {user_id}")
     
     async def send_signal(self, user_id: str, message: dict):
+        sent = False
+        
+        # Try WebSocket first
         if user_id in self.active_connections:
             sent_count = 0
             dead_connections = []
@@ -6591,11 +6595,61 @@ class SignalingManager:
             for ws in dead_connections:
                 self.disconnect(user_id, ws)
             
-            logger.info(f"Signal sent to {user_id}: {sent_count} connection(s)")
-            return sent_count > 0
-        return False
+            logger.info(f"Signal sent via WebSocket to {user_id}: {sent_count} connection(s)")
+            sent = sent_count > 0
+        
+        # Also add to SSE queue as fallback
+        if user_id not in self.sse_queues:
+            self.sse_queues[user_id] = []
+        
+        self.sse_queues[user_id].append(message)
+        logger.info(f"Signal added to SSE queue for {user_id}")
+        
+        # Keep only last 10 events per user (prevent memory leak)
+        if len(self.sse_queues[user_id]) > 10:
+            self.sse_queues[user_id] = self.sse_queues[user_id][-10:]
+        
+        return sent
+    
+    def get_pending_events(self, user_id: str):
+        """Get and clear pending SSE events for user"""
+        if user_id in self.sse_queues:
+            events = self.sse_queues[user_id].copy()
+            self.sse_queues[user_id] = []
+            return events
+        return []
 
 signaling_manager = SignalingManager()
+
+# SSE endpoint for call notifications (fallback when WebSocket fails)
+@api_router.get("/calls/events/{user_id}")
+async def call_events_sse(user_id: str, request: Request):
+    """Server-Sent Events endpoint for call notifications"""
+    async def event_generator():
+        try:
+            while True:
+                # Check if client disconnected
+                if await request.is_disconnected():
+                    logger.info(f"SSE client disconnected: {user_id}")
+                    break
+                
+                # Get pending events from queue
+                events = signaling_manager.get_pending_events(user_id)
+                
+                for event in events:
+                    logger.info(f"📤 SSE sending event to {user_id}: {event.get('type')}")
+                    yield {
+                        "event": event.get("type", "message"),
+                        "data": json.dumps(event)
+                    }
+                
+                # Wait before checking again (prevents CPU spinning)
+                await asyncio.sleep(0.5)
+                
+        except Exception as e:
+            logger.error(f"SSE error for user {user_id}: {e}")
+    
+    return EventSourceResponse(event_generator())
 
 @app.websocket("/api/ws/signaling/{user_id}")
 async def websocket_signaling(websocket: WebSocket, user_id: str):
