@@ -109,6 +109,7 @@ export class ZegoCloudCall {
     this.zg = null;
     this.localStream = null;
     this.remoteStream = null;
+    this.remoteStreamId = null; // Track remote stream ID for cleanup
     this.isInRoom = false;
     this.isPublishing = false;
     this.isAudioEnabled = true;
