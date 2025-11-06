@@ -4,6 +4,70 @@ import { ZegoExpressEngine } from 'zego-express-engine-webrtc';
 import { httpClient } from './authClient';
 
 /**
+ * SINGLETON PATTERN: Global ZegoCloud Engine Instance
+ * SDK v3.11.0 requires single engine instance to prevent memory leaks
+ */
+let zegoEngineInstance = null;
+let activeCallsCount = 0;
+
+/**
+ * Initialize global ZegoCloud engine (singleton pattern)
+ */
+async function initializeGlobalEngine(appId) {
+  if (zegoEngineInstance) {
+    console.log('♻️ Reusing existing ZegoCloud engine instance');
+    activeCallsCount++;
+    return zegoEngineInstance;
+  }
+
+  try {
+    // Ensure appID is a NUMBER (critical for SDK v3.11.0)
+    const appIdNumber = Number(appId);
+    if (!Number.isInteger(appIdNumber) || appIdNumber <= 0) {
+      throw new Error(`Invalid appID: must be a positive integer, got ${appId} (type: ${typeof appId})`);
+    }
+
+    // Ensure server is a STRING (critical for SDK v3.11.0)
+    const serverString = String('wss://webliveroom-api.zego.im/ws');
+
+    console.log('🔧 Creating global ZegoCloud engine (singleton)...');
+    console.log('   AppID:', appIdNumber, '(type:', typeof appIdNumber, ')');
+    console.log('   Server:', serverString, '(type:', typeof serverString, ')');
+    console.log('   SDK Version: 3.11.0');
+    
+    // Create engine instance - SINGLETON
+    zegoEngineInstance = new ZegoExpressEngine(appIdNumber, serverString);
+    activeCallsCount = 1;
+    
+    console.log('✅ Global ZegoCloud engine created successfully');
+    return zegoEngineInstance;
+  } catch (error) {
+    console.error('❌ Failed to create global ZegoCloud engine:', error);
+    throw error;
+  }
+}
+
+/**
+ * Destroy global ZegoCloud engine (only when no active calls)
+ */
+function destroyGlobalEngine() {
+  activeCallsCount = Math.max(0, activeCallsCount - 1);
+  
+  if (activeCallsCount === 0 && zegoEngineInstance) {
+    console.log('🗑️ Destroying global ZegoCloud engine...');
+    try {
+      ZegoExpressEngine.destroyEngine(); // STATIC METHOD
+      zegoEngineInstance = null;
+      console.log('✅ Global ZegoCloud engine destroyed');
+    } catch (error) {
+      console.error('❌ Error destroying engine:', error);
+    }
+  } else {
+    console.log(`⏳ Not destroying engine - ${activeCallsCount} active call(s) remaining`);
+  }
+}
+
+/**
  * ZegoCloud Video/Audio Calling Service
  * Handles complete video calling functionality with ZegoCloud SDK
  */
