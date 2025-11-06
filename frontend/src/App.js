@@ -22,11 +22,51 @@ import TestZegoPage from "@/pages/TestZegoPage";
 import TelegramAuthHandler from "@/components/TelegramAuthHandler";
 import { Toaster } from "@/components/ui/toaster";
 import { getToken, setToken, httpClient, getUser, setUser as setUserStorage } from "@/utils/authClient";
+import { destroyZegoEngine } from "@/utils/zegocloud";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Global Telegram WebApp Initialization
+  useEffect(() => {
+    console.log('🚀 Initializing Telegram WebApp globally...');
+    
+    // Check if running in Telegram
+    if (window.Telegram && window.Telegram.WebApp) {
+      try {
+        // Signal that WebApp is ready
+        window.Telegram.WebApp.ready();
+        console.log('✅ Telegram.WebApp.ready() called');
+        
+        // Expand to full height for better UX
+        window.Telegram.WebApp.expand();
+        console.log('✅ Telegram.WebApp.expand() called');
+        
+        // Optional: Set header color to match theme
+        window.Telegram.WebApp.setHeaderColor('bg_color');
+        console.log('✅ Telegram WebApp initialized globally');
+      } catch (error) {
+        console.error('❌ Error initializing Telegram WebApp:', error);
+      }
+    } else {
+      console.log('ℹ️ Not running in Telegram WebApp context');
+    }
+
+    // Cleanup on unload
+    const handleUnload = () => {
+      console.log('🧹 App unloading - cleaning up resources...');
+      destroyZegoEngine();
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      handleUnload();
+    };
+  }, []);
 
   useEffect(() => {
     const loadUser = async () => {
