@@ -419,6 +419,11 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud engine not initialized');
       }
 
+      console.log(`📥 Subscribing to stream: ${streamId} from user: ${userId}`);
+
+      // Track remote stream ID for cleanup
+      this.remoteStreamId = streamId;
+
       // startPlayingStream with video element or callback
       const remoteStream = await this.zg.startPlayingStream(streamId, {
         video: true,
@@ -427,7 +432,7 @@ export class ZegoCloudCall {
       
       this.remoteStream = remoteStream;
       
-      console.log(`Subscribed to stream: ${streamId}`);
+      console.log(`✅ Subscribed to stream: ${streamId}`);
       
       // Notify callback
       if (this.onRemoteStream) {
@@ -436,7 +441,7 @@ export class ZegoCloudCall {
       
       return remoteStream;
     } catch (error) {
-      console.error('Failed to subscribe to stream:', error);
+      console.error('❌ Failed to subscribe to stream:', error);
       this.handleError('Stream subscription failed', error);
     }
   }
