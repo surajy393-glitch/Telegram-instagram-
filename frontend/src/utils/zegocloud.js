@@ -105,7 +105,7 @@ export class ZegoCloudCall {
   }
 
   /**
-   * Initialize ZegoCloud engine - CORRECTED SYNTAX FOR WEB SDK v3.21.0+
+   * Initialize ZegoCloud engine - SDK v3.11.0 compatible
    */
   async initializeEngine() {
     try {
@@ -116,47 +116,53 @@ export class ZegoCloudCall {
       console.log('🔧 Initializing ZegoCloud engine...');
       console.log('   AppID:', this.appId);
       console.log('   Mode: Token-only authentication');
+      console.log('   SDK Version: 3.11.0');
       
-      // CORRECT createEngine syntax for Web SDK v3.21.0+
-      // Use profile object instead of deprecated 5-parameter syntax
-      this.zg = ZegoExpressEngine.createEngine({
-        appID: this.appId,                    // appID (number)
-        scenario: ZegoScenario.Communication, // Use Communication for video calls
-        eventHandler: {
-          // Stream management events
-          onRoomStreamUpdate: (roomID, updateType, streamList) => {
-            console.log('roomStreamUpdate:', roomID, updateType, streamList);
-            if (updateType === 'ADD') {
-              this.handleStreamAdd(roomID, streamList);
-            } else if (updateType === 'DELETE') {
-              this.handleStreamDelete(roomID, streamList);
-            }
-          },
-          
-          // User management events
-          onRoomUserUpdate: (roomID, updateType, userList) => {
-            console.log('roomUserUpdate:', roomID, updateType, userList);
-            if (updateType === 'ADD') {
-              this.handleUserAdd(roomID, userList);
-            } else if (updateType === 'DELETE') {
-              this.handleUserDelete(roomID, userList);
-            }
-          },
-          
-          // Room state events
-          onRoomStateUpdate: this.handleRoomStateUpdate
-        }
-      });
+      // Create engine instance for SDK v3.11.0
+      this.zg = new ZegoExpressEngine(this.appId, 'wss://webliveroom-api.zego.im/ws');
+      
+      // Set up event listeners after engine creation
+      this.setupEventListeners();
       
       console.log('✅ ZegoCloud engine initialized successfully');
       console.log('   AppID:', this.appId);
-      console.log('   Scenario: Communication (video calling optimized)');
+      console.log('   WebSocket Server: wss://webliveroom-api.zego.im/ws');
       return true;
     } catch (error) {
       console.error('❌ Failed to initialize ZegoCloud engine:', error);
       this.handleError('Engine initialization failed', error);
       return false;
     }
+  }
+
+  /**
+   * Set up ZegoCloud event listeners
+   */
+  setupEventListeners() {
+    if (!this.zg) return;
+
+    // Stream management events
+    this.zg.on('roomStreamUpdate', (roomID, updateType, streamList) => {
+      console.log('roomStreamUpdate:', roomID, updateType, streamList);
+      if (updateType === 'ADD') {
+        this.handleStreamAdd(roomID, streamList);
+      } else if (updateType === 'DELETE') {
+        this.handleStreamDelete(roomID, streamList);
+      }
+    });
+    
+    // User management events
+    this.zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+      console.log('roomUserUpdate:', roomID, updateType, userList);
+      if (updateType === 'ADD') {
+        this.handleUserAdd(roomID, userList);
+      } else if (updateType === 'DELETE') {
+        this.handleUserDelete(roomID, userList);
+      }
+    });
+    
+    // Room state events
+    this.zg.on('roomStateUpdate', this.handleRoomStateUpdate);
   }
 
   /**
