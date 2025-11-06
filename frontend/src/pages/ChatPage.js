@@ -184,7 +184,11 @@ const ChatPage = () => {
 
   const logCall = async (callData) => {
     try {
+      // Generate unique callId
+      const callId = `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       await httpClient.post('/calls/log', {
+        callId: callId,
         callerId: currentUser.id,
         receiverId: userId,
         callType: callData.callType,
@@ -193,6 +197,8 @@ const ChatPage = () => {
         startedAt: callData.startedAt,
         endedAt: callData.endedAt
       });
+      
+      console.log('✅ Call logged successfully:', callId);
       
       // Refresh call history
       await fetchCallHistory();
