@@ -113,23 +113,39 @@ export class ZegoCloudCall {
         throw new Error('ZegoCloud App ID not configured');
       }
 
+      // Ensure appID is a NUMBER (critical for SDK v3.11.0)
+      const appIdNumber = Number(this.appId);
+      if (!Number.isInteger(appIdNumber) || appIdNumber <= 0) {
+        throw new Error(`Invalid appID: must be a positive integer, got ${this.appId} (type: ${typeof this.appId})`);
+      }
+
+      // Ensure server is a STRING (critical for SDK v3.11.0)
+      const serverString = String('wss://webliveroom-api.zego.im/ws');
+
       console.log('🔧 Initializing ZegoCloud engine...');
-      console.log('   AppID:', this.appId);
+      console.log('   AppID:', appIdNumber, '(type:', typeof appIdNumber, ')');
+      console.log('   Server:', serverString, '(type:', typeof serverString, ')');
       console.log('   Mode: Token-only authentication');
       console.log('   SDK Version: 3.11.0');
       
       // Create engine instance for SDK v3.11.0
-      this.zg = new ZegoExpressEngine(this.appId, 'wss://webliveroom-api.zego.im/ws');
+      // CRITICAL: appID MUST be NUMBER, server MUST be STRING
+      this.zg = new ZegoExpressEngine(appIdNumber, serverString);
       
       // Set up event listeners after engine creation
       this.setupEventListeners();
       
       console.log('✅ ZegoCloud engine initialized successfully');
-      console.log('   AppID:', this.appId);
-      console.log('   WebSocket Server: wss://webliveroom-api.zego.im/ws');
+      console.log('   AppID:', appIdNumber);
+      console.log('   WebSocket Server:', serverString);
       return true;
     } catch (error) {
       console.error('❌ Failed to initialize ZegoCloud engine:', error);
+      console.error('   Error details:', {
+        message: error.message,
+        appId: this.appId,
+        appIdType: typeof this.appId
+      });
       this.handleError('Engine initialization failed', error);
       return false;
     }
