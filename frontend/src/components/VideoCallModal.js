@@ -84,6 +84,25 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
       setConnectionState('waiting');
     }
   }, [localParticipant, remoteParticipants]);
+  
+  // Track when remote user joins
+  useEffect(() => {
+    if (remoteParticipants && remoteParticipants.length > 0) {
+      setRemoteJoined(true);
+    }
+  }, [remoteParticipants]);
+  
+  // Auto-end call when remote user leaves (after they had joined)
+  useEffect(() => {
+    if (remoteJoined && (!remoteParticipants || remoteParticipants.length === 0)) {
+      console.log('🚪 Remote participant left the call. Ending call in 3 seconds...');
+      const timeout = setTimeout(() => {
+        console.log('⏰ Remote participant did not rejoin. Ending call locally.');
+        handleEndCall();
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [remoteJoined, remoteParticipants]);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
