@@ -34,7 +34,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
 
   const { localParticipant, remoteParticipants } = state || {};
   const { VideoView } = components || {};
-  const { toggleCamera, toggleMicrophone, joinRoom, leaveRoom } = actions || {};
+  const { toggleCamera, toggleMicrophone, joinRoom, leaveRoom, endMeeting } = actions || {};
   
   // Derive audio/camera state from SDK (single source of truth)
   const isMicMuted = !localParticipant?.isAudioEnabled;
