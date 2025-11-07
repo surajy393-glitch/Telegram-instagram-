@@ -28,7 +28,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   // Join the room on mount and leave on unmount
   useEffect(() => {
     if (joinRoom) {
-      console.log('🎥 Joining Whereby room...');
+      console.log('🎥 Joining Whereby room...', roomUrl);
       joinRoom();
     }
 
@@ -38,7 +38,18 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         leaveRoom();
       }
     };
-  }, [joinRoom, leaveRoom]);
+  }, [joinRoom, leaveRoom, roomUrl]);
+
+  // Debug logging for Whereby state
+  useEffect(() => {
+    console.log('📹 VideoCallModal State:', {
+      localParticipant: localParticipant ? 'exists' : 'null',
+      localStream: localParticipant?.stream ? 'exists' : 'null',
+      remoteParticipants: remoteParticipants?.length || 0,
+      VideoView: VideoView ? 'exists' : 'null',
+      connectionState
+    });
+  }, [localParticipant, remoteParticipants, VideoView, connectionState]);
 
   // Track call duration
   useEffect(() => {
