@@ -27,14 +27,12 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
 
   // Track call duration
   useEffect(() => {
-    if (!isOpen) return;
-    
     const timer = setInterval(() => {
       setCallDuration((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isOpen]);
+  }, []);
 
   // Update connection state
   useEffect(() => {
