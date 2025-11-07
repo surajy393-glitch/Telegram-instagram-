@@ -5879,8 +5879,9 @@ def serialize_datetime(dt):
 class SendMessageRequest(BaseModel):
     receiverId: str
     content: str
-    type: str = "text"  # text, image, video, audio, file
+    type: str = "text"  # text, image, video, audio, file, call_notification
     mediaUrl: Optional[str] = None
+    metadata: Optional[dict] = None  # For additional data like call info
 
 class MarkReadRequest(BaseModel):
     conversationId: str
