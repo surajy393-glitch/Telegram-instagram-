@@ -420,7 +420,30 @@ const ChatPage = () => {
                 </div>
                 
                 {/* Messages */}
-                {messageGroups[dateKey].map((message) => (
+                {messageGroups[dateKey].map((message) => {
+                  // Special rendering for call_notification messages
+                  if (message.type === 'call_notification') {
+                    return (
+                      <div
+                        key={message.id}
+                        className="flex justify-center mb-4"
+                      >
+                        <div className="bg-pink-50 border border-pink-200 px-4 py-2 rounded-full flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-pink-600" />
+                          <span className="text-sm text-pink-700">
+                            {message.metadata?.callType === 'video' ? '📹' : '📞'} 
+                            {' '}Video Call
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatTimestamp(message.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  // Regular message rendering
+                  return (
                   <div
                     key={message.id}
                     className={`flex flex-col mb-4 ${message.isMine ? 'items-end' : 'items-start'}`}
@@ -454,7 +477,8 @@ const ChatPage = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ))}
           </>
