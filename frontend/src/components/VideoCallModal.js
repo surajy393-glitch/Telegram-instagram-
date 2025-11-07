@@ -23,7 +23,22 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
 
   const { localParticipant, remoteParticipants } = state || {};
   const { VideoView } = components || {};
-  const { toggleCamera, toggleMicrophone } = actions || {};
+  const { toggleCamera, toggleMicrophone, joinRoom, leaveRoom } = actions || {};
+
+  // Join the room on mount and leave on unmount
+  useEffect(() => {
+    if (joinRoom) {
+      console.log('🎥 Joining Whereby room...');
+      joinRoom();
+    }
+
+    return () => {
+      if (leaveRoom) {
+        console.log('🎥 Leaving Whereby room...');
+        leaveRoom();
+      }
+    };
+  }, [joinRoom, leaveRoom]);
 
   // Track call duration
   useEffect(() => {
