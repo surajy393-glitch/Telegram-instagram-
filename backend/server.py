@@ -6139,11 +6139,13 @@ async def get_conversation_messages(
             })
         
         # Mark messages as read (from other user to current user)
+        # BUT don't auto-mark call_notification messages - they should be marked manually when accepted/rejected
         await db.messages.update_many(
             {
                 "conversation_id": conversation_id,
                 "receiver_id": user_id,
-                "status.read": False
+                "status.read": False,
+                "type": {"$ne": "call_notification"}  # Exclude call notifications
             },
             {
                 "$set": {
