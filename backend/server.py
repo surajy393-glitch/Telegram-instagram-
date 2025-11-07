@@ -33,6 +33,7 @@ from Crypto.Cipher import AES
 from urllib.parse import parse_qsl
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import requests
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
