@@ -55,12 +55,34 @@ const ChatPage = () => {
   const fetchMessages = async () => {
     try {
       const response = await httpClient.get(`/messages/conversation/${userId}`);
-      setMessages(response.data.messages || []);
+      const fetchedMessages = response.data.messages || [];
+      setMessages(fetchedMessages);
       setOtherUser(response.data.otherUser);
       
       // Get conversation ID from response
       if (response.data.conversationId) {
         setConversationId(response.data.conversationId);
+      }
+      
+      // Check for incoming call notifications from the other user
+      const latestCallNotification = fetchedMessages
+        .filter(msg => 
+          msg.type === 'call_notification' && 
+          msg.sender_id === userId &&
+          !msg.status?.read
+        )
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+      
+      if (latestCallNotification && latestCallNotification.metadata) {
+        console.log('📞 Incoming call detected:', latestCallNotification);
+        setIncomingCall({
+          messageId: latestCallNotification._id,
+          callType: latestCallNotification.metadata.callType,
+          roomUrl: latestCallNotification.metadata.roomUrl,
+          meetingId: latestCallNotification.metadata.meetingId,
+          caller: response.data.otherUser
+        });
+        setShowIncomingCallModal(true);
       }
       
       setLoading(false);
