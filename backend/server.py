@@ -5886,6 +5886,52 @@ class SendMessageRequest(BaseModel):
 class MarkReadRequest(BaseModel):
     conversationId: str
 
+@api_router.post("/messages/mark-read")
+async def mark_messages_read(
+    request: MarkReadRequest,
+    authorization: str = Header(None)
+):
+    """Mark all messages in a conversation as read for the current user"""
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user.id
+        conversation_id = request.conversationId
+        
+        # Mark messages as read (exclude call_notification messages)
+        result = await db.messages.update_many(
+            {
+                "conversation_id": conversation_id,
+                "receiver_id": user_id,
+                "status.read": False,
+                "type": {"$ne": "call_notification"}
+            },
+            {
+                "$set": {
+                    "status.read": True,
+                    "read_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Reset unread count for this user in conversation
+        await db.conversations.update_one(
+            {"_id": conversation_id},
+            {"$set": {f"unread_count.{user_id}": 0}}
+        )
+        
+        logger.info(f"Marked {result.modified_count} messages as read in conversation {conversation_id}")
+        return {"status": "success", "markedCount": result.modified_count}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error marking messages as read: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/messages/send")
 async def send_message(
     request: SendMessageRequest,
