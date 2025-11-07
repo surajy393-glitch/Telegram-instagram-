@@ -154,13 +154,30 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
 
   const handleEndCall = useCallback(async () => {
     try {
-      // Clean up streams
-      if (localParticipant?.stream) {
-        localParticipant.stream.getTracks().forEach(track => track.stop());
+      console.log('🛑 Ending call...');
+      
+      // If host, end meeting for all participants; else just leave
+      if (endMeeting) {
+        console.log('🛑 Host ending meeting for all participants...');
+        endMeeting();
+      } else {
+        console.log('🚪 Participant leaving room...');
+        if (leaveRoom) {
+          leaveRoom();
+        }
       }
 
-      // Delete the room from Whereby
+      // Clean up local media streams
+      if (localParticipant?.stream) {
+        localParticipant.stream.getTracks().forEach(track => {
+          track.stop();
+          console.log('🔇 Stopped track:', track.kind);
+        });
+      }
+
+      // Delete the room from Whereby backend
       if (meetingId) {
+        console.log('🗑️ Deleting Whereby room:', meetingId);
         await httpClient.delete(`/whereby/delete-room/${meetingId}`);
       }
     } catch (error) {
