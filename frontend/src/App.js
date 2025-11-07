@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { WherebyProvider } from "@whereby.com/browser-sdk/react";
@@ -20,8 +21,128 @@ import PostDetailPage from "@/pages/PostDetailPage";
 import ChatPage from "@/pages/ChatPage";
 import MessagesPage from "@/pages/MessagesPage";
 import TelegramAuthHandler from "@/components/TelegramAuthHandler";
+import IncomingCallModal from "@/components/IncomingCallModal";
+import VideoCallModal from "@/components/VideoCallModal";
 import { Toaster } from "@/components/ui/toaster";
 import { getToken, setToken, httpClient, getUser, setUser as setUserStorage } from "@/utils/authClient";
+
+// Global Call Detection Component
+function GlobalCallHandler({ user }) {
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [showIncomingCallModal, setShowIncomingCallModal] = useState(false);
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [callRoomUrl, setCallRoomUrl] = useState(null);
+  const [callMeetingId, setCallMeetingId] = useState(null);
+  const [otherUser, setOtherUser] = useState(null);
+
+  // Global polling for incoming calls
+  useEffect(() => {
+    if (!user) return;
+
+    const checkIncomingCalls = async () => {
+      try {
+        const response = await httpClient.get('/messages/incoming-calls');
+        const calls = response.data.incomingCalls || [];
+        
+        if (calls.length > 0) {
+          const latestCall = calls[0];
+          console.log('📞 Global incoming call detected:', latestCall);
+          
+          setIncomingCall({
+            messageId: latestCall.messageId,
+            callType: latestCall.callType,
+            roomUrl: latestCall.roomUrl,
+            meetingId: latestCall.meetingId,
+            caller: {
+              id: latestCall.callerId,
+              fullName: latestCall.callerName,
+              username: latestCall.callerUsername,
+              profileImage: latestCall.callerImage
+            },
+            conversationId: latestCall.conversationId
+          });
+          setShowIncomingCallModal(true);
+        }
+      } catch (error) {
+        console.error('Error checking incoming calls:', error);
+      }
+    };
+
+    // Check immediately
+    checkIncomingCalls();
+
+    // Then check every 3 seconds
+    const interval = setInterval(checkIncomingCalls, 3000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const handleAcceptCall = async () => {
+    if (incomingCall) {
+      console.log('✅ Accepting global incoming call');
+      
+      // Mark notification as read
+      try {
+        if (incomingCall.conversationId) {
+          await httpClient.post('/messages/mark-read', { conversationId: incomingCall.conversationId });
+        }
+      } catch (error) {
+        console.error('Error marking call as read:', error);
+      }
+      
+      // Set up call
+      setCallRoomUrl(incomingCall.roomUrl);
+      setCallMeetingId(incomingCall.meetingId);
+      setOtherUser(incomingCall.caller);
+      setIsCallActive(true);
+      setShowIncomingCallModal(false);
+      setIncomingCall(null);
+    }
+  };
+
+  const handleRejectCall = async () => {
+    console.log('❌ Rejecting global incoming call');
+    
+    // Mark notification as read
+    try {
+      if (incomingCall?.conversationId) {
+        await httpClient.post('/messages/mark-read', { conversationId: incomingCall.conversationId });
+      }
+    } catch (error) {
+      console.error('Error marking call as read:', error);
+    }
+    
+    setShowIncomingCallModal(false);
+    setIncomingCall(null);
+  };
+
+  const handleCallEnd = () => {
+    setIsCallActive(false);
+    setCallRoomUrl(null);
+    setCallMeetingId(null);
+    setOtherUser(null);
+  };
+
+  return (
+    <>
+      <IncomingCallModal
+        isOpen={showIncomingCallModal}
+        callType={incomingCall?.callType}
+        callerUser={incomingCall?.caller}
+        onAccept={handleAcceptCall}
+        onReject={handleRejectCall}
+      />
+      
+      <VideoCallModal
+        isOpen={isCallActive}
+        roomUrl={callRoomUrl}
+        onClose={handleCallEnd}
+        otherUser={otherUser}
+        meetingId={callMeetingId}
+      />
+    </>
+  );
+}
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
