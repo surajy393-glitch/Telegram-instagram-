@@ -502,6 +502,15 @@ const ChatPage = () => {
         </div>
       </div>
 
+      {/* Incoming Call Modal */}
+      <IncomingCallModal
+        isOpen={showIncomingCallModal}
+        callType={incomingCall?.callType}
+        callerUser={incomingCall?.caller}
+        onAccept={handleAcceptIncomingCall}
+        onReject={handleRejectIncomingCall}
+      />
+
       {/* Video Call Modal */}
       <VideoCallModal
         isOpen={isCallActive}
