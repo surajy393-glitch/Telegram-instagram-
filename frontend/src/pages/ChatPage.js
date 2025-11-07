@@ -304,44 +304,11 @@ const ChatPage = () => {
         // Continue with call even if signal fails
       }
       
-      // Create ZegoCloud call instance - falls back to guest ID if needed
-      console.log('🎥 Creating ZegoCloudCall with userId:', currentUser.id, 'remoteUserId:', userId);
-      const call = new ZegoCloudCall(currentUser.id, userId, type);
-      setCurrentCall(call);
+      // TODO: Implement Whereby video calling
+      console.log('🎥 Starting call with userId:', currentUser.id, 'remoteUserId:', userId);
       
-      // Set up call callbacks
-      call.setCallbacks({
-        onRemoteStream: (stream, userId) => {
-          console.log('Remote stream received:', stream);
-          setRemoteStream(stream);
-        },
-        onCallEnd: () => {
-          handleCallEnd();
-        },
-        onError: (message, error) => {
-          console.error('Call error:', message, error);
-          alert(`Call error: ${message}`);
-          handleCallEnd();
-        },
-        onIncomingCall: (user) => {
-          console.log('Incoming call from:', user);
-        }
-      });
-      
-      // Start the call
-      const callStartTime = new Date().toISOString();
-      const success = await call.startCall();
-      
-      if (success) {
-        setLocalStream(call.localStream);
-        setIsVideoEnabled(type === 'video');
-        setIsAudioEnabled(true);
-        
-        // Don't log 'started' status - only log when call ends
-        console.log('✅ Call started successfully');
-      } else {
-        throw new Error('Failed to start call');
-      }
+      // Placeholder for Whereby implementation
+      alert('Video calling feature is being migrated to Whereby. Coming soon!');
     } catch (error) {
       console.error('Error starting call:', error);
       alert('Failed to start call. Please check your camera/microphone permissions.');
