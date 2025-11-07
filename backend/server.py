@@ -6571,7 +6571,7 @@ async def get_incoming_calls(authorization: str = Header(None)):
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
         
-        user_id = current_user["id"]
+        user_id = current_user.id
         
         # Find all unread call_notification messages where current user is the receiver
         incoming_calls = await db.messages.find({
