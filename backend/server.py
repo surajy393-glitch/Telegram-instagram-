@@ -6378,68 +6378,6 @@ async def conversation_action(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@api_router.post("/zego/token")
-async def generate_zego_token(
-    request: ZegoTokenRequest,
-    authorization: str = Header(None)
-):
-    """Generate ZegoCloud Token04 for video calling"""
-    try:
-        # Authenticate user
-        current_user = await get_current_user(authorization)
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-        
-        # Get ZegoCloud credentials from environment
-        app_id = os.getenv("ZEGO_APP_ID")
-        server_secret = os.getenv("ZEGO_SERVER_SECRET")
-        
-        if not app_id or not server_secret:
-            raise HTTPException(status_code=500, detail="ZegoCloud credentials not configured")
-        
-        # Token generation parameters
-        user_id = request.userId
-        room_id = request.roomId
-        effective_time_in_seconds = 3600  # 1 hour TTL
-        
-        # Create payload with room_id and privileges
-        payload_data = {
-            "room_id": room_id,
-            "privilege": {
-                1: 1,  # PrivilegeKeyLogin: PrivilegeEnable
-                2: 1   # PrivilegeKeyPublish: PrivilegeEnable
-            },
-            "stream_id_list": []
-        }
-        payload = json.dumps(payload_data)
-        
-        # Generate ZegoCloud Token04 using official algorithm
-        token = generate_zegocloud_token04(
-            int(app_id),
-            user_id,
-            server_secret,
-            effective_time_in_seconds,
-            payload
-        )
-        
-        logger.info(f"Generated ZegoCloud Token04 for user {user_id} in room {room_id}")
-        
-        return {
-            "success": True,
-            "token": token,
-            "appId": int(app_id),
-            "userId": user_id,
-            "roomId": room_id,
-            "ttl": effective_time_in_seconds,
-            "expiresAt": int(time.time()) + effective_time_in_seconds
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error generating ZegoCloud token: {e}")
-        raise HTTPException(status_code=500, detail="Failed to generate token")
-
 
 # Include the router in the main app
 app.include_router(api_router)
