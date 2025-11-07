@@ -7,6 +7,7 @@ import { httpClient } from '../utils/authClient';
 const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   const [callDuration, setCallDuration] = useState(0);
   const [connectionState, setConnectionState] = useState('connecting');
+  const [remoteJoined, setRemoteJoined] = useState(false);
 
   // Connect to Whereby room
   const { state, actions, components } = useRoomConnection(
