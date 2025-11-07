@@ -57,7 +57,7 @@ async def link_account(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"🔗 *Link Your Webapp Account*\n\n"
         f"Your link code: `{link_code}`\n\n"
-        f"1. Go to https://luvhive-chat-2.preview.emergentagent.com\n"
+        f"1. Go to https://callsignal-debug-1.preview.emergentagent.com\n"
         f"2. Login to your account\n"
         f"3. Go to Profile page\n"
         f"4. Enter this code to link your Telegram account\n\n"
@@ -157,7 +157,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🎭 *Welcome to LuvHive Bot!*\n\n"
         "Your anonymous dating & social companion\n\n"
-        "🌐 *Webapp:* https://luvhive-chat-2.preview.emergentagent.com\n\n"
+        "🌐 *Webapp:* https://callsignal-debug-1.preview.emergentagent.com\n\n"
         "📋 *Commands:*\n"
         "/link - Link your webapp account\n"
         "/premium - Upgrade to premium\n"

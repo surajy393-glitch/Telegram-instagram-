@@ -61,7 +61,7 @@ All sensitive keys are stored in `/app/backend/.env` (not in git):
 ✅ Authentication flow complete
 
 ## Preview URL
-https://luvhive-chat-2.preview.emergentagent.com
+https://callsignal-debug-1.preview.emergentagent.com
 
 ## Notes
 - All API keys are stored securely in .env files
