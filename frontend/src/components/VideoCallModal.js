@@ -9,13 +9,16 @@ const VideoCallModal = ({ isOpen, roomUrl, onClose, otherUser, meetingId }) => {
   const [callDuration, setCallDuration] = useState(0);
   const [connectionState, setConnectionState] = useState('connecting');
 
-  // Connect to Whereby room
-  const { state, actions, components } = useRoomConnection(roomUrl, {
-    localMediaOptions: {
-      audio: true,
-      video: true,
-    },
-  });
+  // Only connect to Whereby room if we have a valid URL
+  const { state, actions, components } = useRoomConnection(
+    roomUrl && isOpen ? roomUrl : '',
+    {
+      localMediaOptions: {
+        audio: true,
+        video: true,
+      },
+    }
+  );
 
   const { localParticipant, remoteParticipants } = state || {};
   const { VideoView } = components || {};
