@@ -105,6 +105,21 @@
 user_problem_statement: "Implement comprehensive messaging system for LuvHive. Add Messages button in navigation (between Search and Notifications), create inbox/conversation list page, create 1-on-1 chat page with real-time messaging, and add Message button on user profiles. All messaging features should be free for testing purposes."
 
 backend:
+  - task: "Whereby Video Calling Integration"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Whereby video calling endpoint implemented at POST /api/whereby/create-room. Accepts participantUserId and callType in request body. Creates temporary Whereby rooms with 24-hour expiration. Returns roomUrl, meetingId, and hostRoomUrl. Saves call records to MongoDB video_calls collection."
+      - working: true
+        agent: "testing"
+        comment: "✅ WHEREBY VIDEO CALLING TESTING COMPLETE - 100% SUCCESS RATE (7/7 tests passed). COMPREHENSIVE TEST RESULTS: 1) ✅ Room Creation - Successfully created Whereby video room with valid meeting ID and room URL (https://luvhive.whereby.com/...), 2) ✅ Response Structure - All required fields present (roomUrl, meetingId, hostRoomUrl), 3) ✅ Database Persistence - Call records correctly saved to video_calls collection with all required fields (callId, callerId, receiverId, roomUrl, callType, status, createdAt, endDate), 4) ✅ Authentication - Endpoint correctly requires Bearer token authentication (401 for unauthenticated requests), 5) ✅ Validation - Missing participantUserId correctly rejected with 422 status, 6) ✅ Call Type Handling - Endpoint accepts any callType value (no strict validation). BUGS FIXED DURING TESTING: Fixed 'User object is not subscriptable' error (changed current_user['id'] to current_user.id), Fixed 'endDate is invalid' error (updated date format to Whereby-compatible ISO 8601), Fixed 'roomNamePrefix is too long' error (shortened prefix using MD5 hash). Whereby API integration is production-ready and fully functional."
+
   - task: "Messaging System - Backend API Endpoints"
     implemented: true
     working: "NA"
