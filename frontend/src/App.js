@@ -18,11 +18,9 @@ import SearchPage from "@/pages/SearchPage";
 import PostDetailPage from "@/pages/PostDetailPage";
 import ChatPage from "@/pages/ChatPage";
 import MessagesPage from "@/pages/MessagesPage";
-import TestZegoPage from "@/pages/TestZegoPage";
 import TelegramAuthHandler from "@/components/TelegramAuthHandler";
 import { Toaster } from "@/components/ui/toaster";
 import { getToken, setToken, httpClient, getUser, setUser as setUserStorage } from "@/utils/authClient";
-import { destroyZegoEngine } from "@/utils/zegocloud";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
