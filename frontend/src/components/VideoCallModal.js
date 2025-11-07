@@ -94,12 +94,12 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         .then(() => {
           if (cancelled) return;
           console.log('✅ Room joined successfully');
-          // Ensure camera and microphone are enabled after joining if needed
-          if (typeof toggleCamera === 'function' && localParticipant && !localParticipant.isVideoEnabled) {
+          // Camera/mic ko sirf ek baar enable karein
+          if (typeof toggleCamera === 'function') {
             console.log('Enabling camera...');
             toggleCamera(true);
           }
-          if (typeof toggleMicrophone === 'function' && localParticipant && !localParticipant.isAudioEnabled) {
+          if (typeof toggleMicrophone === 'function') {
             console.log('Enabling microphone...');
             toggleMicrophone(true);
           }
@@ -115,8 +115,8 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         leaveRoom();
       }
     };
-    // Note: including toggleCamera, toggleMicrophone, and localParticipant satisfies the exhaustive-deps rule.
-  }, [joinRoom, leaveRoom, roomUrl, toggleCamera, toggleMicrophone, localParticipant]);
+    // Dependency array chhota rakha warna loop banega - sirf join/leave/roomUrl chahiye
+  }, [joinRoom, leaveRoom, roomUrl]);
 
   // Automatically end the call when kicked/left/rejected
   useEffect(() => {
