@@ -49,12 +49,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   const isMicMuted = !localParticipant?.isAudioEnabled;
   const isCameraOff = !localParticipant?.isVideoEnabled;
 
-  /**
-   * Cleanly end the call. If the current participant has host privileges then
-   * use the `endMeeting` action which closes the room for everyone. If not,
-   * fall back to leaving the room normally. Local media tracks are always
-   * stopped and the associated Whereby room is deleted via the backend.
-   */
+  // Cleanly end the call
   const handleEndCall = useCallback(async () => {
     try {
       console.log('Ending call...');
@@ -66,7 +61,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         console.log('Participant leaving room...');
         leaveRoom();
       }
-
       // Clean up local media streams
       if (localParticipant?.stream) {
         localParticipant.stream.getTracks().forEach((track) => {
@@ -74,7 +68,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
           console.log('Stopped track:', track.kind);
         });
       }
-
       // Delete the room from Whereby backend
       if (meetingId) {
         console.log('Deleting Whereby room:', meetingId);
@@ -92,12 +85,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     }
   }, [endMeeting, leaveRoom, localParticipant, meetingId, onClose]);
 
-  /**
-   * Join the Whereby room on mount. When the hook provides the joinRoom
-   * function it should be invoked to establish the connection. After joining
-   * we explicitly enable the camera and microphone if they are disabled. A
-   * cleanup function is returned to leave the room on unmount.
-   */
+  // Join the Whereby room on mount
   useEffect(() => {
     let cancelled = false;
     if (typeof joinRoom === 'function') {
@@ -127,19 +115,10 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         leaveRoom();
       }
     };
-    // We intentionally omit dependencies on toggleCamera/toggleMicrophone because
-    // they may be undefined on first render. Only joinRoom/leaveRoom/roomUrl should trigger re-run.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [joinRoom, leaveRoom, roomUrl]);
+    // Note: including toggleCamera, toggleMicrophone, and localParticipant satisfies the exhaustive-deps rule.
+  }, [joinRoom, leaveRoom, roomUrl, toggleCamera, toggleMicrophone, localParticipant]);
 
-  /**
-   * When the connectionStatus indicates that the participant has been kicked
-   * (which happens when the host ends the meeting for all participants) or
-   * explicitly left the room, automatically trigger handleEndCall. Without
-   * monitoring this status the remote participant would remain in the call
-   * indefinitely because the `remoteParticipants` array can sometimes persist
-   * stale references even after the host has gone.
-   */
+  // Automatically end the call when kicked/left/rejected
   useEffect(() => {
     if (connectionStatus === 'kicked' || connectionStatus === 'left' || connectionStatus === 'knock_rejected') {
       console.log(`Connection status '${connectionStatus}' detected. Ending call.`);
@@ -147,7 +126,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     }
   }, [connectionStatus, handleEndCall]);
 
-  // Monitor for Whereby connection errors and retry automatically
+  // Monitor for connection errors and retry
   useEffect(() => {
     if (state?.error && typeof joinRoom === 'function') {
       console.log('⚠️ Whereby connection error detected:', state.error);
@@ -160,7 +139,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     }
   }, [state?.error, joinRoom]);
 
-  // Debug logging for Whereby state
+  // Debug logging
   useEffect(() => {
     console.log('VideoCallModal State:', {
       localParticipant: localParticipant ? 'exists' : 'null',
@@ -180,7 +159,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Update connection state based on availability of streams
+  // Update connection state
   useEffect(() => {
     if (localParticipant?.stream && remoteParticipants?.length > 0) {
       setConnectionState('connected');
@@ -215,7 +194,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Click handlers for toggling mic/camera
+  // Click handlers
   const handleToggleMic = useCallback(() => {
     if (typeof toggleMicrophone === 'function') {
       toggleMicrophone();
@@ -254,11 +233,9 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         </button>
       </div>
 
-      {/* Video Grid */}
+      {/* Video grid */}
       <div className="flex-1 relative bg-black">
-        {/* Remote Video (Full Screen) or Local Video While Waiting */}
         {remoteParticipants?.length > 0 && remoteParticipants[0]?.stream ? (
-          /* Remote participant joined - show their video */
           <div className="absolute inset-0">
             {VideoView && (
               <VideoView
@@ -270,17 +247,15 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
             )}
           </div>
         ) : localParticipant?.stream && VideoView ? (
-          /* No remote participant - show own video in main area */
           <div className="absolute inset-0">
             <VideoView
               stream={localParticipant.stream}
               muted
-              mirror={true}
+              mirror
               autoPlay
               playsInline
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
-            {/* Overlay message */}
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
               <div className="text-center text-white">
                 <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto animate-pulse">
@@ -291,7 +266,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
             </div>
           </div>
         ) : (
-          /* No video streams yet - show loading state */
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-pink-900 to-purple-900">
             <div className="text-center text-white">
               {connectionState === 'connecting' && (
@@ -319,7 +293,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
               <VideoView
                 stream={localParticipant.stream}
                 muted
-                mirror={true}
+                mirror
                 autoPlay
                 playsInline
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -337,7 +311,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
       {/* Controls */}
       <div className="bg-gray-900 p-6">
         <div className="flex items-center justify-center gap-4">
-          {/* Mute/Unmute */}
           <button
             onClick={handleToggleMic}
             className={`w-14 h-14 rounded-full flex items-center justify-center transition ${
@@ -346,8 +319,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
           >
             {isMicMuted ? <MicOff className="w-6 h-6 text-white" /> : <Mic className="w-6 h-6 text-white" />}
           </button>
-
-          {/* Camera On/Off */}
           <button
             onClick={handleToggleCamera}
             className={`w-14 h-14 rounded-full flex items-center justify-center transition ${
@@ -356,8 +327,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
           >
             {isCameraOff ? <VideoOff className="w-6 h-6 text-white" /> : <VideoIcon className="w-6 h-6 text-white" />}
           </button>
-
-          {/* End Call */}
           <button
             onClick={handleEndCall}
             className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition shadow-lg"
@@ -370,9 +339,8 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   );
 };
 
-// Wrapper component that handles conditional rendering
+// Wrapper component
 const VideoCallModal = ({ isOpen, roomUrl, onClose, otherUser, meetingId }) => {
-  // Don't render anything if modal is not open or no valid room URL
   if (!isOpen || !roomUrl) {
     return null;
   }
