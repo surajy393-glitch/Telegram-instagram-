@@ -118,6 +118,23 @@ const ChatPage = () => {
       setCallMeetingId(response.data.meetingId);
       setIsCallActive(true);
 
+      // Send a message to notify the other user
+      try {
+        await httpClient.post('/messages/send', {
+          receiverId: userId,
+          content: `📞 Voice Call: ${response.data.roomUrl}`,
+          type: 'call_notification',
+          metadata: {
+            callType: 'audio',
+            roomUrl: response.data.roomUrl,
+            meetingId: response.data.meetingId
+          }
+        });
+        console.log('✅ Call notification sent to user');
+      } catch (notifError) {
+        console.error('Failed to send call notification:', notifError);
+      }
+
     } catch (error) {
       console.error('Error starting call:', error);
       alert('Failed to start voice call. Please try again.');
