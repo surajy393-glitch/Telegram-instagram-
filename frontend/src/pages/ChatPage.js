@@ -591,7 +591,7 @@ const ChatPage = () => {
           <div className="flex justify-center items-center h-full">
             <div className="inline-block w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : messages.length === 0 && callHistory.length === 0 ? (
+        ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center mb-4">
               <Send className="w-10 h-10 text-pink-600" />
