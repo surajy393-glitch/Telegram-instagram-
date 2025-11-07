@@ -118,19 +118,20 @@ const ChatPage = () => {
 
       console.log('Room created:', response.data);
       
-      setCallRoomUrl(response.data.roomUrl);
+      // Call initiator uses hostRoomUrl for host privileges, receiver gets roomUrl
+      setCallRoomUrl(response.data.hostRoomUrl || response.data.roomUrl);
       setCallMeetingId(response.data.meetingId);
       setIsCallActive(true);
 
-      // Send a message to notify the other user
+      // Send a message to notify the other user (they get regular roomUrl)
       try {
         await httpClient.post('/messages/send', {
           receiverId: userId,
-          content: `📹 Video Call: ${response.data.roomUrl}`,
+          content: `📹 Video Call`,
           type: 'call_notification',
           metadata: {
             callType: 'video',
-            roomUrl: response.data.roomUrl,
+            roomUrl: response.data.roomUrl, // Receiver gets regular roomUrl
             meetingId: response.data.meetingId
           }
         });
