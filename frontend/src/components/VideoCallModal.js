@@ -4,16 +4,17 @@ import { X, Mic, MicOff, Video as VideoIcon, VideoOff, PhoneOff } from 'lucide-r
 import { httpClient } from '../utils/authClient';
 
 const VideoCallModal = ({ isOpen, roomUrl, onClose, otherUser, meetingId }) => {
+  // Early return if not open or no valid URL to prevent hook errors
+  if (!isOpen || !roomUrl) return null;
+
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [connectionState, setConnectionState] = useState('connecting');
 
   // Only connect to Whereby room if we have a valid URL
-  // Pass null instead of empty string to prevent Invalid URL error
-  const shouldConnect = isOpen && roomUrl && roomUrl.trim().length > 0;
   const { state, actions, components } = useRoomConnection(
-    shouldConnect ? roomUrl : null,
+    roomUrl,
     {
       localMediaOptions: {
         audio: true,
