@@ -6532,7 +6532,8 @@ async def create_whereby_room(
             "endDate": end_date,
             "roomNamePrefix": room_name_prefix,
             "fields": ["hostRoomUrl"],
-            "roomMode": "normal"  # Use normal mode for 1-on-1 calls
+            "roomMode": "normal",  # Use normal mode for 1-on-1 calls
+            "isLocked": False  # Critical: Allow participants to join automatically
         }
         
         # Make request to Whereby API
