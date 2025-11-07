@@ -94,16 +94,16 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   const handleToggleMic = useCallback(() => {
     if (toggleMicrophone) {
       toggleMicrophone();
-      setIsMicMuted(!isMicMuted);
+      // SDK state updates automatically - no need for local state
     }
-  }, [isMicMuted, toggleMicrophone]);
+  }, [toggleMicrophone]);
 
   const handleToggleCamera = useCallback(() => {
     if (toggleCamera) {
       toggleCamera();
-      setIsCameraOff(!isCameraOff);
+      // SDK state updates automatically - no need for local state
     }
-  }, [isCameraOff, toggleCamera]);
+  }, [toggleCamera]);
 
   const handleEndCall = useCallback(async () => {
     try {
