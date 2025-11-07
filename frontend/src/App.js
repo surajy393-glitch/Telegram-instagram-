@@ -152,9 +152,10 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
+    <WherebyProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
           {/* Telegram WebApp Auth Route */}
           <Route 
             path="/telegram-auth" 
