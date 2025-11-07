@@ -219,4 +219,21 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   );
 };
 
+// Wrapper component that handles conditional rendering
+const VideoCallModal = ({ isOpen, roomUrl, onClose, otherUser, meetingId }) => {
+  // Don't render anything if modal is not open or no valid room URL
+  if (!isOpen || !roomUrl) {
+    return null;
+  }
+
+  return (
+    <VideoCallContent
+      roomUrl={roomUrl}
+      onClose={onClose}
+      otherUser={otherUser}
+      meetingId={meetingId}
+    />
+  );
+};
+
 export default VideoCallModal;
