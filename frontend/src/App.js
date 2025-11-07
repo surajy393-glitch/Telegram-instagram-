@@ -286,10 +286,6 @@ function App() {
             } 
           />
           <Route 
-            path="/test-zego" 
-            element={<TestZegoPage />} 
-          />
-          <Route 
             path="/post/:postId" 
             element={
               isAuthenticated ? (
