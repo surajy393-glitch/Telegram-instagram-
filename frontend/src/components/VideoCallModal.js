@@ -3,16 +3,14 @@ import { useRoomConnection } from '@whereby.com/browser-sdk/react';
 import { X, Mic, MicOff, Video as VideoIcon, VideoOff, PhoneOff } from 'lucide-react';
 import { httpClient } from '../utils/authClient';
 
-const VideoCallModal = ({ isOpen, roomUrl, onClose, otherUser, meetingId }) => {
-  // Early return if not open or no valid URL to prevent hook errors
-  if (!isOpen || !roomUrl) return null;
-
+// Internal component that uses the Whereby hook
+const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [connectionState, setConnectionState] = useState('connecting');
 
-  // Only connect to Whereby room if we have a valid URL
+  // Connect to Whereby room
   const { state, actions, components } = useRoomConnection(
     roomUrl,
     {
