@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { httpClient, getUser } from '../utils/authClient';
 import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X, Phone, Video } from 'lucide-react';
 import VideoCallModal from '../components/VideoCallModal';
+import IncomingCallModal from '../components/IncomingCallModal';
 
 const ChatPage = () => {
   const { userId } = useParams();
