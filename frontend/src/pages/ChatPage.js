@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { httpClient, getUser } from '../utils/authClient';
-import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X } from 'lucide-react';
+import { ArrowLeft, Send, Image as ImageIcon, Smile, Check, X, Phone, Video } from 'lucide-react';
+import VideoCallModal from '../components/VideoCallModal';
 
 const ChatPage = () => {
   const { userId } = useParams();
