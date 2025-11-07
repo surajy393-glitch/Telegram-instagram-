@@ -5975,7 +5975,7 @@ async def send_message(
             {"_id": conversation_id},
             {
                 "$set": {
-                    "last_message": request.content if request.type == "text" else f"Sent a {request.type}",
+                    "last_message": request.content if request.type in ["text", "call_notification"] else f"Sent a {request.type}",
                     "last_message_at": datetime.now(timezone.utc)
                 },
                 "$inc": {f"unread_count.{receiver_id}": 1},
