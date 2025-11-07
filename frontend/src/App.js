@@ -330,8 +330,8 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster />
+      </WherebyProvider>
     </div>
-    </WherebyProvider>
   );
 }
 
