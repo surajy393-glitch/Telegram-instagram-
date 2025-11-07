@@ -175,6 +175,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
             <VideoView
               stream={localParticipant.stream}
               muted
+              mirror={true}
               style={{
                 width: '100%',
                 height: '100%',
