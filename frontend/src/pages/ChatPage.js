@@ -20,21 +20,12 @@ const ChatPage = () => {
 
   useEffect(() => {
     fetchMessages();
-    fetchCallHistory();
     
     // Poll for new messages every 3 seconds
     const messageInterval = setInterval(fetchMessages, 3000);
     
-    // Poll for incoming calls every 2 seconds
-    const callInterval = setInterval(checkForIncomingCalls, 2000);
-    
     return () => {
       clearInterval(messageInterval);
-      clearInterval(callInterval);
-      // Cleanup call if active
-      if (currentCall) {
-        currentCall.endCall();
-      }
     };
   }, [userId]);
 
