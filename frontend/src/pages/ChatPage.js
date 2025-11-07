@@ -80,12 +80,22 @@ const ChatPage = () => {
       setCallMeetingId(response.data.meetingId);
       setIsCallActive(true);
 
-      // Optionally: Send a message to notify the other user
-      // await httpClient.post('/messages/send', {
-      //   receiverId: userId,
-      //   content: 'Started a video call',
-      //   type: 'call_notification'
-      // });
+      // Send a message to notify the other user
+      try {
+        await httpClient.post('/messages/send', {
+          receiverId: userId,
+          content: `📹 Video Call: ${response.data.roomUrl}`,
+          type: 'call_notification',
+          metadata: {
+            callType: 'video',
+            roomUrl: response.data.roomUrl,
+            meetingId: response.data.meetingId
+          }
+        });
+        console.log('✅ Call notification sent to user');
+      } catch (notifError) {
+        console.error('Failed to send call notification:', notifError);
+      }
 
     } catch (error) {
       console.error('Error starting call:', error);
