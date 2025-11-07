@@ -751,29 +751,6 @@ const ChatPage = () => {
           </form>
         </div>
       </div>
-
-      {/* Call Modal */}
-      <CallModal
-        isOpen={isCallActive}
-        callType={callType}
-        localStream={localStream}
-        remoteStream={remoteStream}
-        onEndCall={handleCallEnd}
-        onToggleAudio={toggleAudio}
-        onToggleVideo={toggleVideo}
-        otherUser={otherUser}
-        isAudioEnabled={isAudioEnabled}
-        isVideoEnabled={isVideoEnabled}
-      />
-
-      {/* Incoming Call Modal */}
-      <IncomingCallModal
-        isOpen={!!incomingCall}
-        callType={incomingCall?.callType}
-        callerUser={incomingCall?.callerUser}
-        onAccept={handleAcceptIncomingCall}
-        onReject={handleRejectIncomingCall}
-      />
     </div>
   );
 };
