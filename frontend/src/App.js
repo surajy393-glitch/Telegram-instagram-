@@ -331,6 +331,7 @@ function App() {
       </BrowserRouter>
       <Toaster />
     </div>
+    </WherebyProvider>
   );
 }
 
