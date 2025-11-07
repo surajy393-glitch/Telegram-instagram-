@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { WherebyProvider } from "@whereby.com/browser-sdk/react";
 import LandingPage from "@/pages/LandingPage";
 import DatingRegisterPage from "@/pages/DatingRegisterPage";
 import LoginPage from "@/pages/LoginPage";
