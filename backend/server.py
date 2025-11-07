@@ -6560,6 +6560,54 @@ async def delete_whereby_room(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.get("/messages/incoming-calls")
+async def get_incoming_calls(authorization: str = Header(None)):
+    """
+    Get all unread incoming call notifications for the current user across all conversations
+    """
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user["id"]
+        
+        # Find all unread call_notification messages where current user is the receiver
+        incoming_calls = await db.messages.find({
+            "receiver_id": user_id,
+            "type": "call_notification",
+            "status.read": False
+        }).sort("created_at", -1).to_list(length=10)
+        
+        # Format response with caller information
+        formatted_calls = []
+        for call in incoming_calls:
+            # Get caller info
+            caller = await db.users.find_one({"id": call["sender_id"]})
+            
+            formatted_calls.append({
+                "messageId": call["_id"],
+                "callerId": call["sender_id"],
+                "callerName": caller.get("fullName", "Unknown") if caller else "Unknown",
+                "callerUsername": caller.get("username", "unknown") if caller else "unknown",
+                "callerImage": caller.get("profileImage") if caller else None,
+                "callType": call.get("metadata", {}).get("callType", "video"),
+                "roomUrl": call.get("metadata", {}).get("roomUrl"),
+                "meetingId": call.get("metadata", {}).get("meetingId"),
+                "createdAt": call.get("created_at").isoformat() if call.get("created_at") else None,
+                "conversationId": call.get("conversation_id")
+            })
+        
+        return {"incomingCalls": formatted_calls}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching incoming calls: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/whereby/call-history/{user_id}")
 async def get_call_history(
     user_id: str,
