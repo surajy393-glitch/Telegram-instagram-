@@ -44,7 +44,22 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   useEffect(() => {
     if (joinRoom) {
       console.log('🎥 Joining Whereby room...', roomUrl);
-      joinRoom();
+      joinRoom()
+        .then(() => {
+          console.log('✅ Room joined successfully');
+          // Explicitly enable camera and microphone after joining
+          if (toggleCamera) {
+            console.log('📹 Enabling camera...');
+            toggleCamera(true);
+          }
+          if (toggleMicrophone) {
+            console.log('🎤 Enabling microphone...');
+            toggleMicrophone(true);
+          }
+        })
+        .catch(err => {
+          console.error('❌ Error joining room:', err);
+        });
     }
 
     return () => {
@@ -53,7 +68,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         leaveRoom();
       }
     };
-  }, [joinRoom, leaveRoom, roomUrl]);
+  }, [joinRoom, leaveRoom, toggleCamera, toggleMicrophone, roomUrl]);
 
   // Monitor for Whereby connection errors and retry automatically
   useEffect(() => {
