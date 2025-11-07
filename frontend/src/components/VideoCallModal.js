@@ -8,6 +8,17 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   const [callDuration, setCallDuration] = useState(0);
   const [connectionState, setConnectionState] = useState('connecting');
   const [remoteJoined, setRemoteJoined] = useState(false);
+  
+  // Parse roomKey from URL (critical for host rights)
+  let parsedRoomKey;
+  try {
+    const urlObj = new URL(roomUrl);
+    parsedRoomKey = urlObj.searchParams.get('roomKey') || undefined;
+  } catch {
+    parsedRoomKey = undefined;
+  }
+  
+  console.log('🔑 Parsed roomKey:', parsedRoomKey ? 'exists' : 'none');
 
   // Connect to Whereby room
   const { state, actions, components } = useRoomConnection(
@@ -17,6 +28,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
         audio: true,
         video: true,
       },
+      roomKey: parsedRoomKey,  // Critical: Pass roomKey for host rights
     }
   );
 
