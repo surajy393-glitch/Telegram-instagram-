@@ -6420,7 +6420,7 @@ async def create_whereby_room(
         end_date = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat() + "Z"
         
         # Create unique room name
-        room_name_prefix = f"luvhive-{current_user['id']}-{request.participantUserId}"
+        room_name_prefix = f"luvhive-{current_user.id}-{request.participantUserId}"
         
         # Prepare Whereby API request
         headers = {
@@ -6436,7 +6436,7 @@ async def create_whereby_room(
         }
         
         # Make request to Whereby API
-        logger.info(f"Creating Whereby room for users {current_user['id']} and {request.participantUserId}")
+        logger.info(f"Creating Whereby room for users {current_user.id} and {request.participantUserId}")
         response = requests.post(
             WHEREBY_API_URL,
             headers=headers,
