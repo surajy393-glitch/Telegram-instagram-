@@ -10,8 +10,10 @@ const VideoCallModal = ({ isOpen, roomUrl, onClose, otherUser, meetingId }) => {
   const [connectionState, setConnectionState] = useState('connecting');
 
   // Only connect to Whereby room if we have a valid URL
+  // Pass null instead of empty string to prevent Invalid URL error
+  const shouldConnect = isOpen && roomUrl && roomUrl.trim().length > 0;
   const { state, actions, components } = useRoomConnection(
-    roomUrl && isOpen ? roomUrl : '',
+    shouldConnect ? roomUrl : null,
     {
       localMediaOptions: {
         audio: true,
