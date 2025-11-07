@@ -19,6 +19,11 @@ const ChatPage = () => {
   const prevMessageCount = useRef(0);
   const currentUser = getUser();
 
+  // Video call state
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [callRoomUrl, setCallRoomUrl] = useState(null);
+  const [callMeetingId, setCallMeetingId] = useState(null);
+
   useEffect(() => {
     fetchMessages();
     
