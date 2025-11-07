@@ -394,7 +394,7 @@ The bot runs these automated jobs:
 ## 🤝 Integration with Web App (LuvHive)
 
 Your Telegram bot can integrate with your web app at:
-`https://whereby-chat.preview.emergentagent.com`
+`https://whereby-calls.preview.emergentagent.com`
 
 ### Integration Points:
 1. **User Linking:** Link Telegram account to web app
