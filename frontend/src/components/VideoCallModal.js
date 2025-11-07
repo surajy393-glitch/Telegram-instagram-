@@ -193,6 +193,8 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
             {VideoView && (
               <VideoView
                 stream={remoteParticipants[0].stream}
+                autoPlay
+                playsInline
                 style={{
                   width: '100%',
                   height: '100%',
