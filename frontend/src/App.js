@@ -81,24 +81,36 @@ function GlobalCallHandler({ user }) {
     if (incomingCall) {
       console.log('✅ Accepting global incoming call');
       
+      // Save call details before clearing state
+      const callDetails = {
+        roomUrl: incomingCall.roomUrl,
+        meetingId: incomingCall.meetingId,
+        caller: incomingCall.caller,
+        conversationId: incomingCall.conversationId
+      };
+      
       // Mark notification as read
       try {
-        if (incomingCall.conversationId) {
-          await httpClient.post('/messages/mark-read', { conversationId: incomingCall.conversationId });
+        if (callDetails.conversationId) {
+          await httpClient.post('/messages/mark-read', { conversationId: callDetails.conversationId });
         }
       } catch (error) {
         console.error('Error marking call as read:', error);
       }
       
-      // Close incoming modal FIRST, then open call (prevents z-index conflict)
+      // Close incoming modal FIRST (prevents z-index conflict)
       setShowIncomingCallModal(false);
       setIncomingCall(null);
       
-      // Then set up call
-      setCallRoomUrl(incomingCall.roomUrl);
-      setCallMeetingId(incomingCall.meetingId);
-      setOtherUser(incomingCall.caller);
-      setIsCallActive(true);
+      // Wait 1.5 seconds for caller to claim room with hostRoomUrl before receiver joins
+      console.log('⏳ Waiting 1.5s for caller to claim room...');
+      setTimeout(() => {
+        console.log('🎥 Joining call as participant with roomUrl');
+        setCallRoomUrl(callDetails.roomUrl);
+        setCallMeetingId(callDetails.meetingId);
+        setOtherUser(callDetails.caller);
+        setIsCallActive(true);
+      }, 1500);
     }
   };
 
