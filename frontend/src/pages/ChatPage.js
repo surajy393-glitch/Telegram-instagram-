@@ -23,6 +23,10 @@ const ChatPage = () => {
   const [isCallActive, setIsCallActive] = useState(false);
   const [callRoomUrl, setCallRoomUrl] = useState(null);
   const [callMeetingId, setCallMeetingId] = useState(null);
+  
+  // Incoming call state
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [showIncomingCallModal, setShowIncomingCallModal] = useState(false);
 
   useEffect(() => {
     fetchMessages();
