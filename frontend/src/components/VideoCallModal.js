@@ -5,8 +5,6 @@ import { httpClient } from '../utils/authClient';
 
 // Internal component that uses the Whereby hook
 const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
-  const [isMicMuted, setIsMicMuted] = useState(false);
-  const [isCameraOff, setIsCameraOff] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [connectionState, setConnectionState] = useState('connecting');
 
@@ -24,6 +22,10 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   const { localParticipant, remoteParticipants } = state || {};
   const { VideoView } = components || {};
   const { toggleCamera, toggleMicrophone, joinRoom, leaveRoom } = actions || {};
+  
+  // Derive audio/camera state from SDK (single source of truth)
+  const isMicMuted = !localParticipant?.isAudioEnabled;
+  const isCameraOff = !localParticipant?.isVideoEnabled;
 
   // Join the room on mount and leave on unmount
   useEffect(() => {
