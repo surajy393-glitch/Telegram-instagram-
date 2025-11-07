@@ -6392,6 +6392,208 @@ async def conversation_action(
         logger.error(f"Error performing conversation action: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== WHEREBY VIDEO CALLING ENDPOINTS ====================
+
+@api_router.post("/whereby/create-room", response_model=VideoRoomResponse)
+async def create_whereby_room(
+    request: VideoRoomRequest,
+    authorization: str = Header(None)
+):
+    """
+    Create a temporary Whereby video room for 1-on-1 calling
+    Room expires after 24 hours
+    """
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Verify API key is configured
+        if not WHEREBY_API_KEY:
+            raise HTTPException(
+                status_code=500, 
+                detail="Whereby API key not configured"
+            )
+        
+        # Set room expiration to 24 hours from now
+        end_date = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat() + "Z"
+        
+        # Create unique room name
+        room_name_prefix = f"luvhive-{current_user['id']}-{request.participantUserId}"
+        
+        # Prepare Whereby API request
+        headers = {
+            "Authorization": f"Bearer {WHEREBY_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "endDate": end_date,
+            "roomNamePrefix": room_name_prefix,
+            "fields": ["hostRoomUrl"],
+            "roomMode": "normal"  # Use normal mode for 1-on-1 calls
+        }
+        
+        # Make request to Whereby API
+        logger.info(f"Creating Whereby room for users {current_user['id']} and {request.participantUserId}")
+        response = requests.post(
+            WHEREBY_API_URL,
+            headers=headers,
+            json=payload,
+            timeout=10
+        )
+        
+        if response.status_code != 201:
+            logger.error(f"Whereby API error: {response.status_code} - {response.text}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to create video room: {response.text}"
+            )
+        
+        room_data = response.json()
+        logger.info(f"✅ Whereby room created: {room_data.get('meetingId')}")
+        
+        # Store call record in database
+        call_record = {
+            "callId": room_data.get("meetingId"),
+            "callerId": current_user["id"],
+            "receiverId": request.participantUserId,
+            "roomName": room_data.get("roomName"),
+            "roomUrl": room_data.get("roomUrl"),
+            "callType": request.callType,
+            "status": "pending",
+            "createdAt": datetime.now(timezone.utc).isoformat(),
+            "endDate": end_date
+        }
+        
+        await db.video_calls.insert_one(call_record)
+        logger.info(f"Call record saved to database")
+        
+        return VideoRoomResponse(
+            roomUrl=room_data.get("roomUrl"),
+            meetingId=room_data.get("meetingId"),
+            hostRoomUrl=room_data.get("hostRoomUrl")
+        )
+        
+    except requests.RequestException as e:
+        logger.error(f"Whereby API request failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error communicating with Whereby API: {str(e)}"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating video room: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.delete("/whereby/delete-room/{meeting_id}")
+async def delete_whereby_room(
+    meeting_id: str,
+    authorization: str = Header(None)
+):
+    """
+    Delete a Whereby room to end a call
+    """
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Verify API key is configured
+        if not WHEREBY_API_KEY:
+            raise HTTPException(
+                status_code=500,
+                detail="Whereby API key not configured"
+            )
+        
+        # Make request to delete the room
+        headers = {
+            "Authorization": f"Bearer {WHEREBY_API_KEY}"
+        }
+        
+        response = requests.delete(
+            f"{WHEREBY_API_URL}/{meeting_id}",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code not in [200, 204]:
+            logger.error(f"Failed to delete Whereby room: {response.status_code}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to delete video room"
+            )
+        
+        # Update call record in database
+        await db.video_calls.update_one(
+            {"callId": meeting_id},
+            {"$set": {
+                "status": "completed",
+                "endedAt": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        logger.info(f"✅ Whereby room deleted: {meeting_id}")
+        return {"status": "success", "message": "Room deleted"}
+        
+    except requests.RequestException as e:
+        logger.error(f"Error deleting room: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error deleting room: {str(e)}"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in delete_whereby_room: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/whereby/call-history/{user_id}")
+async def get_call_history(
+    user_id: str,
+    authorization: str = Header(None)
+):
+    """
+    Get call history for a user
+    """
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Security: ensure user can only access their own history
+        if current_user["id"] != user_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Cannot access other users' call history"
+            )
+        
+        # Query database for calls
+        calls = await db.video_calls.find({
+            "$or": [
+                {"callerId": user_id},
+                {"receiverId": user_id}
+            ]
+        }).sort("createdAt", -1).limit(50).to_list(length=50)
+        
+        # Convert datetime fields to strings
+        for call in calls:
+            if "_id" in call:
+                call.pop("_id")
+        
+        return {"calls": calls, "total": len(calls)}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching call history: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Include the router in the main app
