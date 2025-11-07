@@ -291,7 +291,10 @@ const ChatPage = () => {
     const groups = {};
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset
     
-    messages.forEach(msg => {
+    // Filter out call_notification messages - they should only trigger IncomingCallModal, not appear in chat
+    const chatMessages = messages.filter(msg => msg.type !== 'call_notification');
+    
+    chatMessages.forEach(msg => {
       const date = new Date(msg.createdAt);
       const istDate = new Date(date.getTime() + istOffset);
       const dateKey = istDate.toDateString();
