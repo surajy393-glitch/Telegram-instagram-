@@ -322,6 +322,20 @@ class ChatMessage(BaseModel):
     message: str
     createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# Whereby Video Call Models
+class VideoRoomRequest(BaseModel):
+    participantUserId: str
+    callType: str = "video"  # "video" or "audio"
+
+class VideoRoomResponse(BaseModel):
+    roomUrl: str
+    meetingId: str
+    hostRoomUrl: Optional[str] = None
+
+# Whereby API Configuration
+WHEREBY_API_KEY = os.getenv("WHEREBY_API_KEY")
+WHEREBY_API_URL = "https://api.whereby.dev/v1/meetings"
+
 # Helper functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
