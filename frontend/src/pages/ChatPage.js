@@ -601,44 +601,6 @@ const ChatPage = () => {
           </div>
         ) : (
           <>
-            {/* Call History Section */}
-            {callHistory.length > 0 && (
-              <div className="mb-6">
-                <div className="flex justify-center mb-3">
-                  <span className="bg-pink-50 px-3 py-1 rounded-full text-xs text-pink-600 font-medium border border-pink-200">
-                    Recent Calls
-                  </span>
-                </div>
-                {callHistory.slice(0, 5).map((call) => (
-                  <div key={call.callId || call._id} className="flex items-center justify-center gap-3 mb-3 p-3 bg-white rounded-lg border border-pink-100 shadow-sm">
-                    <div className={`p-2 rounded-full ${
-                      call.status === 'completed' ? 'bg-green-100' : 
-                      call.status === 'missed' ? 'bg-red-100' : 'bg-gray-100'
-                    }`}>
-                      {call.callType === 'video' ? (
-                        <Video className="w-4 h-4 text-gray-700" />
-                      ) : (
-                        <Phone className="w-4 h-4 text-gray-700" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        {call.callerId === currentUser?.id ? 'Outgoing' : 'Incoming'} {call.callType} call
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {call.status === 'completed' 
-                          ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s`
-                          : call.status}
-                      </p>
-                    </div>
-                    <span className="text-xs text-gray-400">
-                      {formatTimestamp(call.startedAt)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-            
             {/* Messages by Date */}
             {Object.keys(messageGroups).map((dateKey) => (
               <div key={dateKey}>
