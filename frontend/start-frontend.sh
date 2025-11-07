@@ -11,7 +11,7 @@ if [ -f "/app/frontend/.env.example" ]; then
     echo "REACT_APP_PREMIUM_INVOICE_SLUG_1MONTH=${REACT_APP_PREMIUM_INVOICE_SLUG_1MONTH:-3kUQYVseOVSmAQAA0m-tMH9NqQk}" >> /app/frontend/.env
     echo "REACT_APP_PREMIUM_INVOICE_SLUG_6MONTHS=${REACT_APP_PREMIUM_INVOICE_SLUG_6MONTHS:-L0_hnVseOVSnAQAAFLgFTU2YFJA}" >> /app/frontend/.env
     echo "REACT_APP_PREMIUM_INVOICE_SLUG_12MONTHS=${REACT_APP_PREMIUM_INVOICE_SLUG_12MONTHS:-SkA8EVseOVSoAQAA-AGZzB-kumQ}" >> /app/frontend/.env
-    echo "REACT_APP_ZEGO_APP_ID=${REACT_APP_ZEGO_APP_ID:-2106710509}" >> /app/frontend/.env
+    # ZEGO removed - using Whereby now
     
     echo ".env file synchronized successfully"
 fi
