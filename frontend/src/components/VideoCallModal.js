@@ -258,6 +258,8 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
                 stream={localParticipant.stream}
                 muted
                 mirror={true}
+                autoPlay
+                playsInline
                 style={{
                   width: '100%',
                   height: '100%',
