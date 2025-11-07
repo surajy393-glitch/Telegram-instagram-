@@ -34,6 +34,7 @@ function GlobalCallHandler({ user }) {
   const [callRoomUrl, setCallRoomUrl] = useState(null);
   const [callMeetingId, setCallMeetingId] = useState(null);
   const [otherUser, setOtherUser] = useState(null);
+  const [displayedCallIds, setDisplayedCallIds] = useState(new Set());
 
   // Global polling for incoming calls
   useEffect(() => {
@@ -46,7 +47,16 @@ function GlobalCallHandler({ user }) {
         
         if (calls.length > 0) {
           const latestCall = calls[0];
+          
+          // Skip if we've already displayed this call
+          if (displayedCallIds.has(latestCall.messageId)) {
+            return;
+          }
+          
           console.log('📞 Global incoming call detected:', latestCall);
+          
+          // Add to displayed set
+          setDisplayedCallIds(prev => new Set(prev).add(latestCall.messageId));
           
           setIncomingCall({
             messageId: latestCall.messageId,
@@ -75,7 +85,7 @@ function GlobalCallHandler({ user }) {
     const interval = setInterval(checkIncomingCalls, 3000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, displayedCallIds]);
 
   const handleAcceptCall = async () => {
     if (incomingCall) {
@@ -86,16 +96,18 @@ function GlobalCallHandler({ user }) {
         roomUrl: incomingCall.roomUrl,
         meetingId: incomingCall.meetingId,
         caller: incomingCall.caller,
-        conversationId: incomingCall.conversationId
+        conversationId: incomingCall.conversationId,
+        messageId: incomingCall.messageId
       };
       
-      // Mark notification as read
+      // Mark call notification as read using dedicated endpoint
       try {
-        if (callDetails.conversationId) {
-          await httpClient.post('/messages/mark-read', { conversationId: callDetails.conversationId });
+        if (callDetails.messageId) {
+          await httpClient.post('/messages/mark-call-read', { messageId: callDetails.messageId });
+          console.log('✅ Call notification marked as read');
         }
       } catch (error) {
-        console.error('Error marking call as read:', error);
+        console.error('Error marking call notification as read:', error);
       }
       
       // Close incoming modal FIRST (prevents z-index conflict)
@@ -117,13 +129,30 @@ function GlobalCallHandler({ user }) {
   const handleRejectCall = async () => {
     console.log('❌ Rejecting global incoming call');
     
-    // Mark notification as read
+    // Save call details
+    const callDetails = {
+      messageId: incomingCall?.messageId,
+      meetingId: incomingCall?.meetingId
+    };
+    
+    // Mark call notification as read using dedicated endpoint
     try {
-      if (incomingCall?.conversationId) {
-        await httpClient.post('/messages/mark-read', { conversationId: incomingCall.conversationId });
+      if (callDetails.messageId) {
+        await httpClient.post('/messages/mark-call-read', { messageId: callDetails.messageId });
+        console.log('✅ Call notification marked as read');
       }
     } catch (error) {
-      console.error('Error marking call as read:', error);
+      console.error('Error marking call notification as read:', error);
+    }
+    
+    // Delete the Whereby room
+    try {
+      if (callDetails.meetingId) {
+        await httpClient.delete(`/whereby/delete-room/${callDetails.meetingId}`);
+        console.log('✅ Whereby room deleted after rejection');
+      }
+    } catch (error) {
+      console.error('Error deleting Whereby room:', error);
     }
     
     setShowIncomingCallModal(false);
