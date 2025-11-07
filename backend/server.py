@@ -6417,7 +6417,8 @@ async def create_whereby_room(
             )
         
         # Set room expiration to 24 hours from now
-        end_date = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat() + "Z"
+        # Whereby expects ISO 8601 format with milliseconds: YYYY-MM-DDTHH:MM:SS.sssZ
+        end_date = (datetime.now(timezone.utc) + timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         
         # Create unique room name
         room_name_prefix = f"luvhive-{current_user.id}-{request.participantUserId}"
