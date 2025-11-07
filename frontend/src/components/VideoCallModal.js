@@ -82,8 +82,6 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     }
   }, [localParticipant, meetingId, onClose]);
 
-  if (!isOpen || !roomUrl) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
       {/* Header */}
