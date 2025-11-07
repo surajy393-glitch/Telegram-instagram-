@@ -109,7 +109,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
   }, [localParticipant, meetingId, onClose]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-90 z-[60] flex flex-col">
       {/* Header */}
       <div className="bg-gray-900 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
