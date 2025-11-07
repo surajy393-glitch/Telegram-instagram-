@@ -90,13 +90,15 @@ function GlobalCallHandler({ user }) {
         console.error('Error marking call as read:', error);
       }
       
-      // Set up call
+      // Close incoming modal FIRST, then open call (prevents z-index conflict)
+      setShowIncomingCallModal(false);
+      setIncomingCall(null);
+      
+      // Then set up call
       setCallRoomUrl(incomingCall.roomUrl);
       setCallMeetingId(incomingCall.meetingId);
       setOtherUser(incomingCall.caller);
       setIsCallActive(true);
-      setShowIncomingCallModal(false);
-      setIncomingCall(null);
     }
   };
 
