@@ -57,7 +57,7 @@ Your Telegram bot (@Loveekisssbot) is now **FULLY OPERATIONAL** and integrated w
 ## 🎯 **How to Use (For Users)**
 
 ### **Step 1: Access Web App**
-- Go to: https://callsignal-debug-1.preview.emergentagent.com/login
+- Go to: https://whereby-chat.preview.emergentagent.com/login
 - Click "Continue with Telegram"
 
 ### **Step 2: Authenticate with Bot**
