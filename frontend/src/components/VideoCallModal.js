@@ -185,7 +185,7 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     } finally {
       onClose?.();
     }
-  }, [localParticipant, meetingId, onClose]);
+  }, [endMeeting, leaveRoom, localParticipant, meetingId, onClose]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-[60] flex flex-col">
