@@ -65,6 +65,61 @@ const ChatPage = () => {
     }
   };
 
+  const startVideoCall = async () => {
+    try {
+      console.log('Starting video call with user:', userId);
+      
+      const response = await httpClient.post('/whereby/create-room', {
+        participantUserId: userId,
+        callType: 'video'
+      });
+
+      console.log('Room created:', response.data);
+      
+      setCallRoomUrl(response.data.roomUrl);
+      setCallMeetingId(response.data.meetingId);
+      setIsCallActive(true);
+
+      // Optionally: Send a message to notify the other user
+      // await httpClient.post('/messages/send', {
+      //   receiverId: userId,
+      //   content: 'Started a video call',
+      //   type: 'call_notification'
+      // });
+
+    } catch (error) {
+      console.error('Error starting call:', error);
+      alert('Failed to start video call. Please try again.');
+    }
+  };
+
+  const startVoiceCall = async () => {
+    try {
+      console.log('Starting voice call with user:', userId);
+      
+      const response = await httpClient.post('/whereby/create-room', {
+        participantUserId: userId,
+        callType: 'audio'
+      });
+
+      console.log('Room created:', response.data);
+      
+      setCallRoomUrl(response.data.roomUrl);
+      setCallMeetingId(response.data.meetingId);
+      setIsCallActive(true);
+
+    } catch (error) {
+      console.error('Error starting call:', error);
+      alert('Failed to start voice call. Please try again.');
+    }
+  };
+
+  const handleCallEnd = () => {
+    setIsCallActive(false);
+    setCallRoomUrl(null);
+    setCallMeetingId(null);
+  };
+
   const handleAcceptRequest = async () => {
     try {
       await httpClient.post('/messages/request/accept', { conversationId });
