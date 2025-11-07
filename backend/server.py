@@ -5932,6 +5932,53 @@ async def mark_messages_read(
         logger.error(f"Error marking messages as read: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+class MarkCallReadRequest(BaseModel):
+    messageId: str
+
+@api_router.post("/messages/mark-call-read")
+async def mark_call_notification_read(
+    request: MarkCallReadRequest,
+    authorization: str = Header(None)
+):
+    """Mark a specific call notification message as read"""
+    try:
+        # Authenticate user
+        current_user = await get_current_user(authorization)
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        user_id = current_user.id
+        message_id = request.messageId
+        
+        # Mark the specific call_notification message as read
+        result = await db.messages.update_one(
+            {
+                "_id": message_id,
+                "receiver_id": user_id,
+                "type": "call_notification",
+                "status.read": False
+            },
+            {
+                "$set": {
+                    "status.read": True,
+                    "read_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        if result.modified_count > 0:
+            logger.info(f"Marked call notification {message_id} as read for user {user_id}")
+            return {"status": "success", "marked": True}
+        else:
+            logger.warning(f"Call notification {message_id} not found or already read")
+            return {"status": "success", "marked": False}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error marking call notification as read: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/messages/send")
 async def send_message(
     request: SendMessageRequest,
