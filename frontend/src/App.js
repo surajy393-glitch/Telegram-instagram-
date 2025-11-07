@@ -55,14 +55,12 @@ function App() {
     // Cleanup on unload
     const handleUnload = () => {
       console.log('🧹 App unloading - cleaning up resources...');
-      destroyZegoEngine();
     };
 
     window.addEventListener('beforeunload', handleUnload);
     
     return () => {
       window.removeEventListener('beforeunload', handleUnload);
-      handleUnload();
     };
   }, []);
 
