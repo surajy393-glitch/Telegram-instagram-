@@ -276,6 +276,9 @@ function App() {
     <div className="App">
       <WherebyProvider>
         <BrowserRouter>
+          {/* Global Call Handler - works across all pages */}
+          {isAuthenticated && user && <GlobalCallHandler user={user} />}
+          
           <Routes>
           {/* Telegram WebApp Auth Route */}
           <Route 
