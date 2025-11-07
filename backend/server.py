@@ -6457,7 +6457,7 @@ async def create_whereby_room(
         # Store call record in database
         call_record = {
             "callId": room_data.get("meetingId"),
-            "callerId": current_user["id"],
+            "callerId": current_user.id,
             "receiverId": request.participantUserId,
             "roomName": room_data.get("roomName"),
             "roomUrl": room_data.get("roomUrl"),
