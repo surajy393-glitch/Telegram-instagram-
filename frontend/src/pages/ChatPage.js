@@ -252,6 +252,29 @@ const ChatPage = () => {
                   <h2 className="font-semibold text-gray-900">{otherUser.fullName}</h2>
                   <p className="text-xs text-gray-500">@{otherUser.username}</p>
                 </div>
+
+                {/* Call Buttons */}
+                {!isRequest && (
+                  <div className="flex items-center gap-2">
+                    {/* Voice Call Button */}
+                    <button
+                      onClick={startVoiceCall}
+                      className="p-2 rounded-full hover:bg-pink-50 text-pink-600 hover:text-pink-700 transition"
+                      title="Voice Call"
+                    >
+                      <Phone className="w-5 h-5" />
+                    </button>
+                    
+                    {/* Video Call Button */}
+                    <button
+                      onClick={startVideoCall}
+                      className="p-2 rounded-full hover:bg-pink-50 text-pink-600 hover:text-pink-700 transition"
+                      title="Video Call"
+                    >
+                      <Video className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
