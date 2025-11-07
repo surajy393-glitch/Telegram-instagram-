@@ -409,6 +409,15 @@ const ChatPage = () => {
           </form>
         </div>
       </div>
+
+      {/* Video Call Modal */}
+      <VideoCallModal
+        isOpen={isCallActive}
+        roomUrl={callRoomUrl}
+        onClose={handleCallEnd}
+        otherUser={otherUser}
+        meetingId={callMeetingId}
+      />
     </div>
   );
 };
