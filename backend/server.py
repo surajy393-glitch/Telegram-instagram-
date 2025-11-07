@@ -5956,8 +5956,9 @@ async def send_message(
             "sender_id": sender_id,
             "receiver_id": receiver_id,
             "type": request.type,
-            "content": request.content if request.type == "text" else None,
-            "media_url": request.mediaUrl if request.type != "text" else None,
+            "content": request.content if request.type in ["text", "call_notification"] else None,
+            "media_url": request.mediaUrl if request.type not in ["text", "call_notification"] else None,
+            "metadata": request.metadata if request.metadata else None,
             "status": {
                 "sent": True,
                 "delivered": True,
