@@ -6420,8 +6420,10 @@ async def create_whereby_room(
         # Whereby expects ISO 8601 format with milliseconds: YYYY-MM-DDTHH:MM:SS.sssZ
         end_date = (datetime.now(timezone.utc) + timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         
-        # Create unique room name
-        room_name_prefix = f"luvhive-{current_user.id}-{request.participantUserId}"
+        # Create unique room name (Whereby has a length limit, so use short hash)
+        import hashlib
+        user_hash = hashlib.md5(f"{current_user.id}-{request.participantUserId}".encode()).hexdigest()[:8]
+        room_name_prefix = f"luvhive-{user_hash}"
         
         # Prepare Whereby API request
         headers = {
