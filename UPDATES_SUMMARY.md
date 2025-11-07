@@ -61,7 +61,7 @@ All sensitive keys are stored in `/app/backend/.env` (not in git):
 ✅ Authentication flow complete
 
 ## Preview URL
-https://whereby-calls.preview.emergentagent.com
+https://luvhive-whereby.preview.emergentagent.com
 
 ## Notes
 - All API keys are stored securely in .env files
