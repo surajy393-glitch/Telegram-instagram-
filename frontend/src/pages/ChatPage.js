@@ -18,24 +18,6 @@ const ChatPage = () => {
   const prevMessageCount = useRef(0);
   const currentUser = getUser();
 
-  // Call state management
-  const [isCallActive, setIsCallActive] = useState(false);
-  const [currentCall, setCurrentCall] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const [remoteStream, setRemoteStream] = useState(null);
-  const [callType, setCallType] = useState('video');
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  const [incomingCall, setIncomingCall] = useState(null);
-  const [callHistory, setCallHistory] = useState([]);
-  const [callStartTime, setCallStartTime] = useState(null);
-  const [permissionsGranted, setPermissionsGranted] = useState(false);
-  
-  // WebSocket reference for call signaling
-  const wsRef = useRef(null);
-  const sseRef = useRef(null);
-  const permissionRequested = useRef(false);
-
   // WebSocket Signaling Connection (with SSE fallback)
   useEffect(() => {
     if (!currentUser?.id) return;
