@@ -65,16 +65,28 @@ const ChatPage = () => {
       }
       
       // Check for incoming call notifications from the other user
-      const latestCallNotification = fetchedMessages
-        .filter(msg => 
-          msg.type === 'call_notification' && 
-          msg.sender_id === userId &&
-          !msg.status?.read
-        )
+      console.log('🔍 Checking for call notifications...');
+      console.log('  Total messages:', fetchedMessages.length);
+      console.log('  Current user ID:', currentUser?.id);
+      console.log('  Other user ID (userId):', userId);
+      
+      const callNotifications = fetchedMessages.filter(msg => msg.type === 'call_notification');
+      console.log('  Call notification messages:', callNotifications.length, callNotifications);
+      
+      const unreadCallNotifications = callNotifications.filter(msg => !msg.status?.read);
+      console.log('  Unread call notifications:', unreadCallNotifications.length);
+      
+      const incomingCallNotifications = unreadCallNotifications.filter(msg => msg.sender_id === userId);
+      console.log('  Incoming call notifications (from other user):', incomingCallNotifications.length);
+      
+      const latestCallNotification = incomingCallNotifications
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
       
+      console.log('  Latest call notification:', latestCallNotification);
+      
       if (latestCallNotification && latestCallNotification.metadata) {
-        console.log('📞 Incoming call detected:', latestCallNotification);
+        console.log('✅ Incoming call detected! Setting up modal...');
+        console.log('  Metadata:', latestCallNotification.metadata);
         setIncomingCall({
           messageId: latestCallNotification._id,
           callType: latestCallNotification.metadata.callType,
@@ -83,6 +95,9 @@ const ChatPage = () => {
           caller: response.data.otherUser
         });
         setShowIncomingCallModal(true);
+        console.log('  IncomingCallModal should now be visible!');
+      } else {
+        console.log('❌ No incoming call notifications found');
       }
       
       setLoading(false);
