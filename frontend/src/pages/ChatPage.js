@@ -397,8 +397,6 @@ const ChatPage = () => {
       if (currentCall) {
         await currentCall.endCall();
       }
-        await fetchCallHistory();
-      }
       
       // Reset call state
       setIsCallActive(false);
