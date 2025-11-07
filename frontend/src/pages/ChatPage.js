@@ -174,6 +174,44 @@ const ChatPage = () => {
     setCallMeetingId(null);
   };
 
+  const handleAcceptIncomingCall = async () => {
+    if (incomingCall) {
+      console.log('✅ Accepting incoming call');
+      
+      // Mark the notification message as read
+      try {
+        if (conversationId) {
+          await httpClient.post('/messages/mark-read', { conversationId });
+        }
+      } catch (error) {
+        console.error('Error marking call notification as read:', error);
+      }
+      
+      // Join the call
+      setCallRoomUrl(incomingCall.roomUrl);
+      setCallMeetingId(incomingCall.meetingId);
+      setIsCallActive(true);
+      setShowIncomingCallModal(false);
+      setIncomingCall(null);
+    }
+  };
+
+  const handleRejectIncomingCall = async () => {
+    console.log('❌ Rejecting incoming call');
+    
+    // Mark the notification message as read
+    try {
+      if (conversationId) {
+        await httpClient.post('/messages/mark-read', { conversationId });
+      }
+    } catch (error) {
+      console.error('Error marking call notification as read:', error);
+    }
+    
+    setShowIncomingCallModal(false);
+    setIncomingCall(null);
+  };
+
   const handleAcceptRequest = async () => {
     try {
       await httpClient.post('/messages/request/accept', { conversationId });
