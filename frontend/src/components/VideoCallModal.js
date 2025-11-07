@@ -40,6 +40,19 @@ const VideoCallContent = ({ roomUrl, onClose, otherUser, meetingId }) => {
     };
   }, [joinRoom, leaveRoom, roomUrl]);
 
+  // Monitor for Whereby connection errors and retry automatically
+  useEffect(() => {
+    if (state?.error && joinRoom) {
+      console.log('⚠️ Whereby connection error detected:', state.error);
+      console.log('🔄 Retrying joinRoom in 1 second...');
+      const retryTimer = setTimeout(() => {
+        console.log('🔄 Attempting to rejoin room...');
+        joinRoom();
+      }, 1000);
+      return () => clearTimeout(retryTimer);
+    }
+  }, [state?.error, joinRoom]);
+
   // Debug logging for Whereby state
   useEffect(() => {
     console.log('📹 VideoCallModal State:', {
